@@ -13,9 +13,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Karyawan {
-  id String @unique @default(uuid())
-  name String
-  date DateTime @default(now())
+model User {
+  id        String   @unique @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Instrument {
+  id       String    @unique @default(uuid())
+  name     String
+  periode  String
+  nilai    Int
+}
+
+model Staff {
+  id      String    @unique @default(uuid())
+  name    String
+  jabatan String
+  date    DateTime  @default(now())
 }
 
