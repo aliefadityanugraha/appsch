@@ -13,11 +13,13 @@ const path = require("path");
 const methodOverride = require("method-override");
 const expressLayouts = require("express-ejs-layouts");
 const cookieParser = require("cookie-parser");
+
 // const multer = require("./config/multer");
 var flash = require("connect-flash");
 
 const routerV1 = require("./routes/route");
 // const routerV2 = require("./routes/v2");
+
 
 // app.use(sessionConfig.sessionConf);
 var session;
