@@ -18,20 +18,36 @@ model User {
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
 }
 
-model Instrument {
+model Periode {
   id       String    @unique @default(uuid())
-  name     String
   periode  String
   nilai    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
 }
 
 model Staff {
   id      String    @unique @default(uuid())
   name    String
   jabatan String
+  nip     String
   date    DateTime  @default(now())
+  tugas   Tugas[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+}
+
+model Tugas {
+  id        String    @unique @default(uuid())
+  deskripsi String
+  nilai     Int
+  date      DateTime  @default(now())
+  staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  staffId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
 }
 
