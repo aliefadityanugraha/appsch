@@ -1,0 +1,29 @@
+
+<h1>Tambah Data Staff</h1>
+<form action="/addStaff" method="post">
+  <div>
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+  </div>
+  <div>
+    <label for="jabatan">Jabatan:</label>
+    <input type="text" id="jabatan" name="jabatan" required>
+  </div>
+  <div>
+    <label for="nip">NIP:</label>
+    <input type="text" id="nip" name="nip" required>
+  </div>
+  <div>
+    <button type="submit">Submit</button>
+  </div>
+</form>
+
+<div>
+    <% let no = 1; %>
+    <% data.forEach(e => { %>
+    <div>
+      <p><%= no %> || <%= e.name %> | <%= e.jabatan %> | <%= e.nip %> || <a href="/editStaff/<%= e.id %>">Edit</a> |  <a href="/deleteStaff/<%= e.id %>">Delete</a> | <a href="/addTugas/<%= e.id %>" target="_blank">Tambah Tugas</a></p>
+    </div>
+    <% no++ %>
+    <% }) %>
+</div>

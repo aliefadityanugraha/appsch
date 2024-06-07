@@ -1,0 +1,31 @@
+
+<h1>Tambah Tugas Staff</h1>
+<h3><%= staff[0].name %></h3>
+<p>Staff ID : <%= staff[0].id %></p>
+<p>Presentase Nilai : <%= data.reduce((acc, e) => acc + e.nilai, 0) %></p>
+
+<form action="/addTugas" method="post">
+    <input type="hidden" id="id" name="id" value="<%= id %>" required >
+  <div>
+    <label for="deskripsi">Deskripsi Tugas:</label>
+    <input type="text" id="deskripsi" name="deskripsi" required>
+  </div>
+  <div>
+    <label for="nilai">Nilai:</label>
+    <input type="number" id="nilai" name="nilai" required>
+  </div>
+  <div>
+    <button type="submit">Submit</button>
+  </div>
+</form>
+
+<h3>Tugas Tugas</h3>
+<div>
+    <% let no = 1; %>
+    <% data.forEach(e => { %>
+    <div>
+      <p><%= no %> || <%= e.deskripsi %> | <%= e.nilai %> || <a href="/editTugas/<%= e.id %>">Edit</a> |  <a href="/deleteTugas/<%= e.id %>/<%= staff[0].id %>">Delete</a></p>
+    </div>
+    <% no++ %>
+    <% }) %>
+</div>
