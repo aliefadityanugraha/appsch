@@ -13,8 +13,7 @@ const path = require("path");
 const methodOverride = require("method-override");
 const expressLayouts = require("express-ejs-layouts");
 const cookieParser = require("cookie-parser");
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+
 // const multer = require("./config/multer");
 var flash = require("connect-flash");
 
