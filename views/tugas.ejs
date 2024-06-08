@@ -1,31 +1,53 @@
+<style>
+  .form-section {
+    margin-bottom: 20px;
+  }
+</style>
 
-<h1>Tambah Tugas Staff</h1>
-<h3><%= staff[0].name %></h3>
+<h1 class="mt-4 mb-3">Tambah Tugas Staff</h1>
+<h3 class="mb-2"><%= staff[0].name %></h3>
 <p>Staff ID : <%= staff[0].id %></p>
 <p>Presentase Nilai : <%= data.reduce((acc, e) => acc + e.nilai, 0) %></p>
 
-<form action="/addTugas" method="post">
+<form action="/addTugas" method="post" class="mt-4">
     <input type="hidden" id="id" name="id" value="<%= id %>" required >
-  <div>
-    <label for="deskripsi">Deskripsi Tugas:</label>
-    <input type="text" id="deskripsi" name="deskripsi" required>
+  <div class="form-section">
+    <label for="deskripsi" class="form-label">Deskripsi Tugas:</label>
+    <input type="text" id="deskripsi" name="deskripsi" class="form-control" required>
   </div>
-  <div>
-    <label for="nilai">Nilai:</label>
-    <input type="number" id="nilai" name="nilai" required>
+  <div class="form-section">
+    <label for="nilai" class="form-label">Nilai:</label>
+    <input type="number" id="nilai" name="nilai" class="form-control" required>
   </div>
-  <div>
-    <button type="submit">Submit</button>
+  <div class="form-section">
+    <button type="submit" class="btn btn-primary">Submit</button>
   </div>
 </form>
 
-<h3>Tugas Tugas</h3>
-<div>
+<h3 class="mt-4">Tugas Tugas</h3>
+
+<table id="myTable" class="table table-striped" cellspacing="0">
+  <thead>
+    <tr>
+      <th>No</th>
+      <th>Deskripsi</th>
+      <th>Nilai</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
     <% let no = 1; %>
     <% data.forEach(e => { %>
-    <div>
-      <p><%= no %> || <%= e.deskripsi %> | <%= e.nilai %> || <a href="/editTugas/<%= e.id %>">Edit</a> |  <a href="/deleteTugas/<%= e.id %>/<%= staff[0].id %>">Delete</a></p>
-    </div>
+      <tr>
+          <td><%= no %></td>
+          <td><%= e.deskripsi %></td>
+          <td><%= e.nilai %></td>
+          <td>
+            <a href="/editTugas/<%= e.id %>" class="btn btn-outline-primary">Edit</a> 
+            <a href="/deleteTugas/<%= e.id %>/<%= staff[0].id %>" class="btn btn-outline-danger">Delete</a>
+          </td>
+      </tr>
     <% no++ %>
     <% }) %>
-</div>
+  </tbody>
+</table>

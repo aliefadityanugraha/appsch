@@ -1,9 +1,9 @@
 /** @format */
 
+
 "use strict";
 
 const express = require("express");
-// const mongoose = require("./config/mongose");
 // const sessionConfig = require("./config/session");
 
 const app = express();
@@ -18,7 +18,6 @@ const cookieParser = require("cookie-parser");
 var flash = require("connect-flash");
 
 const routerV1 = require("./routes/route");
-// const routerV2 = require("./routes/v2");
 
 
 // app.use(sessionConfig.sessionConf);
@@ -35,6 +34,5 @@ app.use(cookieParser());
 app.use(flash());
 
 app.use("/", routerV1);
-// app.use("/", routerV2);
 
 module.exports = app;

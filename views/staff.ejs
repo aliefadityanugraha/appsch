@@ -1,29 +1,67 @@
-
 <h1>Tambah Data Staff</h1>
-<form action="/addStaff" method="post">
-  <div>
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required>
+<form action="/addStaff" method="post" class="row g-3">
+  <div class="col-md-6">
+    <label for="name" class="form-label">Name:</label>
+    <input type="text" class="form-control" id="name" name="name" required />
   </div>
-  <div>
-    <label for="jabatan">Jabatan:</label>
-    <input type="text" id="jabatan" name="jabatan" required>
+  <div class="col-md-6">
+    <label for="jabatan" class="form-label">Jabatan:</label>
+    <input
+      type="text"
+      class="form-control"
+      id="jabatan"
+      name="jabatan"
+      required
+    />
   </div>
-  <div>
-    <label for="nip">NIP:</label>
-    <input type="text" id="nip" name="nip" required>
+  <div class="col-md-6">
+    <label for="nip" class="form-label">NIP:</label>
+    <input type="text" class="form-control" id="nip" name="nip" required />
   </div>
-  <div>
-    <button type="submit">Submit</button>
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Submit</button>
   </div>
 </form>
 
-<div>
-    <% let no = 1; %>
-    <% data.forEach(e => { %>
-    <div>
-      <p><%= no %> || <%= e.name %> | <%= e.jabatan %> | <%= e.nip %> || <a href="/editStaff/<%= e.id %>">Edit</a> |  <a href="/deleteStaff/<%= e.id %>">Delete</a> | <a href="/addTugas/<%= e.id %>" target="_blank">Tambah Tugas</a></p>
-    </div>
-    <% no++ %>
-    <% }) %>
+<div class="container mt-4">
+  <table id="myTable" class="table table-striped">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Nama</th>
+        <th>Jabatan</th>
+        <th>NIP</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% let no = 1; %> <% data.forEach(e => { %>
+      <tr>
+        <td><%= no %></td>
+        <td><%= e.name %></td>
+        <td><%= e.jabatan %></td>
+        <td><%= e.nip %></td>
+        <td>
+          <a href="/editStaff/<%= e.id %>" class="btn btn-outline-primary"
+            >Edit</a
+          >
+          <a href="/deleteStaff/<%= e.id %>" class="btn btn-outline-danger"
+            >Delete</a
+          >
+          <a
+            href="/addTugas/<%= e.id %>"
+            class="btn btn-outline-success"
+            target="_blank"
+            >Tambah Tugas</a
+          >
+        </td>
+      </tr>
+      <% no++ %> <% }) %>
+    </tbody>
+  </table>
 </div>
+<script>
+  $(document).ready(function () {
+    $("#myTable").DataTable();
+  });
+</script>
