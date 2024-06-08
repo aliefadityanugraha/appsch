@@ -1,25 +1,69 @@
 <h3>Data Periode</h3>
 
-<form action="/addPeriode" method="post">
-  <div>
-    <label for="periode">Periode:</label>
-    <input type="text" id="periode" name="periode" required>
+<form action="/addPeriode" method="post" class="row g-3">
+  <div class="col-md-6">
+    <label for="periode" class="form-label">Periode:</label>
+    <input
+      type="text"
+      class="form-control"
+      id="periode"
+      name="periode"
+      required
+    />
   </div>
-  <div>
-    <label for="nilai">Nilai:</label>
-    <input type="number" id="nilai" name="nilai" required>
+  <div class="col-md-6">
+    <label for="nilai" class="form-label">Nilai:</label>
+    <input
+      type="number"
+      class="form-control"
+      id="nilai"
+      name="nilai"
+      required
+    />
   </div>
-  <div>
-    <button type="submit">Submit</button>
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Submit</button>
   </div>
 </form>
 
-<div>
-    <% let no = 1; %>
-    <% data.forEach(e => { %>
-    <div>
-      <p><%= no %> || <%= e.periode %> | <%= e.nilai %> || <a href="/editPeriode/<%= e.id %>">Edit</a> |  <a href="/deletePeriode/<%= e.id %>">Delete</a></p>
-    </div>
-    <% no++ %>
-    <% }) %>
+<div class="container mt-4">
+  <table class="table table-striped" id="myTable">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Periode</th>
+        <th scope="col">Nilai</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% let no = 1; %> <% data.forEach(e => { %>
+      <tr>
+        <th scope="row"><%= no %></th>
+        <td><%= e.periode %></td>
+        <td><%= e.nilai %></td>
+        <td>
+          <a
+            href="/editPeriode/<%= e.id %>"
+            class="btn btn-primary"
+            role="button"
+            >Edit</a
+          >
+          <a
+            href="/deletePeriode/<%= e.id %>"
+            class="btn btn-danger"
+            role="button"
+            >Delete</a
+          >
+        </td>
+      </tr>
+      <% no++ %> <% }) %>
+    </tbody>
+  </table>
 </div>
+
+<script>
+  $(document).ready(function () {
+    $("#myTable").DataTable();
+  });
+</script>
