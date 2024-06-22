@@ -20,5 +20,8 @@ router.get('/editPeriode/:id', mainController.editPeriode);
 router.post('/updatePeriode', mainController.updatePeriode);
 router.get('/deletePeriode/:id', mainController.deletePeriode);
 
+router.get('/data', mainController.data);
+router.post('/addRecordTugas/:id', mainController.addData);
+
 module.exports = router;
 
