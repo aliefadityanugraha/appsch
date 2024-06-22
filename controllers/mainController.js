@@ -1,5 +1,7 @@
 /** @format */
 
+
+
 "use strict";
 
 const { PrismaClient } = require("@prisma/client");
@@ -14,8 +16,21 @@ module.exports = {
   })
   },
   staff: async (req, res) => {
-    const data = await prisma.staff.findMany();
-    console.log(data);
+    const data = await prisma.staff.findMany({
+      // where: {
+      //   createdAt: {
+      //     gte: new Date('2024-06-21'), // Start of date range
+      //     lte: new Date('2024-06-31'), // End of date range
+      //   },
+      // },
+      include: {
+        tugas: true
+      },
+      orderBy: {
+        createdAt: 'asc'
+      }
+    });
+    // console.log(data[0].tugas);
     res.render("staff", {
       layout: "layouts/main-layouts",
       message: "ok",
@@ -150,10 +165,56 @@ module.exports = {
       where: {
         id: req.params.id,
       },
-    });
-    console.log(req.params.id);
+    })
     
     res.redirect("/periode"); 
   },
+  
+  data: async (req, res) => {
+    const data = await prisma.staff.findMany({
+      where: {
+        createdAt: {
+          gte: new Date('2024-06-01'), // Start of date range
+          lte: new Date('2024-06-31'), // End of date range
+        },
+      },
+       include: {
+        tugas: true
+      },
+      orderBy: {
+        createdAt: 'asc'
+      }
+    });
+    res.render("data", {
+      layout: "layouts/main-layouts",
+      message: "ok",
+      title: "Data",
+      data
+    });
+  },
+  addData: async (req, res) => {
+    console.log(req.params.id)
+    
+    // jumlahkan array yang tercentang
+    let total = Object.values(req.body.value).reduce((val, nilaiSekarang) => {
+        return parseInt(val) + parseInt(nilaiSekarang);
+    },0)
+    
+    console.log(total)
+    
+    let persentase = (total / 100) * 4.5;
+    console.log(persentase)
+    // algoritma ada disini
+    
+    const data = await prisma.records.create({
+      data: {
+        detail: req.body,
+        nilai: persentase,
+        staffId: req.params.id,
+      },
+    });
+    console.log(data)
+    res.redirect("/data");
+  }
 };
 

@@ -27,6 +27,8 @@ model Periode {
   nilai    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
+  tugas     Tugas    @relation(fields: [tugasId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tugasId   String
 }
 
 model Staff {
@@ -36,6 +38,7 @@ model Staff {
   nip     String
   date    DateTime  @default(now())
   tugas   Tugas[]
+  records Records[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
 }
@@ -47,7 +50,17 @@ model Tugas {
   date      DateTime  @default(now())
   staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   staffId   String
+  periode   Periode[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
 }
 
+model Records {
+  id        String    @unique @default(uuid())
+  nilai     Float
+  detail    Json
+  staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  staffId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+}

@@ -32,6 +32,7 @@
         <th>Jabatan</th>
         <th>NIP</th>
         <th>Action</th>
+        <th>Tugas</th>
       </tr>
     </thead>
     <tbody>
@@ -54,6 +55,21 @@
             target="_blank"
             >Tambah Tugas</a
           >
+        </td>
+        <td>
+        <form action="/addRecordTugas/<%= e.id %>" method="post">
+        <% let noo = 1; %>
+         <% e.tugas.forEach(ex => { %>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="tugasCheck<%= noo %>" name="value" value="<%- parseInt(ex.nilai) %>">
+            <label class="form-check-label" for="tugasCheck<%= noo %>">
+              <%= ex.deskripsi %>
+            </label>
+          </div>
+          <% noo++ %>
+         <% }) %>
+        <button class="btn btn-info my-2" type="submit">Add Record</button>
+        </form>
         </td>
       </tr>
       <% no++ %> <% }) %>
