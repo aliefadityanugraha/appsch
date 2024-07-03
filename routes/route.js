@@ -1,9 +1,11 @@
+"use strict";
+
 const express = require("express");
 const router = express.Router();
 
 const mainController = require("../controllers/mainController");
 const staffController = require("../controllers/staffController");
-const tugasController = require("../controllers/tugasController");
+const taskController = require("../controllers/taskController");
 const recordsController = require("../controllers/recordsController");
 const periodeController = require("../controllers/periodeController");
 
@@ -11,21 +13,20 @@ router.get("/", mainController.main);
 
 router.get("/staff", staffController.staff);
 router.post("/addStaff", staffController.addStaff);
+router.post("/updateStaff/:id", staffController.updateStaff);
 router.get("/deleteStaff/:id", staffController.deleteStaff);
 
-router.get("/addTugas/:id", tugasController.tugas);
-router.post("/addTugas", tugasController.addTugas);
-router.get("/editTugas/:id", tugasController.editTugas);
-router.post("/updateTugas", tugasController.updateTugas);
-router.get("/deleteTugas/:id/:staffId", tugasController.deleteTugas);
+router.get("/addTask/:id", taskController.task);
+router.post("/addTask", taskController.addTask);
+router.post("/updateTask/:id", taskController.updateTask);
+router.get("/deleteTask/:id/:staffId", taskController.deleteTask);
 
 router.get("/periode", periodeController.periode);
 router.post("/addPeriode", periodeController.addPeriode);
-router.get("/editPeriode/:id", periodeController.editPeriode);
-router.post("/updatePeriode", periodeController.updatePeriode);
+router.post("/updatePeriode/:id", periodeController.updatePeriode);
 router.get("/deletePeriode/:id", periodeController.deletePeriode);
 
 router.get("/data", recordsController.data);
-router.post("/addRecordTugas/:id", recordsController.addData);
+router.post("/addRecordTask/:id", recordsController.addData);
 
 module.exports = router;

@@ -13,18 +13,18 @@ module.exports = {
       //   },
       // },
       include: {
-        tugas: true,
+        task: true,
       },
       orderBy: {
         createdAt: "asc",
       },
     });
-    // console.log(data[0].tugas);
     res.render("staff", {
       layout: "layouts/main-layouts",
       message: "ok",
       title: "Data Staff",
       data,
+      req: req.path,
     });
   },
   addStaff: async (req, res) => {
@@ -39,11 +39,18 @@ module.exports = {
     res.redirect("/staff");
   },
   updateStaff: async (req, res) => {
-    res.render("updateStaff", {
-      layout: "layouts/main-layouts",
-      message: "ok",
-      title: "Update Staff",
+    const data = await prisma.staff.update({
+      where: {
+        id: req.params.id,
+      },
+      data: {
+        name: req.body.name,
+        jabatan: req.body.jabatan,
+        nip: req.body.nip,
+        updatedAt: new Date(),
+      },
     });
+    res.redirect("/staff");
   },
   deleteStaff: async (req, res) => {
     const data = await prisma.staff.delete({

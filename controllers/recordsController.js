@@ -55,6 +55,7 @@ module.exports = {
       title: "Data",
       data: records,
       parseJson,
+      req: req.path,
     });
   },
   addData: async (req, res) => {
@@ -79,6 +80,6 @@ module.exports = {
       },
     });
     console.log(data);
-    res.redirect("/data");
+    res.redirect("/staff");
   },
 };

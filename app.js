@@ -1,6 +1,4 @@
 /** @format */
-
-
 "use strict";
 
 const express = require("express");
@@ -18,7 +16,6 @@ const cookieParser = require("cookie-parser");
 var flash = require("connect-flash");
 
 const routerV1 = require("./routes/route");
-
 
 // app.use(sessionConfig.sessionConf);
 var session;
