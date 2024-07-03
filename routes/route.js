@@ -2,26 +2,30 @@ const express = require("express");
 const router = express.Router();
 
 const mainController = require("../controllers/mainController");
+const staffController = require("../controllers/staffController");
+const tugasController = require("../controllers/tugasController");
+const recordsController = require("../controllers/recordsController");
+const periodeController = require("../controllers/periodeController");
 
-router.get('/', mainController.main);
-router.get('/staff', mainController.staff);
-router.post('/addStaff', mainController.addStaff);
-router.get('/deleteStaff/:id', mainController.deleteStaff);
+router.get("/", mainController.main);
 
-router.get('/addTugas/:id', mainController.tugas);
-router.post('/addTugas', mainController.addTugas);
-router.get('/editTugas/:id', mainController.editTugas);
-router.post('/updateTugas', mainController.updateTugas);
-router.get('/deleteTugas/:id/:staffId', mainController.deleteTugas);
+router.get("/staff", staffController.staff);
+router.post("/addStaff", staffController.addStaff);
+router.get("/deleteStaff/:id", staffController.deleteStaff);
 
-router.get('/periode', mainController.periode);
-router.post('/addPeriode', mainController.addPeriode);
-router.get('/editPeriode/:id', mainController.editPeriode);
-router.post('/updatePeriode', mainController.updatePeriode);
-router.get('/deletePeriode/:id', mainController.deletePeriode);
+router.get("/addTugas/:id", tugasController.tugas);
+router.post("/addTugas", tugasController.addTugas);
+router.get("/editTugas/:id", tugasController.editTugas);
+router.post("/updateTugas", tugasController.updateTugas);
+router.get("/deleteTugas/:id/:staffId", tugasController.deleteTugas);
 
-router.get('/data', mainController.data);
-router.post('/addRecordTugas/:id', mainController.addData);
+router.get("/periode", periodeController.periode);
+router.post("/addPeriode", periodeController.addPeriode);
+router.get("/editPeriode/:id", periodeController.editPeriode);
+router.post("/updatePeriode", periodeController.updatePeriode);
+router.get("/deletePeriode/:id", periodeController.deletePeriode);
+
+router.get("/data", recordsController.data);
+router.post("/addRecordTugas/:id", recordsController.addData);
 
 module.exports = router;
-
