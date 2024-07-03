@@ -22,6 +22,15 @@
     />
   </div>
   <div class="col-12">
+    <button type="button" class="btn btn-secondary" onclick="clearForm()">
+      Clear
+    </button>
+    <script>
+      function clearForm() {
+        document.getElementById("periode").value = "";
+        document.getElementById("nilai").value = "";
+      }
+    </script>
     <button type="submit" class="btn btn-primary">Submit</button>
   </div>
 </form>
@@ -43,18 +52,22 @@
         <td><%= e.periode %></td>
         <td><%= e.nilai %></td>
         <td>
+          <script>
+            function editPeriode(id, periode, nilai) {
+              document.getElementById("periode").value = periode;
+              document.getElementById("nilai").value = nilai;
+              document.querySelector("form").action = "/updatePeriode/" + id;
+            }
+          </script>
           <a
-            href="/editPeriode/<%= e.id %>"
+            href="javascript:void(0)"
             class="btn btn-primary"
-            role="button"
-            >Edit</a
-          >
-          <a
-            href="/deletePeriode/<%= e.id %>"
-            class="btn btn-danger"
-            role="button"
-            >Delete</a
-          >
+            onclick="editPeriode('<%= e.id %>', '<%= e.periode %>', '<%= e.nilai %>')"
+            ><i class="bi bi-pencil-fill"></i
+          ></a>
+          <a href="/deletePeriode/<%= e.id %>" class="btn btn-danger"
+            ><i class="bi bi-trash3-fill"></i
+          ></a>
         </td>
       </tr>
       <% no++ %> <% }) %>

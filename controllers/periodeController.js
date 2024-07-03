@@ -11,6 +11,7 @@ module.exports = {
       message: "ok",
       title: "Periode",
       data,
+      req: req.path,
     });
   },
   addPeriode: async (req, res) => {
@@ -23,19 +24,19 @@ module.exports = {
     console.log(data);
     res.redirect("/periode");
   },
-  editPeriode: async (req, res) => {
-    res.render("editPeriode", {
-      layout: "layouts/main-layouts",
-      message: "ok",
-      title: "Edit Periode",
-    });
-  },
   updatePeriode: async (req, res) => {
-    res.render("updatePeriode", {
-      layout: "layouts/main-layouts",
-      message: "ok",
-      title: "Update Periode",
+    const data = await prisma.periode.update({
+      where: {
+        id: req.params.id,
+      },
+      data: {
+        periode: req.body.periode,
+        nilai: parseInt(req.body.nilai),
+        updatedAt: new Date(),
+      },
     });
+    console.log(data[0] + "periode updated");
+    res.redirect("/periode");
   },
   deletePeriode: async (req, res) => {
     const data = await prisma.periode.delete({
