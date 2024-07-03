@@ -27,6 +27,7 @@ model Periode {
   nilai    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
+  task   Task[]
 }
 
 model Staff {
@@ -35,19 +36,31 @@ model Staff {
   jabatan String
   nip     String
   date    DateTime  @default(now())
-  tugas   Tugas[]
+  task   Task[]
+  records Records[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
 }
 
-model Tugas {
+model Task {
   id        String    @unique @default(uuid())
   deskripsi String
   nilai     Int
   date      DateTime  @default(now())
   staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   staffId   String
+  periode     Periode    @relation(fields: [periodeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  periodeId   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
 }
 
+model Records {
+  id        String    @unique @default(uuid())
+  nilai     Float
+  detail    Json
+  staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  staffId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+}
