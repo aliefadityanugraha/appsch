@@ -1,29 +1,160 @@
+<script>
+  function updateStaffData(id) {
+    const name = document.getElementById("name").value;
+    const jabatan = document.getElementById("jabatan").value;
+    const nip = document.getElementById("nip").value;
 
-<h1>Tambah Data Staff</h1>
-<form action="/addStaff" method="post">
-  <div>
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required>
-  </div>
-  <div>
-    <label for="jabatan">Jabatan:</label>
-    <input type="text" id="jabatan" name="jabatan" required>
-  </div>
-  <div>
-    <label for="nip">NIP:</label>
-    <input type="text" id="nip" name="nip" required>
-  </div>
-  <div>
-    <button type="submit">Submit</button>
-  </div>
-</form>
-
-<div>
-    <% let no = 1; %>
-    <% data.forEach(e => { %>
-    <div>
-      <p><%= no %> || <%= e.name %> | <%= e.jabatan %> | <%= e.nip %> || <a href="/editStaff/<%= e.id %>">Edit</a> |  <a href="/deleteStaff/<%= e.id %>">Delete</a> | <a href="/addTugas/<%= e.id %>" target="_blank">Tambah Tugas</a></p>
+    fetch(`/updateStaff/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: name,
+        jabatan: jabatan,
+        nip: nip,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          alert("Staff data updated successfully");
+          window.location.href = "/staff";
+        } else {
+          alert("Failed to update staff data");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+</script>
+<div class="container">
+  <h1>Tambah Data Staff</h1>
+  <form action="/addStaff" method="post" class="row g-3">
+    <div class="col-md-6">
+      <label for="name" class="form-label">Nama:</label>
+      <input
+        type="text"
+        class="form-control"
+        id="name"
+        name="name"
+        required
+        placeholder="Masukkan Nama"
+      />
     </div>
-    <% no++ %>
-    <% }) %>
+    <div class="col-md-6">
+      <label for="jabatan" class="form-label">Jabatan:</label>
+      <input
+        type="text"
+        class="form-control"
+        id="jabatan"
+        name="jabatan"
+        required
+        placeholder="Masukkan Jabatan"
+      />
+    </div>
+    <div class="col-md-6">
+      <label for="nip" class="form-label">NIP:</label>
+      <input
+        type="text"
+        class="form-control"
+        id="nip"
+        name="nip"
+        required
+        placeholder="Masukkan NIP"
+      />
+    </div>
+    <div class="col-12">
+      <button type="button" class="btn btn-secondary" onclick="clearForm()">
+        Clear
+      </button>
+      <script>
+        function clearForm() {
+          document.getElementById("name").value = "";
+          document.getElementById("jabatan").value = "";
+          document.getElementById("nip").value = "";
+          document.querySelector("form").action = "/addStaff/";
+        }
+      </script>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+  </form>
 </div>
+
+<div class="container mt-4">
+  <table id="myTable" class="table table-striped">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Nama</th>
+        <th>Jabatan</th>
+        <th>NIP</th>
+        <th>Action</th>
+        <th>Tugas</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% let no = 1; %> <% data.forEach(e => { %>
+      <tr>
+        <td><%= no %></td>
+        <td><%= e.name %></td>
+        <td><%= e.jabatan %></td>
+        <td><%= e.nip %></td>
+        <td>
+          <script>
+            function edit(id, name, jabatan, nip) {
+              document.getElementById("name").value = name;
+              document.getElementById("jabatan").value = jabatan;
+              document.getElementById("nip").value = nip;
+              document.querySelector("form").action = "/updateStaff/" + id;
+            }
+          </script>
+          <a
+            href="javascript:void(0)"
+            class="btn btn-outline-primary"
+            onclick="edit('<%= e.id %>', '<%= e.name %>', '<%= e.jabatan %>', '<%= e.nip %>')"
+            ><i class="bi bi-pencil-fill"></i
+          ></a>
+          <a href="/deleteStaff/<%= e.id %>" class="btn btn-outline-danger"
+            ><i class="bi bi-trash3-fill"></i
+          ></a>
+          <a
+            href="/addTask/<%= e.id %>"
+            class="btn btn-outline-success"
+            target="_blank"
+            ><i class="bi bi-file-earmark-plus"></i
+          ></a>
+        </td>
+        <td>
+          <form action="/addRecordTask/<%= e.id %>" method="post">
+            <% let noo = 1; %> <% e.task.forEach(ex => { %>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="tugasCheck<%= noo %>"
+                name="value"
+                value="<%- parseInt(ex.nilai) %>"
+              />
+              <label class="form-check-label" for="tugasCheck<%= noo %>"
+                ><%= ex.deskripsi %></label
+              >
+            </div>
+            <% noo++ %> <% }) %> <% if (e.task.length > 0) { %>
+            <button class="btn btn-info my-2 text-light" type="submit">
+              <i class="bi bi-plus-circle"></i> Add Record</i>
+            </button>
+            <% } %>
+          </form>
+        </td>
+      </tr>
+      <% no++ %> <% }) %>
+    </tbody>
+  </table>
+</div>
+<script>
+  $(document).ready(function () {
+    $("#myTable").DataTable();
+  });
+</script>
