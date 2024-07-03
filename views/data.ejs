@@ -1,5 +1,8 @@
-<% let no = 1; %>
-<% data.forEach(element => { %>
-    <%= no++ %> - <%= element.id %> - <%= element.name %> - <%= element.jabatan %> - <%= element.tugas %>
-    <br>
+<% let no = 1; %> <% data.forEach(element => { %> <%= no++ %> - <%= element.id%>
+- <%= element.name %> - <%= element.jabatan %> - <%- element.records %>
+<br />
 <% }) %>
+
+<hr />
+
+<hr />
