@@ -5,12 +5,9 @@
   .table {
     margin-top: 20px;
   }
-  .table th,
-  .table td {
-    text-align: center;
-  }
 </style>
 
+<%- include('./components/button-go-back.ejs') %>
 <h1 class="mt-4 mb-3">Tambah Task Staff</h1>
 <h3 class="mb-2"><%= staff[0].name %></h3>
 <p>Staff ID : <%= staff[0].id %></p>
@@ -66,7 +63,11 @@
 
 <h3 class="mt-4">Tasks</h3>
 
-<table id="myTable" class="table table-striped" cellspacing="0">
+<table
+  id="myTable"
+  class="table table-striped display responsive nowrap"
+  cellspacing="0"
+>
   <thead>
     <tr>
       <th>No</th>
@@ -81,20 +82,21 @@
     <tr>
       <td><%= no %></td>
       <td><%= e.deskripsi %></td>
-      <td><%= periode %></td>
+      <td><%= e.periode.periode %></td>
       <td><%= e.nilai %></td>
       <td>
         <script>
-          function editTask(id, deskripsi, nilai) {
+          function editTask(id, deskripsi, nilai, periode) {
             document.getElementById("deskripsi").value = deskripsi;
             document.getElementById("nilai").value = nilai;
+            document.getElementById("periode").value = periode;
             document.querySelector("form").action = "/updateTask/" + id;
           }
         </script>
         <a
           href="javascript:void(0)"
           class="btn btn-outline-primary"
-          onclick="editTask('<%= e.id %>', '<%= e.deskripsi %>', '<%= e.nilai %>')"
+          onclick="editTask('<%= e.id %>', '<%= e.deskripsi %>', '<%= e.nilai %>', '<%= e.periodeId %>')"
           ><i class="bi bi-pencil-fill"></i
         ></a>
         <a
@@ -107,3 +109,10 @@
     <% no++ %> <% }) %>
   </tbody>
 </table>
+<script>
+  $(document).ready(function () {
+    $("#myTable").DataTable({
+      responsive: true,
+    });
+  });
+</script>

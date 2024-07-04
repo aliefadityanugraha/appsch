@@ -7,7 +7,6 @@ const prisma = new PrismaClient();
 
 module.exports = {
   main: async (req, res) => {
-    console.log(req.path);
     res.render("main", {
       layout: "layouts/main-layouts",
       message: "ok",

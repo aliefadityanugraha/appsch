@@ -1,4 +1,5 @@
-<h3>Data Periode</h3>
+<%- include('./components/button-go-back.ejs') %>
+<h3>Data Periode Instument</h3>
 
 <form action="/addPeriode" method="post" class="row g-3">
   <div class="col-md-6">
@@ -36,7 +37,7 @@
 </form>
 
 <div class="container mt-4">
-  <table class="table table-striped" id="myTable">
+  <table class="table table-striped display responsive nowrap" id="myTable">
     <thead>
       <tr>
         <th scope="col">#</th>
@@ -77,6 +78,8 @@
 
 <script>
   $(document).ready(function () {
-    $("#myTable").DataTable();
+    $("#myTable").DataTable({
+      responsive: true,
+    });
   });
 </script>

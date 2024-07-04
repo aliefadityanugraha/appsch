@@ -12,69 +12,28 @@
       rel="stylesheet"
       href="/public/bootstrap-icons-1.11.3/font/bootstrap-icons.min.css"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap.css"
-    />
+    <link rel="stylesheet" href="/public/css/dataTables.bootstrap.css" />
     <script src="/public/js/jquery-3.7.1.min.js"></script>
+    <style>
+      div.dt-container .dt-paging .dt-paging-button {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      *,
+      ::after,
+      ::before {
+        box-sizing: unset;
+      }
+    </style>
     <title><%= title %></title>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
-      <div class="container">
-        <a class="navbar-brand" href="/">Application Manajement</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a
-                class="nav-link <%= req === '/' ? 'active' : '' %>"
-                aria-current="page"
-                href="/"
-                >Home</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link <%= req === '/staff' ? 'active' : '' %>"
-                aria-current="page"
-                href="/staff"
-                >Data Staff</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link <%= req === '/periode' ? 'active' : '' %>"
-                aria-current="page"
-                href="/periode"
-                >Data Periode</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link <%= req === '/data' ? 'active' : '' %>"
-                aria-current="page"
-                href="/data"
-                >Records Data(Rekap)</a
-              >
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+    <%- include('../components/navbar.ejs') %>
 
     <div class="container p-3"><%- body %></div>
+    <%- include('../components/footer.ejs') %>
   </body>
+
   <script src="/public/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
   <script src="/public/js/datatables.min.js"></script>
   <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.js"></script>

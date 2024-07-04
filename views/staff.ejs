@@ -1,35 +1,5 @@
-<script>
-  function updateStaffData(id) {
-    const name = document.getElementById("name").value;
-    const jabatan = document.getElementById("jabatan").value;
-    const nip = document.getElementById("nip").value;
-
-    fetch(`/updateStaff/${id}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: name,
-        jabatan: jabatan,
-        nip: nip,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          alert("Staff data updated successfully");
-          window.location.href = "/staff";
-        } else {
-          alert("Failed to update staff data");
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  }
-</script>
 <div class="container">
+  <%- include('./components/button-go-back.ejs') %>
   <h1>Tambah Data Staff</h1>
   <form action="/addStaff" method="post" class="row g-3">
     <div class="col-md-6">
@@ -83,7 +53,19 @@
 </div>
 
 <div class="container mt-4">
-  <table id="myTable" class="table table-striped">
+  <style>
+    @media (max-width: 768px) {
+      #myTable {
+        font-size: 12px;
+        width: 100%;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+  </style>
+
+  <table id="myTable" class="table table-striped display responsive nowrap">
     <thead>
       <tr>
         <th>No</th>
@@ -91,7 +73,6 @@
         <th>Jabatan</th>
         <th>NIP</th>
         <th>Action</th>
-        <th>Tugas</th>
       </tr>
     </thead>
     <tbody>
@@ -102,14 +83,6 @@
         <td><%= e.jabatan %></td>
         <td><%= e.nip %></td>
         <td>
-          <script>
-            function edit(id, name, jabatan, nip) {
-              document.getElementById("name").value = name;
-              document.getElementById("jabatan").value = jabatan;
-              document.getElementById("nip").value = nip;
-              document.querySelector("form").action = "/updateStaff/" + id;
-            }
-          </script>
           <a
             href="javascript:void(0)"
             class="btn btn-outline-primary"
@@ -122,39 +95,65 @@
           <a
             href="/addTask/<%= e.id %>"
             class="btn btn-outline-success"
-            target="_blank"
             ><i class="bi bi-file-earmark-plus"></i
           ></a>
-        </td>
-        <td>
-          <form action="/addRecordTask/<%= e.id %>" method="post">
-            <% let noo = 1; %> <% e.task.forEach(ex => { %>
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="tugasCheck<%= noo %>"
-                name="value"
-                value="<%- parseInt(ex.nilai) %>"
-              />
-              <label class="form-check-label" for="tugasCheck<%= noo %>"
-                ><%= ex.deskripsi %></label
-              >
+  
+          <!-- modal -->
+          <button type="button" class="btn btn-info my-2 text-light" data-bs-toggle="modal" data-bs-target="#exampleModal<%= e.id %>">
+            <i class="bi bi-plus-circle"></i> Add Record
+          </button>
+          <div class="modal fade" id="exampleModal<%= e.id %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Add Record for <%= e.name %></h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form action="/addRecordTask/<%= e.id %>" method="post">
+                    <% let noo = 1; %> <% e.task.forEach(ex => { %>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="tugasCheck<%= noo %>"
+                        name="value"
+                        value="<%- parseInt(ex.nilai) %>"
+                      />
+                      <label class="form-check-label" for="tugasCheck<%= noo %>"
+                        ><%= ex.deskripsi %></label
+                      >
+                    </div>
+                    <% noo++ %> <% }) %> <% if (e.task.length > 0) { %>
+                    <button class="btn btn-info my-2 text-light" type="submit">
+                      <i class="bi bi-plus-circle"></i> Add Record</i>
+                    </button>
+                    <% } %>
+                  </form>
+                </div>
+              </div>
             </div>
-            <% noo++ %> <% }) %> <% if (e.task.length > 0) { %>
-            <button class="btn btn-info my-2 text-light" type="submit">
-              <i class="bi bi-plus-circle"></i> Add Record</i>
-            </button>
-            <% } %>
-          </form>
+          </div>
         </td>
       </tr>
       <% no++ %> <% }) %>
     </tbody>
   </table>
+  
+  <!-- edit javascript -->
+  <script>
+    function edit(id, name, jabatan, nip) {
+      document.getElementById("name").value = name;
+      document.getElementById("jabatan").value = jabatan;
+      document.getElementById("nip").value = nip;
+      document.querySelector("form").action = "/updateStaff/" + id;
+    }
+  </script>
 </div>
 <script>
   $(document).ready(function () {
-    $("#myTable").DataTable();
+    $("#myTable").DataTable({
+      responsive: true
+    });
   });
 </script>
