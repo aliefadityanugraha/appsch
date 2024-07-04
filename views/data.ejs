@@ -1,8 +1,42 @@
-<% let no = 1; %> <% data.forEach(element => { %> <%= no++ %> - <%= element.id%>
-- <%= element.name %> - <%= element.jabatan %> - <%- element.records %>
-<br />
-<% }) %>
+<%- include('./components/button-go-back.ejs') %>
+<h1>Records</h1>
 
-<hr />
+  <table class="table table-bordered" style="margin: 0 !important; padding: 0 !important;">
+    <thead>
+      <tr>
+        <th>Staff Id</th>
+        <th>Data</th>
+      </tr>
+    </thead>
+    <tbody>
+<% for (const staffId in dataParseJson) { %>
 
-<hr />
+        <tr>
+            <td><p><%= staffId %></p></td>
+            <td style="margin: 0 !important; padding: 0 !important;">
+                <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <% for( let indexOfHead = 1; indexOfHead < 31; indexOfHead++ ) { %>
+                            <th><%= indexOfHead %></th>
+                        <% } %>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                      <% const records = dataParseJson[staffId]; %> <% for (const record of
+                      records) { %>
+                      
+                        <td><%= record.nilai %></td>
+                      
+                      <% } %>
+                      </tr>
+                    </tbody>
+                  </div>
+                </table>
+            </td>
+        </tr> 
+    
+<% } %>
+</tbody>
+  </table>
