@@ -1,2 +1,2 @@
-# Ignore all HTML files:
+# Ignore all Ejs files:
 **/*.ejs
