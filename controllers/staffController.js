@@ -21,45 +21,34 @@ module.exports = {
     });
     res.render("staff", {
       layout: "layouts/main-layouts",
-      message: "ok",
       title: "Data Staff",
       data,
       req: req.path,
     });
   },
   addStaff: async (req, res) => {
+    const { name, jabatan, nip } = req.body;
     const data = await prisma.staff.create({
-      data: {
-        name: req.body.name,
-        jabatan: req.body.jabatan,
-        nip: req.body.nip,
-      },
+      data: { name, jabatan, nip },
     });
     console.log(data);
     res.redirect("/staff");
   },
   updateStaff: async (req, res) => {
+    const { id } = req.params;
+    const { name, jabatan, nip } = req.body;
     const data = await prisma.staff.update({
-      where: {
-        id: req.params.id,
-      },
-      data: {
-        name: req.body.name,
-        jabatan: req.body.jabatan,
-        nip: req.body.nip,
-        updatedAt: new Date(),
-      },
+      where: { id },
+      data: { name, jabatan, nip, updatedAt: new Date() },
     });
     res.redirect("/staff");
   },
   deleteStaff: async (req, res) => {
+    const { id } = req.params;
     const data = await prisma.staff.delete({
-      where: {
-        id: req.params.id,
-      },
+      where: { id },
     });
     console.log(data);
-
     res.redirect("/staff");
   },
 };

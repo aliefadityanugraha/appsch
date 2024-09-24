@@ -8,6 +8,7 @@ const staffController = require("../controllers/staffController");
 const taskController = require("../controllers/taskController");
 const recordsController = require("../controllers/recordsController");
 const periodeController = require("../controllers/periodeController");
+const settingsController = require("../controllers/settingController");
 
 router.get("/", mainController.main);
 
@@ -28,5 +29,7 @@ router.get("/deletePeriode/:id", periodeController.deletePeriode);
 
 router.get("/data", recordsController.data);
 router.post("/addRecordTask/:id", recordsController.addData);
+
+router.get("/settings", settingsController.settings);
 
 module.exports = router;

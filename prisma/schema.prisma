@@ -64,3 +64,11 @@ model Records {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
 }
+
+model Settings {
+  id        String    @id @default(uuid())
+  tunjangan String
+  color     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+}

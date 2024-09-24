@@ -1,6 +1,7 @@
 "use strict";
 
 const { PrismaClient } = require("@prisma/client");
+const { task } = require("./taskController");
 const prisma = new PrismaClient();
 
 module.exports = {
@@ -24,37 +25,51 @@ module.exports = {
       return record.staffId;
     });
 
-    const parseJson = Object.fromEntries(groupByStaff);
+    const dataParseJson = Object.fromEntries(groupByStaff);
 
-    console.log(parseJson);
+    console.log(dataParseJson);
     console.log(
       "--------------------------------------------------------------------------"
     );
 
-    // Loop through the main object
-    Object.keys(parseJson).forEach((staffId) => {
-      console.log(`Staff ID: ${staffId}`);
+    // New object to accumulate the data
+    let newObj = {};
 
-      // Loop through the array of records for each staffId
-      parseJson[staffId].forEach((record) => {
-        // Corrected this line
-        const newObject = {
-          id: record.id,
-          nilai: record.nilai,
-          createdAt: record.createdAt,
-          updatedAt: record.updatedAt,
-        };
-        console.log(newObject);
-        // Access other properties as needed
-      });
-    });
+    // for (const staffId in dataParseJson) {
+    //   newObj[staffId] = dataParseJson[staffId].map((record) => ({
+    //     id: record.id,
+    //     nilai: record.nilai,
+    //     createdAt: record.createdAt,
+    //     updatedAt: record.updatedAt,
+    //     // detail: record.detail.map((item) => item.index),
+    //   }));
+    // }
+
+    // console.log(JSON.stringify(newObj, null, 2));
+
+    // Loop through the main object
+    // Object.keys(parseJson).forEach((staffId) => {
+    //   console.log(`Staff ID: ${staffId}`);
+
+    //   // Loop through the array of records for each staffId
+    //   parseJson[staffId].forEach((record) => {
+    //     // Corrected this line
+    //     const newObject = {
+    //       id: record.id,
+    //       nilai: record.nilai,
+    //       createdAt: record.createdAt,
+    //       updatedAt: record.updatedAt,
+    //     };
+    //     console.log(newObject);
+    //     // Access other properties as needed
+    //   });
+    // });
 
     res.render("data", {
       layout: "layouts/main-layouts",
-      message: "ok",
       title: "Data",
       data: records,
-      parseJson,
+      dataParseJson,
       req: req.path,
     });
   },
