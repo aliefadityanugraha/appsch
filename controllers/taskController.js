@@ -1,4 +1,4 @@
-"use strcit";
+"use strict";
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
@@ -12,20 +12,18 @@ module.exports = {
       },
     });
 
-    const data = await prisma.task.findMany({
+    const tasks = await prisma.task.findMany({
       where: {
         staffId: staffId,
       },
-    });
-    const periodeData = await prisma.periode.findMany({
-      orderBy: {
-        createdAt: "asc",
+      include: {
+        periode: true,
       },
     });
 
-    const periode = await prisma.periode.findMany({
-      where: {
-        id: data[0].periodeId,
+    const periodeData = await prisma.periode.findMany({
+      orderBy: {
+        createdAt: "asc",
       },
     });
 
@@ -33,49 +31,54 @@ module.exports = {
       layout: "layouts/main-layouts",
       message: "ok",
       title: staff[0].name,
-      data,
+      data: tasks,
       staff,
       id: req.params.id,
-      periodeData: periodeData,
-      periode: periode[0].periode,
+      periodeData,
       req: req.path,
     });
   },
 
   addTask: async (req, res) => {
+    const { deskripsi, nilai, id, periode } = req.body;
     const data = await prisma.task.create({
       data: {
-        deskripsi: req.body.deskripsi,
-        nilai: parseInt(req.body.nilai),
-        staffId: req.body.id,
-        periodeId: req.body.periode,
+        deskripsi,
+        nilai: parseInt(nilai),
+        staffId: id,
+        periodeId: periode,
       },
     });
     console.log(data);
-    res.redirect("/addTask/" + req.body.id);
+    res.redirect(`/addTask/${id}`);
   },
+
   updateTask: async (req, res) => {
+    const { deskripsi, nilai } = req.body;
+    const taskId = req.params.id;
     const data = await prisma.task.update({
       where: {
-        id: req.params.id,
+        id: taskId,
       },
       data: {
-        deskripsi: req.body.deskripsi,
-        nilai: parseInt(req.body.nilai),
+        deskripsi,
+        nilai: parseInt(nilai),
         updatedAt: new Date(),
       },
     });
     console.log(data);
-    res.redirect("/addTask/" + req.body.id);
+    res.redirect(`/addTask/${req.body.id}`);
   },
+
   deleteTask: async (req, res) => {
-    const data = await prisma.task.delete({
+    const taskId = req.params.id;
+    const staffId = req.params.staffId;
+    await prisma.task.delete({
       where: {
-        id: req.params.id,
+        id: taskId,
       },
     });
-    console.log(req.params.id + "task deleted");
-
-    res.redirect("/addTask/" + req.params.staffId);
+    console.log(`${taskId} task deleted`);
+    res.redirect(`/addTask/${staffId}`);
   },
 };

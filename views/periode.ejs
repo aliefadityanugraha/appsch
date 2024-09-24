@@ -1,4 +1,5 @@
-<h3>Data Periode</h3>
+<%- include('./components/button-go-back.ejs') %>
+<h3>Data Periode Instument</h3>
 
 <form action="/addPeriode" method="post" class="row g-3">
   <div class="col-md-6">
@@ -36,7 +37,7 @@
 </form>
 
 <div class="container mt-4">
-  <table class="table table-striped" id="myTable">
+  <table class="table table-striped display responsive nowrap" id="myTable">
     <thead>
       <tr>
         <th scope="col">#</th>
@@ -61,13 +62,56 @@
           </script>
           <a
             href="javascript:void(0)"
-            class="btn btn-primary"
+            class="btn btn-outline-primary"
             onclick="editPeriode('<%= e.id %>', '<%= e.periode %>', '<%= e.nilai %>')"
             ><i class="bi bi-pencil-fill"></i
           ></a>
-          <a href="/deletePeriode/<%= e.id %>" class="btn btn-danger"
-            ><i class="bi bi-trash3-fill"></i
-          ></a>
+          <a
+            href="#"
+            class="btn btn-outline-danger"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteModal<%= e.id %>"
+          >
+            <i class="bi bi-trash3-fill"></i>
+          </a>
+          <div
+            class="modal fade"
+            id="deleteModal<%= e.id %>"
+            tabindex="-1"
+            aria-labelledby="deleteModalLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="deleteModalLabel">
+                    Confirm Delete
+                  </h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div class="modal-body">
+                  Are you sure you want to delete this periode?
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    Cancel
+                  </button>
+                  <a href="/deletePeriode/<%= e.id %>" class="btn btn-danger"
+                    >Delete</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
         </td>
       </tr>
       <% no++ %> <% }) %>
@@ -77,6 +121,8 @@
 
 <script>
   $(document).ready(function () {
-    $("#myTable").DataTable();
+    $("#myTable").DataTable({
+      responsive: true,
+    });
   });
 </script>
