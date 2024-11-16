@@ -3,27 +3,38 @@
 "use strict";
 
 const jwt = require("jsonwebtoken");
-const jwtConfig = require("../config/jwt");
+const { SECRET_KEY } = require("../config/jwt");
 
 module.exports = {
   isLogin: (req, res, next) => {
-    const session = req.session;
-    if (!session.token) {
+    const { token } = req.session;
+
+    if (!token) {
       console.log("Session not found");
-      res.status(200).redirect("/auth/login");
-    } else {
-      jwt.verify(session.token, jwtConfig.SECRET_KEY);
+      return res.status(401).redirect("/login");
+    }
+
+    try {
+      jwt.verify(token, SECRET_KEY);
       next();
+    } catch (error) {
+      console.error("Invalid token:", error.message);
+      return res.status(403).redirect("/login");
     }
   },
+
   authenticateToken: (req, res, next) => {
     const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
+    const token = authHeader?.split(" ")[1];
 
-    if (token == null) return res.status(401).json({ message: "Unauthorized" });
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
-    jwt.verify(token, jwtConfig.SECRET_KEY, (err, user) => {
-      if (err) return res.status(403).json({ message: "Invalid token" });
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+      if (err) {
+        return res.status(403).json({ message: "Invalid token" });
+      }
       req.user = user;
       next();
     });

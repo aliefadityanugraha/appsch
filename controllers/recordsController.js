@@ -10,7 +10,7 @@ module.exports = {
       where: {
         createdAt: {
           gte: new Date("2024-06-01"), // Start of date range
-          lte: new Date("2024-07-31"), // End of date range
+          lte: new Date("2024-12-31"), // End of date range
         },
       },
       include: {
@@ -28,9 +28,7 @@ module.exports = {
     const dataParseJson = Object.fromEntries(groupByStaff);
 
     console.log(dataParseJson);
-    console.log(
-      "--------------------------------------------------------------------------"
-    );
+
 
     // New object to accumulate the data
     let newObj = {};
@@ -74,8 +72,8 @@ module.exports = {
     });
   },
   addData: async (req, res) => {
-    console.log(req.params.id);
 
+    console.log(req.body, "ini body");
     // jumlahkan array yang tercentang
     let total = Object.values(req.body.value).reduce((val, nilaiSekarang) => {
       return parseInt(val) + parseInt(nilaiSekarang);
@@ -89,9 +87,10 @@ module.exports = {
 
     const data = await prisma.records.create({
       data: {
-        detail: req.body,
+        detail: req.body.value,
         nilai: persentase,
         staffId: req.params.id,
+        instrument: req.body.instrument,
       },
     });
     console.log(data);

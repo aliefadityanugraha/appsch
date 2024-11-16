@@ -18,57 +18,59 @@ model User {
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Periode {
-  id       String    @unique @default(uuid())
-  periode  String
-  nilai    Int
+  id        String   @unique @default(uuid())
+  periode   String
+  nilai     Int
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
-  task   Task[]
+  updatedAt DateTime @default(now()) @updatedAt
+  task      Task[]
 }
 
 model Staff {
-  id      String    @unique @default(uuid())
-  name    String
-  jabatan String
-  nip     String
-  date    DateTime  @default(now())
-  task   Task[]
-  records Records[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  id        String    @unique @default(uuid())
+  name      String
+  jabatan   String
+  nip       String
+  tunjangan String
+  date      DateTime  @default(now())
+  task      Task[]
+  records   Records[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
 }
 
 model Task {
-  id        String    @unique @default(uuid())
+  id        String   @unique @default(uuid())
   deskripsi String
   nilai     Int
-  date      DateTime  @default(now())
+  date      DateTime @default(now())
   staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   staffId   String
-  periode     Periode    @relation(fields: [periodeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  periodeId   String
+  periode   Periode  @relation(fields: [periodeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  periodeId String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Records {
-  id        String    @unique @default(uuid())
+  id        String   @unique @default(uuid())
   nilai     Float
   detail    Json
   staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   staffId   String
+  instrument String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Settings {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   tunjangan String
   color     String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }

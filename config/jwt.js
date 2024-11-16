@@ -3,5 +3,5 @@
 "use strict";
 
 module.exports = {
-  SECRET_KEY: "aliefadityanugraha",
+  SECRET_KEY: "appschedule",
 };
