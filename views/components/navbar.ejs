@@ -56,20 +56,21 @@
         </li>
         <li class="nav-item">
           <a
-            class="nav-link <%= req === '/settins' ? 'active' : '' %>"
+            class="nav-link <%= req === '/settings' ? 'active' : '' %>"
             aria-current="page"
             href="/settings"
             >Settings</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link <%= req === '/logout' ? 'active' : '' %>"
+            aria-current="page"
+            href="/logout"
+            >Logout</a
           >
         </li>
       </ul>
     </div>
   </div>
 </nav>
-
-<!-- <style>
-  nav {
-    border-radius: 20px;
-    margin: 15px;
-  }
-</style> -->

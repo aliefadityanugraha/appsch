@@ -10,7 +10,7 @@ module.exports = {
       where: {
         createdAt: {
           gte: new Date("2024-06-01"), // Start of date range
-          lte: new Date("2024-12-31"), // End of date range
+          lte: new Date("2025-12-31"), // End of date range
         },
       },
       include: {
@@ -28,7 +28,6 @@ module.exports = {
     const dataParseJson = Object.fromEntries(groupByStaff);
 
     console.log(dataParseJson);
-
 
     // New object to accumulate the data
     let newObj = {};
@@ -72,7 +71,6 @@ module.exports = {
     });
   },
   addData: async (req, res) => {
-
     console.log(req.body, "ini body");
     // jumlahkan array yang tercentang
     let total = Object.values(req.body.value).reduce((val, nilaiSekarang) => {
