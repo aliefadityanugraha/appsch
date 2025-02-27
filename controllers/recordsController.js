@@ -10,7 +10,7 @@ module.exports = {
       where: {
         createdAt: {
           gte: new Date("2024-06-01"), // Start of date range
-          lte: new Date("2024-07-31"), // End of date range
+          lte: new Date("2025-07-31"), // End of date range
         },
       },
       include: {
