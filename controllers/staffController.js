@@ -27,19 +27,19 @@ module.exports = {
     });
   },
   addStaff: async (req, res) => {
-    const { name, jabatan, nip } = req.body;
+    const { name, jabatan, nip, tunjangan } = req.body;
     const data = await prisma.staff.create({
-      data: { name, jabatan, nip },
+      data: { name, jabatan, nip, tunjangan },
     });
     console.log(data);
     res.redirect("/staff");
   },
   updateStaff: async (req, res) => {
     const { id } = req.params;
-    const { name, jabatan, nip } = req.body;
+    const { name, jabatan, nip, tunjangan } = req.body;
     const data = await prisma.staff.update({
       where: { id },
-      data: { name, jabatan, nip, updatedAt: new Date() },
+      data: { name, jabatan, nip, tunjangan, updatedAt: new Date() },
     });
     res.redirect("/staff");
   },

@@ -36,6 +36,17 @@
         placeholder="Masukkan NIP"
       />
     </div>
+    <div class="col-md-6">
+      <label for="tunjangan" class="form-label">Tunjangan:</label>
+      <input
+        type="text"
+        class="form-control"
+        id="tunjangan"
+        name="tunjangan"
+        required
+        placeholder="Masukkan Tunjangan"
+      />
+    </div>
     <div class="col-12">
       <button type="button" class="btn btn-secondary" onclick="clearForm()">
         Clear
@@ -45,6 +56,7 @@
           document.getElementById("name").value = "";
           document.getElementById("jabatan").value = "";
           document.getElementById("nip").value = "";
+          document.getElementById("tunjangan").value = "";
           document.querySelector("form").action = "/addStaff/";
         }
       </script>
@@ -73,6 +85,7 @@
         <th>Nama</th>
         <th>Jabatan</th>
         <th>NIP</th>
+        <th>Tunjangan</th>
         <th>Action</th>
       </tr>
     </thead>
@@ -83,11 +96,12 @@
         <td><%= e.name %></td>
         <td><%= e.jabatan %></td>
         <td><%= e.nip %></td>
+        <td><%= e.tunjangan %></td>
         <td>
           <a
             href="javascript:void(0)"
             class="btn btn-outline-primary"
-            onclick="edit('<%= e.id %>', '<%= e.name %>', '<%= e.jabatan %>', '<%= e.nip %>')"
+            onclick="edit('<%= e.id %>', '<%= e.name %>', '<%= e.jabatan %>', '<%= e.nip %>', '<%= e.tunjangan %>')"
             ><i class="bi bi-pencil-fill"></i
           ></a>
           <a href="#" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<%= e.id %>">
@@ -139,6 +153,8 @@
                         value="<%- parseInt(ex.nilai) %>"
                         onchange="if(this.checked){this.nextElementSibling.style.textDecoration='line-through';}else{this.nextElementSibling.style.textDecoration='none';}"
                       />
+                      <%- ex.periode %>
+                      <input type="text" name="instrument" value="<%= ex.periode %>" hidden>
                       <label class="form-check-label" for="tugasCheck<%= noo %>"
                         ><%= ex.deskripsi %></label
                       >
@@ -161,10 +177,11 @@
   
   <!-- edit javascript -->
   <script>
-    function edit(id, name, jabatan, nip) {
+    function edit(id, name, jabatan, nip, tunjangan) {
       document.getElementById("name").value = name;
       document.getElementById("jabatan").value = jabatan;
       document.getElementById("nip").value = nip;
+      document.getElementById("tunjangan").value = tunjangan;
       document.querySelector("form").action = "/updateStaff/" + id;
     }
   </script>

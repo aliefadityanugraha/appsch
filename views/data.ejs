@@ -1,6 +1,18 @@
 <%- include('./components/button-go-back.ejs') %>
 <h1>Records</h1>
 
+<div class="filter-container">
+  <label for="start-date">Tanggal Awal:</label>
+  <input type="date" id="start-date" class="date">
+  
+  <label for="end-date">Tanggal Akhir:</label>
+  <input type="date" id="end-date" class="date">
+
+  <button class="btn btn-primary" onclick="filterData()">Filter</button>
+</div>
+
+<br>
+
   <table class="table table-bordered text-center" style="margin: 0 !important; padding: 0 !important;">
     <thead>
       <tr>
@@ -9,8 +21,7 @@
       </tr>
     </thead>
     <tbody>
-<% for (const staffId in dataParseJson) { %>
-
+  <% for (const staffId in dataParseJson) { %>
         <tr>
             <td><p><%= staffId %></p></td>
             <td style="margin: 0 !important; padding: 0 !important;">
@@ -24,8 +35,8 @@
                     </thead>
                     <tbody>
                     <tr>
-                      <% const records = dataParseJson[staffId]; %> <% for (const record of
-                      records) { %>
+                      <% const records = dataParseJson[staffId]; %>
+                      <% for (const record of records) { %>
                       
                         <td><%= record.nilai %></td>
                       
@@ -37,6 +48,6 @@
             </td>
         </tr> 
     
-<% } %>
-</tbody>
+    <% } %>
+    </tbody>
   </table>
