@@ -21,6 +21,8 @@ router.post("/login", authController.loginPost);
 router.get("/register", authController.register);
 router.post("/register", authController.registerPost);
 
+router.get("/logout", authController.logout);
+
 router.get("/staff", isLogin, staffController.staff);
 router.post("/addStaff", isLogin, staffController.addStaff);
 router.post("/updateStaff/:id", isLogin, staffController.updateStaff);

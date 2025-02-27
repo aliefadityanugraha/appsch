@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Filter Data Berdasarkan Tanggal</title>
+  </head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+    }
+
+    .filter-container {
+      margin-bottom: 20px;
+    }
+
+    label {
+      margin-right: 10px;
+    }
+
+    input {
+      margin-right: 10px;
+      padding: 5px;
+    }
+
+    button {
+      padding: 5px 10px;
+      background-color: blue;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: darkblue;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 8px;
+      text-align: left;
+      border: 1px solid black;
+    }
+  </style>
+  <body>
+    <div class="filter-container">
+      <label for="start-date">Tanggal Awal:</label>
+      <input type="date" id="start-date" />
+
+      <label for="end-date">Tanggal Akhir:</label>
+      <input type="date" id="end-date" />
+
+      <button onclick="filterData()">Filter</button>
+    </div>
+
+    <table border="1">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Tanggal</th>
+          <th>Nama</th>
+        </tr>
+      </thead>
+      <tbody id="data-table">
+        <tr>
+          <td>1</td>
+          <td>2024-02-20</td>
+          <td>Aldi</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>2024-02-25</td>
+          <td>Budi</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>2024-03-01</td>
+          <td>Citra</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <script>
+      function filterData() {
+        let startDate = document.getElementById("start-date").value;
+        let endDate = document.getElementById("end-date").value;
+        let rows = document.querySelectorAll("#data-table tr");
+
+        rows.forEach((row) => {
+          let dateCell = row.cells[1];
+          if (dateCell) {
+            let rowDate = dateCell.innerText;
+
+            if (
+              (startDate && rowDate < startDate) ||
+              (endDate && rowDate > endDate)
+            ) {
+              row.style.display = "none";
+            } else {
+              row.style.display = "";
+            }
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
