@@ -17,6 +17,17 @@ model User {
   id        String   @unique @default(uuid())
   email     String   @unique
   password  String
+  status    Boolean  @default(true)
+  role      Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Role {
+  id        String   @unique @default(uuid())
+  role      String
+  permission Json    @default("{\"arrayPermission\":[1]}")
+  description String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
@@ -58,11 +69,10 @@ model Task {
 
 model Records {
   id        String   @unique @default(uuid())
-  nilai     Float
-  detail    Json
+  value     Float
+  taskList  Json
   staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   staffId   String
-  instrument String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }

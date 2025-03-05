@@ -1,5 +1,11 @@
-<%- include('./components/button-go-back.ejs') %>
-<h1>Records</h1>
+<div class="container card p-5">
+    <%- include('./components/button-go-back.ejs') %>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@12.1.0/dist/handsontable.full.min.css">
+<script src="https://cdn.jsdelivr.net/npm/handsontable@12.1.0/dist/handsontable.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+
+<h3>Records</h3>
 
 <div class="filter-container">
   <label for="start-date">Tanggal Awal:</label>
@@ -11,43 +17,67 @@
   <button class="btn btn-primary" onclick="filterData()">Filter</button>
 </div>
 
+<div id="excelTable" style="width: 100%; height: 500px; margin: 20px auto;"></div>
+
+    <script>
+        const jsonData = <%- JSON.stringify(records) %>;
+        // Mapping JSON ke dalam format array untuk Handsontable
+        const tableData = [];
+
+        // Header tabel
+        const headers = ["Staff ID", "Nama", "Jabatan", "Total Nilai"];
+        
+        // Mencari jumlah task terbanyak agar kolom cukup
+        let maxTasks = 0;
+        jsonData.forEach(item => {
+            if (item.taskList.length > maxTasks) {
+                maxTasks = item.taskList.length;
+            }
+        });
+
+        // Menambahkan header untuk setiap task
+        for (let i = 1; i <= maxTasks; i++) {
+            headers.push(`Task ${i}`);
+        }
+
+        // Mengisi data ke dalam array
+        jsonData.forEach(item => {
+            const row = [
+                item.staffId,
+                item.staff.name,
+                item.staff.jabatan,
+                item.value
+            ];
+
+            // Menambahkan hanya taskValue ke dalam row
+            item.taskList.forEach(task => {
+                row.push(task.taskValue || task.value || "-");
+            });
+
+            // Jika jumlah tugas kurang dari maxTasks, isi dengan "-"
+            while (row.length < headers.length) {
+                row.push("-");
+            }
+
+            tableData.push(row);
+        });
+
+        // Inisialisasi Handsontable
+        const container = document.getElementById("excelTable");
+        const hot = new Handsontable(container, {
+            data: tableData,
+            colHeaders: headers,
+            rowHeaders: true,
+            filters: true,
+            dropdownMenu: true,
+            contextMenu: true,
+            stretchH: "all",
+            licenseKey: "non-commercial-and-evaluation" // Free untuk keperluan non-komersial
+        });
+    </script>
+
 <br>
 
-  <table class="table table-bordered text-center" style="margin: 0 !important; padding: 0 !important;">
-    <thead>
-      <tr>
-        <th>Staff Id</th>
-        <th>Data</th>
-      </tr>
-    </thead>
-    <tbody>
-  <% for (const staffId in dataParseJson) { %>
-        <tr>
-            <td><p><%= staffId %></p></td>
-            <td style="margin: 0 !important; padding: 0 !important;">
-                <table class="table table-bordered text-center">
-                    <thead>
-                      <tr>
-                        <% for( let indexOfHead = 1; indexOfHead < 31; indexOfHead++ ) { %>
-                            <th><%= indexOfHead %></th>
-                        <% } %>
-                      </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                      <% const records = dataParseJson[staffId]; %>
-                      <% for (const record of records) { %>
-                      
-                        <td><%= record.nilai %></td>
-                      
-                      <% } %>
-                      </tr>
-                    </tbody>
-                  </div>
-                </table>
-            </td>
-        </tr> 
-    
-    <% } %>
-    </tbody>
-  </table>
+
+
+</div>
