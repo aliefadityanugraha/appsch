@@ -1,7 +1,6 @@
 "use strict";
 
 const { PrismaClient } = require("@prisma/client");
-const { task } = require("./taskController");
 const prisma = new PrismaClient();
 
 module.exports = {
@@ -10,7 +9,7 @@ module.exports = {
       where: {
         createdAt: {
           gte: new Date("2024-06-01"), // Start of date range
-          lte: new Date("2025-12-31"), // End of date range
+          lte: new Date("2025-03-31"), // End of date range
         },
       },
       include: {
@@ -21,77 +20,42 @@ module.exports = {
       },
     });
 
-    const groupByStaff = Map.groupBy(records, (record) => {
-      return record.staffId;
-    });
-
-    const dataParseJson = Object.fromEntries(groupByStaff);
-
-    console.log(dataParseJson);
-
-    // New object to accumulate the data
-    let newObj = {};
-
-    // for (const staffId in dataParseJson) {
-    //   newObj[staffId] = dataParseJson[staffId].map((record) => ({
-    //     id: record.id,
-    //     nilai: record.nilai,
-    //     createdAt: record.createdAt,
-    //     updatedAt: record.updatedAt,
-    //     // detail: record.detail.map((item) => item.index),
-    //   }));
-    // }
-
-    // console.log(JSON.stringify(newObj, null, 2));
-
-    // Loop through the main object
-    // Object.keys(parseJson).forEach((staffId) => {
-    //   console.log(`Staff ID: ${staffId}`);
-
-    //   // Loop through the array of records for each staffId
-    //   parseJson[staffId].forEach((record) => {
-    //     // Corrected this line
-    //     const newObject = {
-    //       id: record.id,
-    //       nilai: record.nilai,
-    //       createdAt: record.createdAt,
-    //       updatedAt: record.updatedAt,
-    //     };
-    //     console.log(newObject);
-    //     // Access other properties as needed
-    //   });
-    // });
-
     res.render("data", {
       layout: "layouts/main-layouts",
       title: "Data",
-      data: records,
-      dataParseJson,
       req: req.path,
+      records,
     });
   },
+
   addData: async (req, res) => {
-    console.log(req.body, "ini body");
-    // jumlahkan array yang tercentang
-    let total = Object.values(req.body.value).reduce((val, nilaiSekarang) => {
-      return parseInt(val) + parseInt(nilaiSekarang);
-    }, 0);
+    let data = req.body["task"];
 
-    console.log(total);
+    console.debug(typeof data);
 
-    let persentase = (total / 100) * 4.5;
-    console.log(persentase);
-    // algoritma ada disini
+    if (typeof data === "string") {
+      data = [data];
+    }
 
-    const data = await prisma.records.create({
+    const taskList = Array.isArray(data)
+      ? data.map((item) => {
+          const [taskId, taskValue, taskDescription] = item.split(",");
+          return { taskId, taskValue: parseInt(taskValue), taskDescription };
+        })
+      : [];
+
+    const totalTaskValue = taskList.reduce(
+      (sum, task) => sum + task.taskValue,
+      0
+    );
+
+    await prisma.records.create({
       data: {
-        detail: req.body.value,
-        nilai: persentase,
         staffId: req.params.id,
-        instrument: req.body.instrument,
+        value: totalTaskValue,
+        taskList,
       },
     });
-    console.log(data);
     res.redirect("/staff");
   },
 };

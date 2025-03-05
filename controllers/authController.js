@@ -8,12 +8,13 @@ const { SECRET_KEY } = require("../config/jwt");
 
 module.exports = {
   login: (req, res) => {
-    res.render("login", {
+    res.status(200).render("login", {
       layout: "layouts/auth-layouts",
       message: req.flash("message"),
       title: "Login",
     });
   },
+
   loginPost: async (req, res) => {
     try {
       const { email, password } = req.body;
@@ -50,13 +51,15 @@ module.exports = {
       res.status(500).redirect("/login");
     }
   },
+
   register: (req, res) => {
-    res.render("register", {
+    res.status(200).render("register", {
       layout: "layouts/auth-layouts",
       message: req.flash("message"),
       title: "Register",
     });
   },
+
   registerPost: async (req, res) => {
     try {
       const { email, password } = req.body;
@@ -87,16 +90,17 @@ module.exports = {
 
       req.session.token = token;
       req.flash("message", "Registration successful");
-      res.status(201).redirect("/login");
+      res.status(201).json({ message: "Wokee" });
     } catch (error) {
       console.error("Registration error:", error);
       req.flash("message", "An error occurred during registration");
-      res.status(500).redirect("/register");
+      res.status(500).json({ message: "Error" });
     }
   },
+
   logout: (req, res) => {
     req.session.token = null;
     req.flash("message", "You have been logged out");
-    res.redirect("/login");
+    res.status(201).redirect("/login");
   },
 };

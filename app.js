@@ -15,6 +15,7 @@ const cookieParser = require("cookie-parser");
 let flash = require("connect-flash");
 
 const routerV1 = require("./routes/route");
+const api = require("./routes/api");
 
 app.use(sessionConfig.sessionConf);
 let session;
@@ -29,7 +30,7 @@ app.use(methodOverride("_method"));
 app.use("/public", express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
 
-
 app.use("/", routerV1);
+app.use("/", api);
 
 module.exports = app;

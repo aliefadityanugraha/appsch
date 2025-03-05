@@ -6,6 +6,7 @@ const prisma = new PrismaClient();
 module.exports = {
   task: async (req, res) => {
     const staffId = req.params.id;
+
     const staff = await prisma.staff.findMany({
       where: {
         id: staffId,
@@ -27,9 +28,8 @@ module.exports = {
       },
     });
 
-    res.render("task", {
+    res.status(200).render("task", {
       layout: "layouts/main-layouts",
-      message: "ok",
       title: staff[0].name,
       data: tasks,
       staff,
@@ -41,7 +41,8 @@ module.exports = {
 
   addTask: async (req, res) => {
     const { deskripsi, nilai, id, periode } = req.body;
-    const data = await prisma.task.create({
+
+    await prisma.task.create({
       data: {
         deskripsi,
         nilai: parseInt(nilai),
@@ -49,25 +50,25 @@ module.exports = {
         periodeId: periode,
       },
     });
-    console.log(data);
-    res.redirect(`/addTask/${id}`);
+    res.status(200).redirect(`/addTask/${id}`);
   },
 
   updateTask: async (req, res) => {
-    const { deskripsi, nilai } = req.body;
+    const { deskripsi, periode, nilai } = req.body;
     const taskId = req.params.id;
-    const data = await prisma.task.update({
+
+    await prisma.task.update({
       where: {
         id: taskId,
       },
       data: {
         deskripsi,
         nilai: parseInt(nilai),
+        periodeId: periode,
         updatedAt: new Date(),
       },
     });
-    console.log(data);
-    res.redirect(`/addTask/${req.body.id}`);
+    res.status(200).redirect(`/addTask/${req.body.id}`);
   },
 
   deleteTask: async (req, res) => {
@@ -78,7 +79,6 @@ module.exports = {
         id: taskId,
       },
     });
-    console.log(`${taskId} task deleted`);
-    res.redirect(`/addTask/${staffId}`);
+    res.status(200).redirect(`/addTask/${staffId}`);
   },
 };

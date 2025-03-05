@@ -11,6 +11,8 @@ const periodeController = require("../controllers/periodeController");
 const settingsController = require("../controllers/settingController");
 const authController = require("../controllers/authController");
 
+const apiController = require("../controllers/apiController");
+
 const { isLogin } = require("../middleware/authMidleware");
 
 router.get("/", isLogin, mainController.main);
