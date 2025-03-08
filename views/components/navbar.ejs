@@ -1,76 +1,42 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-success">
-  <div class="container">
-    <a class="navbar-brand" href="/">
-      <img
-        src="/public/img/logo.png"
-        alt="Logo"
-        class="d-inline-block align-text-top"
-        style="width: 50px; height: auto"
-      />
-    </a>
-    <a class="navbar-brand" href="/">Application Manajement</a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarNav"
-      aria-controls="navbarNav"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a
-            class="nav-link <%= req === '/' ? 'active' : '' %>"
-            aria-current="page"
-            href="/"
-            >Home</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link <%= req === '/staff' ? 'active' : '' %>"
-            aria-current="page"
-            href="/staff"
-            >Data Staff</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link <%= req === '/periode' ? 'active' : '' %>"
-            aria-current="page"
-            href="/periode"
-            >Data Periode</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link <%= req === '/data' ? 'active' : '' %>"
-            aria-current="page"
-            href="/data"
-            >Records Data(Rekap)</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link <%= req === '/settings' ? 'active' : '' %>"
-            aria-current="page"
-            href="/settings"
-            >Settings</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link <%= req === '/logout' ? 'active' : '' %>"
-            aria-current="page"
-            href="/logout"
-            >Logout</a
-          >
-        </li>
-      </ul>
+<!-- Navbar -->
+<nav
+        class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl "
+        id="navbarBlur"
+        data-scroll="false"
+>
+    <div class="container-fluid py-1">
+        <div>
+            <h4><%= title %> page</h4>
+        </div>
+        <div
+                class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4"
+                id="navbar"
+        >
+            <ul class="navbar-nav w-100 justify-content-end align-content-center">
+                <li class="nav-item d-flex align-items-center">
+                    <a
+                            href="javascript:void(0);"
+                            class="nav-link font-weight-bold px-0"
+                    >
+                        <i class="fa fa-user me-sm-1"></i>
+                        <a href="/logout" class="d-sm-inline d-none">Logout</a>
+                    </a>
+                </li>
+                <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+                    <a
+                            href="javascript:void(0);"
+                            class="nav-link text-white p-0"
+                            id="iconNavbarSidenav"
+                    >
+                        <div class="sidenav-toggler-inner">
+                            <i class="sidenav-toggler-line bg-dark"></i>
+                            <i class="sidenav-toggler-line bg-dark"></i>
+                            <i class="sidenav-toggler-line bg-dark"></i>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
-  </div>
 </nav>
+<!-- End Navbar -->
