@@ -1,220 +1,241 @@
-<div class="container card p-4">
-  <%- include('./components/button-go-back.ejs') %>
-  <h3>Tambah Data Staff</h3>
-  
-  <form action="/addStaff" method="post" class="row g-3">
-    <div class="col-md-6">
-      <label for="name" class="form-label">Nama:</label>
-      <input
-        type="text"
-        class="form-control"
-        id="name"
-        name="name"
-        required
-        placeholder="Masukkan Nama"
-      />
-    </div>
-    <div class="col-md-6">
-      <label for="jabatan" class="form-label">Jabatan:</label>
-      <input
-        type="text"
-        class="form-control"
-        id="jabatan"
-        name="jabatan"
-        required
-        placeholder="Masukkan Jabatan"
-      />
-    </div>
-    <div class="col-md-6">
-      <label for="nip" class="form-label">NIP:</label>
-      <input
-        type="text"
-        class="form-control"
-        id="nip"
-        name="nip"
-        required
-        placeholder="Masukkan NIP"
-      />
-    </div>
-    <div class="col-md-6">
-      <label for="tunjangan" class="form-label">Tunjangan:</label>
-      <input
-        type="text"
-        class="form-control"
-        id="tunjangan"
-        name="tunjangan"
-        required
-        placeholder="Masukkan Tunjangan"
-      />
-    </div>
-    <div class="col-12">
-      <button type="button" class="btn btn-secondary" onclick="clearForm()">
-        Clear
-      </button>
-      <script>
-        function clearForm() {
-          document.getElementById("name").value = "";
-          document.getElementById("jabatan").value = "";
-          document.getElementById("nip").value = "";
-          document.getElementById("tunjangan").value = "";
-          document.querySelector("form").action = "/addStaff/";
-        }
-      </script>
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
-  </form>
-</div>
+<div class="main-content position-relative border-radius-lg p-4">
+    <div class="container-fluid card p-4">
+        <%- include('./components/button-go-back.ejs') %>
+        <h3>Tambah Data Staff</h3>
 
-<div class="container card p-4 mt-5">
-  <style>
-    @media (max-width: 768px) {
-      #myTable {
-        font-size: 12px;
-        width: 100%;
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-      }
-    }
-  </style>
+        <form action="/addStaff" method="post" class="row g-3">
+            <div class="col-md-6">
+                <label for="name" class="form-label">Nama:</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="name"
+                        name="name"
+                        required
+                        placeholder="Masukkan Nama" required
+                />
+            </div>
+            <div class="col-md-6">
+                <label for="jabatan" class="form-label">Jabatan:</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="jabatan"
+                        name="jabatan"
+                        required
+                        placeholder="Masukkan Jabatan" required
+                />
+            </div>
+            <div class="col-md-6">
+                <label for="nip" class="form-label">NIP:</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="nip"
+                        name="nip"
+                        required
+                        placeholder="Masukkan NIP" required
+                />
+            </div>
+            <div class="col-md-6">
+                <label for="tunjangan" class="form-label">Tunjangan:</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="tunjangan"
+                        name="tunjangan"
+                        required
+                        placeholder="Masukkan Tunjangan" required
+                />
+            </div>
+            <div class="col-12">
+                <button type="button" class="btn btn-secondary" onclick="clearForm()">
+                    Clear
+                </button>
+                <script>
+                    function clearForm() {
+                        document.getElementById("name").value = "";
+                        document.getElementById("jabatan").value = "";
+                        document.getElementById("nip").value = "";
+                        document.getElementById("tunjangan").value = "";
+                        document.querySelector("form").action = "/addStaff/";
+                    }
+                </script>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+    </div>
 
-  <table id="myTable" class="table display responsive" style="width: 100%;">
-    <thead>
-      <tr>
-        <th>No</th>
-        <th>Nama</th>
-        <th>Jabatan</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% let no = 1; %> <% data.forEach(e => { %>
-      <tr>
-        <td><%= no %></td>
-        <td><%= e.name %></td>
-        <td><%= e.jabatan %></td>
-        <td>
-          <a
-            href="javascript:void(0)"
-            class="btn btn-sm btn-outline-primary my-2"
-            onclick="edit('<%= e.id %>', '<%= e.name %>', '<%= e.jabatan %>', '<%= e.nip %>', '<%= e.tunjangan %>')"
-            ><i class="bi bi-pencil-fill"></i
-          ></a>
-          <a href="#" class="btn btn-sm btn-outline-danger " data-bs-toggle="modal" data-bs-target="#deleteModal<%= e.id %>">
-            <i class="bi bi-trash3-fill"></i>
-          </a>
-          <div class="modal fade" id="deleteModal<%= e.id %>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  Are you sure you want to delete staff <span class="fst-italic fw-bold"><%= e.name %></span>?
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                  <a href="/deleteStaff/<%= e.id %>" class="btn btn-danger">Delete</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <a
-            href="/addTask/<%= e.id %>"
-            class="btn btn-sm btn-outline-success my-2"
-            ><i class="bi bi-file-earmark-plus"></i
-          ></a>
-  
-          <!-- modal -->
-          <button type="button" class="btn btn-sm btn-info my-2 text-light" data-bs-toggle="modal" data-bs-target="#exampleModal<%= e.id %>">
-            <i class="bi bi-plus-circle"></i> Add Record
-          </button>
-          <div class="modal modal-lg fade" id="exampleModal<%= e.id %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Add Task Record for <%= e.name %></h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <!-- filter select -->
-        
-                    <select class="form-select mb-3" aria-label="Periode Task" onchange="filterTasks(this.value)" style="width: auto !important;">
-                      <option selected>Filter Periode Task</option>
-                      <% listPeriode.forEach(periode => { %>
-                      <option value="<%= periode.id %>"><%= periode.periode %></option>
-                      <% }) %>
-                      <option value="semua">Tampilkan Semua</option>
-                    </select>
-                  
-                  <!-- end filter select -->
-                  <!-- form add records task -->
-                  <form action="/addRecordTask/<%= e.id %>" method="post">
-                    <div id="taskList">
-                      <% let noLoop = 1; %> <% e.task.forEach(task => { %>
-                      <div class="form-check task-item" data-periode="<%- task.periodeId %>">
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          id="<%= task.id %>"
-                          name="task"
-                          value="<%- [task.id, task.nilai, task.deskripsi] %>"
-                        />
-                        <label class="form-check-label" for="<%= task.id %>"
-                          ><%= task.deskripsi %></label
-                        >
-                      </div>
-                      <% noLoop++ %> <% }) %>
-                    </div>
-                    <% if (e.task.length > 0) { %>
-                    <button class="btn btn-info my-2 text-light" type="submit">
-                      <i class="bi bi-plus-circle"></i> Add Record</i>
-                    </button>
-                    <% } %>
-                  </form>
-                  <!-- end form add records task -->
-                </div>
-              </div>
-            </div>
-          </div>
-        </td>
-      </tr>
-      <% no++ %> <% }) %>
-    </tbody>
-  </table>
-  
-  <!-- edit javascript -->
-  <script>
-    function filterTasks(periode) {
-      const tasks = document.querySelectorAll('.task-item');
-      tasks.forEach(task => {
-        if (periode.toLowerCase() === 'semua') {
-          task.style.display = 'block';
-        } else {
-          if (task.dataset.periode.toLowerCase() === periode.toLowerCase()) {
-            task.style.display = 'block';
-          } else {
-            task.style.display = 'none';
-          }
-        }
-      });
-    }
-  </script>
-  <script>
-    function edit(id, name, jabatan, nip, tunjangan) {
-      document.getElementById("name").value = name;
-      document.getElementById("jabatan").value = jabatan;
-      document.getElementById("nip").value = nip;
-      document.getElementById("tunjangan").value = tunjangan;
-      document.querySelector("form").action = "/updateStaff/" + id;
-    }
-  </script>
+    <div class="container-fluid card p-4 mt-5">
+        <style>
+            @media (max-width: 768px) {
+                #myTable {
+                    font-size: 12px;
+                    width: 100%;
+                    display: block;
+                    overflow-x: auto;
+                    white-space: nowrap;
+                }
+            }
+        </style>
+
+        <table id="myTable" class="table display responsive" style="width: 100%;">
+            <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Jabatan</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% let no = 1; %>
+            <% data.forEach(e => { %>
+                <tr>
+                    <td><%= no %></td>
+                    <td><%= e.name %></td>
+                    <td><%= e.jabatan %></td>
+                    <td>
+                        <a
+                                href="javascript:void(0)"
+                                class="btn btn-sm btn-primary my-2"
+                                onclick="edit('<%= e.id %>', '<%= e.name %>', '<%= e.jabatan %>', '<%= e.nip %>', '<%= e.tunjangan %>')"
+                        ><i class="bi bi-pencil-fill"></i
+                            ></a>
+                        <a href="#" class="btn btn-sm btn-danger my-2" data-bs-toggle="modal"
+                           data-bs-target="#deleteModal<%= e.id %>">
+                            <i class="bi bi-trash3-fill"></i>
+                        </a>
+                        <div class="modal fade" id="deleteModal<%= e.id %>" tabindex="-1"
+                             aria-labelledby="deleteModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete staff <span
+                                                class="fst-italic fw-bold"><%= e.name %></span>?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+                                            Cancel
+                                        </button>
+                                        <a href="/deleteStaff/<%= e.id %>" class="btn btn-danger">Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <a
+                                href="/addTask/<%= e.id %>"
+                                class="btn btn-sm btn-success my-2"
+                        ><i class="bi bi-file-earmark-plus"></i
+                            ></a>
+
+                        <!-- modal -->
+                        <button type="button" class="btn btn-sm btn-info my-2 text-light" data-bs-toggle="modal"
+                                data-bs-target="#exampleModal<%= e.id %>">
+                            <i class="bi bi-plus-circle"></i> Add Record
+                        </button>
+                        <div class="modal modal-lg fade" id="exampleModal<%= e.id %>" tabindex="-1"
+                             aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel"> Add Task Record
+                                            for <%= e.name %></h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!-- filter select -->
+
+                                        <select class="form-select mb-3" aria-label="Periode Task"
+                                                onchange="filterTasks(this.value)" style="width: auto !important;">
+                                            <option selected>Filter Periode Task</option>
+                                            <% listPeriode.forEach(periode => { %>
+                                                <option value="<%= periode.id %>"><%= periode.periode %></option>
+                                            <% }) %>
+                                            <option value="semua">Tampilkan Semua</option>
+                                        </select>
+
+                                        <!-- end filter select -->
+                                        <!-- form add records task -->
+                                        <form action="/addRecordTask/<%= e.id %>" method="post">
+                                            <div id="taskList">
+                                                <% let noLoop = 1; %>
+                                                <% e.task.forEach(task => { %>
+                                                    <div class="form-check task-item"
+                                                         data-periode="<%- task.periodeId %>">
+                                                        <input
+                                                                class="form-check-input"
+                                                                type="checkbox"
+                                                                id="<%= task.id %>"
+                                                                name="task"
+                                                                value="<%- [task.id, task.nilai, task.deskripsi] %>"
+                                                                required
+                                                        />
+                                                        <label class="form-check-label" for="<%= task.id %>"
+                                                        ><%= task.deskripsi %></label
+                                                        >
+                                                    </div>
+                                                    <% noLoop++ %>
+                                                <% }) %>
+                                            </div>
+                                            <% if (e.task.length > 0) { %>
+                                                <button class="btn btn-info my-2 text-light" type="submit">
+                                                    <i class="bi bi-plus-circle"></i> Add Record</i>
+                                                </button>
+                                            <% } %>
+                                        </form>
+                                        <!-- end form add records task -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <% no++ %>
+            <% }) %>
+            </tbody>
+        </table>
+
+        <!-- edit javascript -->
+        <script>
+            function filterTasks(periode) {
+                const tasks = document.querySelectorAll('.task-item');
+                tasks.forEach(task => {
+                    if (periode.toLowerCase() === 'semua') {
+                        task.style.display = 'block';
+                    } else {
+                        if (task.dataset.periode.toLowerCase() === periode.toLowerCase()) {
+                            task.style.display = 'block';
+                        } else {
+                            task.style.display = 'none';
+                        }
+                    }
+                });
+            }
+        </script>
+        <script>
+            function edit(id, name, jabatan, nip, tunjangan) {
+                document.getElementById("name").value = name;
+                document.getElementById("jabatan").value = jabatan;
+                document.getElementById("nip").value = nip;
+                document.getElementById("tunjangan").value = tunjangan;
+                document.querySelector("form").action = "/updateStaff/" + id;
+            }
+        </script>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $("#myTable").DataTable({
+                responsive: true
+            });
+        });
+    </script>
 </div>
-<script>
-  $(document).ready(function () {
-    $("#myTable").DataTable({
-      responsive: true
-    });
-  });
-</script>

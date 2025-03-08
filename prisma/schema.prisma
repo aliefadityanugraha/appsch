@@ -14,22 +14,23 @@ datasource db {
 }
 
 model User {
-  id        String   @unique @default(uuid())
-  email     String   @unique
-  password  String
-  status    Boolean  @default(true)
-  role      Int      @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  id           String   @unique @default(uuid())
+  email        String   @unique
+  password     String
+  status       Boolean  @default(true)
+  role         Int      @default(1)
+  refreshToken String?  @db.LongText
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
 }
 
 model Role {
-  id        String   @unique @default(uuid())
-  role      String
-  permission Json    @default("{\"arrayPermission\":[1]}")
+  id          String   @unique @default(uuid())
+  role        String
+  permission  Json     @default("{\"arrayPermission\":[1]}")
   description String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
 }
 
 model Periode {

@@ -1,36 +1,35 @@
-/** @format */
 "use strict";
 
 const express = require("express");
-const sessionConfig = require("./config/session");
-
 const app = express();
 
-const bodyParser = require("body-parser");
+require("dotenv").config();
 const path = require("path");
 const methodOverride = require("method-override");
 const expressLayouts = require("express-ejs-layouts");
 const cookieParser = require("cookie-parser");
-// const multer = require("./config/multer");
-let flash = require("connect-flash");
+const flash = require("connect-flash");
 
-const routerV1 = require("./routes/route");
-const api = require("./routes/api");
+const flashConfig = require("./config/flash");
+const sessionConfig = require("./config/session");
 
-app.use(sessionConfig.sessionConf);
+const webRoute = require("./routes/web");
+const apiRoute = require("./routes/api");
+
+app.use(cookieParser());
+app.use(sessionConfig.session);
 let session;
-// app.use(multer);
 app.use(flash());
+app.use(flashConfig.flash);
 app.set("view engine", "ejs");
 app.use(expressLayouts);
 app.use(express.json());
-app.use(bodyParser.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
 app.use("/public", express.static(path.join(__dirname, "public")));
-app.use(cookieParser());
 
-app.use("/", routerV1);
-app.use("/", api);
+
+app.use("/", webRoute);
+app.use("/", apiRoute);
 
 module.exports = app;
