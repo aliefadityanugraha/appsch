@@ -1,11 +1,11 @@
-"use strcit";
+"use strict";
 
 module.exports = {
-  settings: (req, res) => {
-    res.render("settings", {
-      layout: "layouts/main-layouts",
-      title: "Setiings",
-      req: req.path,
-    });
-  },
+    settings: (req, res) => {
+        res.render("settings", {
+            layout: "layouts/main-layouts",
+            title: "Settings",
+            req: req.path,
+        });
+    },
 };

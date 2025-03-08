@@ -1,7 +1,7 @@
 {
   "name": "app",
-  "version": "1.0.0",
-  "description": "Personal Website",
+  "version": "1.0.4",
+  "description": "Appsch",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,8 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^6.4.1",
-    "body": "^5.1.0",
-    "body-parser": "^1.20.2",
     "cloudinary": "^1.37.1",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.6",
@@ -24,8 +22,7 @@
     "express-session": "^1.17.3",
     "jsonwebtoken": "^9.0.2",
     "method-override": "^3.0.0",
-    "multer": "^1.4.5-lts.1",
-    "parser": "^0.1.4"
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.5.1",
