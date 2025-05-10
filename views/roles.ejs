@@ -1,0 +1,217 @@
+<!-- @format -->
+<link rel="stylesheet" href="/public/css/insert.css"/>
+<div class="formbold-main-wrapper">
+    <div class="formbold-form-wrapper">
+        <h3 class="text-center mb-5">Roles Management</h3>
+        <form action="/administrator/insert-role" method="POST" class="form-edit">
+            <input type="text" name="_id" class="idInput" hidden/>
+            <div>
+                <label for="role" class="formbold-form-label">Role</label>
+                <input
+                        type="text"
+                        name="role"
+                        id="role"
+                        placeholder="Enter new role"
+                        class="formbold-form-input roleInput"
+                        required
+                />
+            </div>
+            <br/>
+            <div>
+                <label for="roleid" class="formbold-form-label">Role Id</label>
+                <input
+                        type="number"
+                        name="roleId"
+                        id="roleid"
+                        placeholder="Enter new role"
+                        class="formbold-form-input roleIdInput"
+                        required
+                />
+            </div>
+            <br/>
+            <div>
+                <label for="description" class="formbold-form-label">Description</label>
+                <textarea
+                        rows="6"
+                        name="description"
+                        id="description"
+                        placeholder="Type your description"
+                        class="formbold-form-input descriptionInput"
+                        required
+                ></textarea>
+            </div>
+            <div>
+                <p class="py-2">Permission</p>
+                <div class="form-check form-switch">
+                    <input
+                            class="form-check-input postRadio"
+                            type="checkbox"
+                            role="switch"
+                            id="flexSwitchCheckDefault"
+                            name="postPermit"
+                    />
+                    <label class="form-check-label" for="flexSwitchCheckDefault"
+                    >(1) Posts Management</label
+                    >
+                </div>
+                <div class="form-check form-switch">
+                    <input
+                            class="form-check-input categoryRadio"
+                            type="checkbox"
+                            role="switch"
+                            id="flexSwitchCheckDefault"
+                            name="categoryPermit"
+                    />
+                    <label class="form-check-label" for="flexSwitchCheckDefault"
+                    >(2) Categories Management</label
+                    >
+                </div>
+                <div class="form-check form-switch">
+                    <input
+                            class="form-check-input roleRadio"
+                            type="checkbox"
+                            role="switch"
+                            id="flexSwitchCheckDefault"
+                            name="rolePermit"
+                    />
+                    <label class="form-check-label" for="flexSwitchCheckDefault"
+                    >(3) Role Management</label
+                    >
+                </div>
+                <div class="form-check form-switch">
+                    <input
+                            class="form-check-input userRadio"
+                            type="checkbox"
+                            role="switch"
+                            id="flexSwitchCheckDefault"
+                            name="userPermit"
+                    />
+                    <label class="form-check-label" for="flexSwitchCheckDefault"
+                    >(4) User Management</label
+                    >
+                </div>
+            </div>
+            <br/>
+            <div class="d-flex">
+                <button class="btn btn-danger m-2 rounded-pill" onclick="clearInput()">
+                    Clear
+                </button>
+                <button class="btn btn-success m-2 rounded-pill">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+<link
+        rel="stylesheet"
+        type="text/css"
+        href="/public/css/datatables.min.css"
+/>
+<section>
+    <div class="container">
+        <!-- datatables -->
+        <table class="table table-borderless table-hover datatable">
+            <thead>
+            <tr>
+                <th>No</th>
+                <th>Role Title</th>
+                <th>Role Id</th>
+                <th>Description</th>
+                <th>Permission</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% let number = 1; role.forEach(e => { %>
+                <tr>
+                    <td><%= number++ %></td>
+                    <!-- <td><%= e.id %></td> -->
+                    <td><%= e.role %></td>
+                    <td><%= e.roleId %></td>
+                    <td><%= e.description %></td>
+                    <td><%= e.permission %></td>
+                    <td class="d-flex">
+                        <button
+                                class="btn btn-warning btn-edit mx-1 btn-sm rounded-pill"
+                                onclick="edit(`<%- number - 2 %>`)"
+                        >
+                            Edit
+                        </button>
+                        <form action="/delete-category/<%= e._id %>" method="get">
+                            <button
+                                    class="btn btn-danger btn-delete mx-1 btn-sm rounded-pill"
+                                    type="submit"
+                            >
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+            </tbody>
+        </table>
+        <!-- datatable end -->
+    </div>
+</section>
+<script src="/public/js/datatables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".datatable").DataTable();
+    });
+</script>
+
+<!-- rhs -->
+<div class="data" hidden>
+    <% role.forEach(e => { %>
+        <div class="roles">
+            <div class="id"><%= e._id %></div>
+            <div class="role"><%= e.role %></div>
+            <div class="roleId"><%= e.roleId %></div>
+            <div class="permission"><%= e.permission %></div>
+            <div class="description"><%= e.description %></div>
+        </div>
+    <% }) %>
+</div>
+<script>
+    const inputID = document.querySelector(".idInput");
+    const inputRole = document.querySelector(".roleInput");
+    const inputRoleID = document.querySelector(".roleIdInput");
+    const inputDescription = document.querySelector(".descriptionInput");
+    const postRadio = document.querySelector(".postRadio");
+    const categoryRadio = document.querySelector(".categoryRadio");
+    const roleRadio = document.querySelector(".roleRadio");
+    const userRadio = document.querySelector(".userRadio");
+    const form = document.querySelector(".form-edit");
+
+    function edit(target) {
+        const id = document.querySelectorAll(".id");
+        const role = document.querySelectorAll(".role");
+        const roleId = document.querySelectorAll(".roleId");
+        const permission = document.querySelectorAll(".permission");
+        const description = document.querySelectorAll(".description");
+
+        inputID.value = id[target].innerHTML;
+        inputRole.value = role[target].innerHTML;
+        inputRoleID.value = roleId[target].innerHTML;
+        inputDescription.value = description[target].innerHTML;
+
+        const splitPermit = permission[target].innerHTML.split("");
+
+        postRadio.checked = splitPermit.includes("1");
+        categoryRadio.checked = splitPermit.includes("2");
+        roleRadio.checked = splitPermit.includes("3");
+        userRadio.checked = splitPermit.includes("4");
+
+        form.action = "/administrator/edit-role";
+    }
+
+    function clearInput() {
+        inputRole.value = "";
+        inputRoleID.value = "";
+        inputDescription.value = "";
+        postRadio.checked = false;
+        categoryRadio.checked = false;
+        roleRadio.checked = false;
+        userRadio.checked = false;
+        form.action = "/administrator/insert-role";
+    }
+</script>

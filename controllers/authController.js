@@ -6,6 +6,7 @@ const crypto = require("crypto");
 const jsonWebToken = require("jsonwebtoken");
 
 module.exports = {
+
     login: (req, res) => {
 
         res.status(200).render("login", {
@@ -36,7 +37,7 @@ module.exports = {
             const accessToken = jsonWebToken.sign(
                 {userId: user.id, email: user.email},
                 process.env.ACCESS_SECRET_KEY,
-                {expiresIn: "1m"}
+                {expiresIn: "5m"}
             );
 
             const refreshToken = jsonWebToken.sign(
@@ -87,7 +88,7 @@ module.exports = {
                 req.flash("message", "Email already in use");
                 return res.status(400).redirect("/auth/register");
             }
-
+``
             const hashedPassword = crypto.createHash("sha256").update(password).digest("hex");
 
             const newUser = await prisma.user.create({
@@ -118,27 +119,26 @@ module.exports = {
     refreshToken: async (req, res) => {
 
         try {
-            console.log("Get Refresh token");
             const {refreshToken} = req.cookies;
 
             if (!refreshToken) return res.status(401).json({message: "Unauthorized"});
 
             const user = await prisma.user.findFirst({where: {refreshToken}});
 
-            if (!user) return res.status(403).json({message: "Forbidden"});
+            if (!user) return res.status(403).redirect("/auth/login");
 
-            console.log("Refresh token:", refreshToken);
-            jsonWebToken.verify(refreshToken, process.env.REFRESH_SECRET_KEY, (err, decoded) => { // 🔥 Gunakan REFRESH_SECRET_KEY
-                if (err) return res.status(403).json({message: "Forbidden"});
+            jsonWebToken.verify(refreshToken, process.env.REFRESH_SECRET_KEY, (err, decoded) => {
+                if (err) return res.status(403).redirect("/auth/login");
 
                 const accessToken = jsonWebToken.sign(
                     {userId: user.id, email: user.email},
                     process.env.ACCESS_SECRET_KEY,
-                    {expiresIn: "15m"}
+                    {expiresIn: "5m"}
                 );
 
+                console.log("Get Refresh token:", accessToken);
                 req.session.token = accessToken;
-                res.redirect('/');
+                res.redirect("/");
             });
 
         } catch (error) {
