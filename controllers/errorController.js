@@ -2,6 +2,6 @@
 
 module.exports = {
     error404: (req, res) => {
-        res.status(404).redirect('/');
+        res.status(404).redirect("/");
     }
 }

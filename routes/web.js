@@ -17,12 +17,13 @@ const errorController = require("../controllers/errorController");
 
 const {isLogin, authenticateToken} = require("../middleware/authMidleware");
 const {refreshToken} = require("../controllers/authController");
+const {roles} = require("../controllers/roleController");
 
 /* main route */
 router.get("/", authenticateToken, mainController.main);
 
 /* auth route */
-router.get("/auth/login", authController.login);
+router.get("/auth/login", isLogin, authController.login);
 router.post("/auth/login", authController.loginPost);
 
 router.get("/auth/register", authController.register);
@@ -56,10 +57,13 @@ router.post('/filterRecords', authenticateToken, recordsController.filterRecords
 /* settings route */
 router.get("/settings", authenticateToken, settingsController.settings);
 
+/**/
+router.get("/roles", authenticateToken, roles);
+
 /* refresh token route */
 router.get('/auth/refresh-token', refreshToken);
 
 /* error handler route*/
-router.get("/*", errorController.error404);
+// router.get("*", errorController.error404);
 
 module.exports = router;

@@ -194,14 +194,13 @@
                     },
                     body: JSON.stringify({email, password}),
                 });
-
-                const data = await response.json();
+                console.log(response)
 
                 if (response.ok) {
-                    alert(data.message || 'Registration successful!');
+                    alert('Registration successful!');
                     window.location.href = '/auth/login';
                 } else {
-                    alert(data.message || 'Registration failed. Please try again.');
+                    alert('Registration failed. Please try again.');
                 }
             } catch (error) {
                 console.error('Error:', error);

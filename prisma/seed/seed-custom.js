@@ -1,94 +1,68 @@
-import { PrismaClient } from "@prisma/client";
-import { faker } from "@faker-js/faker";
-
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("Seeding database...");
+  // 1. Seed Periode
+  const periodes = await Promise.all(
+      Array.from({ length: 5 }, (_, i) =>
+          prisma.periode.create({
+            data: {
+              periode: `202${i + 1}`,
+              nilai: (i + 1) * 10,
+            },
+          })
+      )
+  );
 
-  // Insert Roles
-  const roles = [];
-  for (let i = 0; i < 3; i++) {
-    const role = await prisma.role.create({
-      data: {
-        role: faker.person.jobTitle(),
-        permission: { arrayPermission: [1, 2, 3] },
-        description: faker.lorem.sentence(),
-      },
-    });
-    roles.push(role);
-  }
+  // 2. Seed Staff
+  const staffs = await Promise.all(
+      Array.from({ length: 5 }, (_, i) =>
+          prisma.staff.create({
+            data: {
+              name: `Staff ${i + 1}`,
+              jabatan: `Jabatan ${i + 1}`,
+              nip: `NIP00${i + 1}`,
+              tunjangan: `${1000000 * (i + 1)}`,
+            },
+          })
+      )
+  );
 
-  // Insert Users
-  const users = [];
-  for (let i = 0; i < 3; i++) {
-    const user = await prisma.user.create({
-      data: {
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-        status: true,
-        role: faker.helpers.arrayElement([1, 2, 3]),
-      },
-    });
-    users.push(user);
-  }
+  // 3. Seed Task (terkait dengan staff dan periode)
+  const tasks = await Promise.all(
+      Array.from({ length: 5 }, (_, i) =>
+          prisma.task.create({
+            data: {
+              deskripsi: `Tugas ke-${i + 1}`,
+              nilai: (i + 1) * 20,
+              staffId: staffs[i % staffs.length].id,
+              periodeId: periodes[i % periodes.length].id,
+            },
+          })
+      )
+  );
 
-  // Insert Settings
-  await prisma.settings.create({
-    data: {
-      tunjangan: faker.finance.amount(1000000, 5000000, 0, "Rp "),
-      color: faker.color.human(),
-    },
-  });
+  // 4. Seed Records (terkait dengan staff dan menyimpan task list sebagai JSON)
+  await Promise.all(
+      Array.from({ length: 5 }, (_, i) =>
+          prisma.records.create({
+            data: {
+              value: (i + 1) * 2.5,
+              taskList: tasks.map(task => ({ id: task.id, deskripsi: task.deskripsi })),
+              staffId: staffs[i % staffs.length].id,
+            },
+          })
+      )
+  );
 
-  // Insert Periode
-  const periodes = [];
-  for (let i = 0; i < 2; i++) {
-    const periode = await prisma.periode.create({
-      data: {
-        periode: `${faker.date.month()} ${faker.date.past().getFullYear()}`,
-        nilai: faker.number.int({ min: 50, max: 100 }),
-      },
-    });
-    periodes.push(periode);
-  }
-
-  // Insert Staff
-  const staffList = [];
-  for (let i = 0; i < 5; i++) {
-    const staff = await prisma.staff.create({
-      data: {
-        name: faker.person.fullName(),
-        jabatan: faker.person.jobTitle(),
-        nip: faker.string.uuid(),
-        tunjangan: faker.finance.amount(1000000, 5000000, 0, "Rp "),
-      },
-    });
-    staffList.push(staff);
-  }
-
-  // Insert Tasks (Setiap Staff Punya 5 Task)
-  for (const staff of staffList) {
-    for (let i = 0; i < 5; i++) {
-      await prisma.task.create({
-        data: {
-          deskripsi: faker.lorem.sentence(),
-          nilai: faker.number.int({ min: 50, max: 100 }),
-          staffId: staff.id,
-          periodeId: faker.helpers.arrayElement(periodes).id,
-        },
-      });
-    }
-  }
-
-  console.log("Seeding completed!");
+  console.log('✅ Seeding selesai!');
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+    .catch(e => {
+      console.error(e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
