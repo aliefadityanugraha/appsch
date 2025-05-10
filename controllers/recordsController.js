@@ -25,7 +25,7 @@ module.exports = {
             },
         });
 
-        res.status(200).render("data", {
+        res.status(200).render("data2", {
             layout: "layouts/main-layouts",
             title: "Data",
             req: req.path,

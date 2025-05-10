@@ -28,8 +28,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
 app.use("/public", express.static(path.join(__dirname, "public")));
 
-
-app.use("/", webRoute);
 app.use("/", apiRoute);
+app.use("/", webRoute);
 
 module.exports = app;
