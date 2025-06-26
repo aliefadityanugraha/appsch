@@ -37,7 +37,7 @@ module.exports = {
             const accessToken = jsonWebToken.sign(
                 {userId: user.id, email: user.email},
                 process.env.ACCESS_SECRET_KEY,
-                {expiresIn: "5m"}
+                {expiresIn: "5h"}
             );
 
             const refreshToken = jsonWebToken.sign(
@@ -55,7 +55,7 @@ module.exports = {
             res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
-                maxAge: 7 * 24 * 60 * 60 * 1000,
+                maxAge: 3 * 24 * 60 * 60 * 1000,
             });
 
             res.redirect("/");
@@ -138,7 +138,8 @@ module.exports = {
 
                 console.log("Get Refresh token:", accessToken);
                 req.session.token = accessToken;
-                res.redirect("/");
+
+                res.redirect('/');
             });
 
         } catch (error) {

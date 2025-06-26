@@ -1,104 +1,140 @@
 <!-- @format -->
 <link rel="stylesheet" href="/public/css/insert.css"/>
-<div class="formbold-main-wrapper">
-    <div class="formbold-form-wrapper">
-        <h3 class="text-center mb-5">Roles Management</h3>
-        <form action="/administrator/insert-role" method="POST" class="form-edit">
-            <input type="text" name="_id" class="idInput" hidden/>
-            <div>
-                <label for="role" class="formbold-form-label">Role</label>
-                <input
-                        type="text"
-                        name="role"
-                        id="role"
-                        placeholder="Enter new role"
-                        class="formbold-form-input roleInput"
-                        required
-                />
-            </div>
-            <br/>
-            <div>
-                <label for="roleid" class="formbold-form-label">Role Id</label>
-                <input
-                        type="number"
-                        name="roleId"
-                        id="roleid"
-                        placeholder="Enter new role"
-                        class="formbold-form-input roleIdInput"
-                        required
-                />
-            </div>
-            <br/>
-            <div>
-                <label for="description" class="formbold-form-label">Description</label>
-                <textarea
-                        rows="6"
-                        name="description"
-                        id="description"
-                        placeholder="Type your description"
-                        class="formbold-form-input descriptionInput"
-                        required
-                ></textarea>
-            </div>
-            <div>
-                <p class="py-2">Permission</p>
-                <div class="form-check form-switch">
-                    <input
-                            class="form-check-input postRadio"
-                            type="checkbox"
-                            role="switch"
-                            id="flexSwitchCheckDefault"
-                            name="postPermit"
-                    />
-                    <label class="form-check-label" for="flexSwitchCheckDefault"
-                    >(1) Posts Management</label
-                    >
+<div class="main-content p-4">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="card shadow-sm p-4 mb-4">
+                    <h3 class="text-center mb-4">Roles Management</h3>
+                    <form action="/administrator/insert-role" method="POST" class="form-edit">
+                        <input type="text" name="_id" class="idInput" hidden/>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <input
+                                    type="text"
+                                    name="role"
+                                    id="role"
+                                    placeholder="Enter new role"
+                                    class="form-control roleInput"
+                                    required
+                            />
+                        </div>
+                        <div class="mb-3">
+                            <label for="roleid" class="form-label">Role Id</label>
+                            <input
+                                    type="number"
+                                    name="roleId"
+                                    id="roleid"
+                                    placeholder="Enter new role"
+                                    class="form-control roleIdInput"
+                                    required
+                            />
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea
+                                    rows="4"
+                                    name="description"
+                                    id="description"
+                                    placeholder="Type your description"
+                                    class="form-control descriptionInput"
+                                    required
+                            ></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <p class="mb-2">Permission</p>
+                            <div class="form-check form-switch mb-1">
+                                <input
+                                        class="form-check-input postRadio"
+                                        type="checkbox"
+                                        role="switch"
+                                        id="postPermit"
+                                        name="postPermit"
+                                />
+                                <label class="form-check-label" for="postPermit">(1) Posts Management</label>
+                            </div>
+                            <div class="form-check form-switch mb-1">
+                                <input
+                                        class="form-check-input categoryRadio"
+                                        type="checkbox"
+                                        role="switch"
+                                        id="categoryPermit"
+                                        name="categoryPermit"
+                                />
+                                <label class="form-check-label" for="categoryPermit">(2) Categories Management</label>
+                            </div>
+                            <div class="form-check form-switch mb-1">
+                                <input
+                                        class="form-check-input roleRadio"
+                                        type="checkbox"
+                                        role="switch"
+                                        id="rolePermit"
+                                        name="rolePermit"
+                                />
+                                <label class="form-check-label" for="rolePermit">(3) Role Management</label>
+                            </div>
+                            <div class="form-check form-switch mb-1">
+                                <input
+                                        class="form-check-input userRadio"
+                                        type="checkbox"
+                                        role="switch"
+                                        id="userPermit"
+                                        name="userPermit"
+                                />
+                                <label class="form-check-label" for="userPermit">(4) User Management</label>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-danger rounded-pill" type="button" onclick="clearInput()">Clear</button>
+                            <button class="btn btn-success rounded-pill" type="submit">Submit</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="form-check form-switch">
-                    <input
-                            class="form-check-input categoryRadio"
-                            type="checkbox"
-                            role="switch"
-                            id="flexSwitchCheckDefault"
-                            name="categoryPermit"
-                    />
-                    <label class="form-check-label" for="flexSwitchCheckDefault"
-                    >(2) Categories Management</label
-                    >
-                </div>
-                <div class="form-check form-switch">
-                    <input
-                            class="form-check-input roleRadio"
-                            type="checkbox"
-                            role="switch"
-                            id="flexSwitchCheckDefault"
-                            name="rolePermit"
-                    />
-                    <label class="form-check-label" for="flexSwitchCheckDefault"
-                    >(3) Role Management</label
-                    >
-                </div>
-                <div class="form-check form-switch">
-                    <input
-                            class="form-check-input userRadio"
-                            type="checkbox"
-                            role="switch"
-                            id="flexSwitchCheckDefault"
-                            name="userPermit"
-                    />
-                    <label class="form-check-label" for="flexSwitchCheckDefault"
-                    >(4) User Management</label
-                    >
-                </div>
             </div>
-            <br/>
-            <div class="d-flex">
-                <button class="btn btn-danger m-2 rounded-pill" onclick="clearInput()">
-                    Clear
-                </button>
-                <button class="btn btn-success m-2 rounded-pill">Submit</button>
+        </div>
+        <div class="card shadow-sm p-4 mb-4">
+            <div class="table-responsive">
+                <table class="table table-borderless table-hover datatable">
+                    <thead class="table-light">
+                    <tr>
+                        <th>No</th>
+                        <th>Role Title</th>
+                        <th>Role Id</th>
+                        <th>Description</th>
+                        <th>Permission</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% let number = 1; role.forEach(e => { %>
+                        <tr>
+                            <td><%= number++ %></td>
+                            <td><%= e.role %></td>
+                            <td><%= e.roleId %></td>
+                            <td><%= e.description %></td>
+                            <td><%= e.permission %></td>
+                            <td class="d-flex gap-1">
+                                <button
+                                        class="btn btn-warning btn-edit btn-sm rounded-pill"
+                                        onclick="edit(`<%- number - 2 %>`)"
+                                >
+                                    Edit
+                                </button>
+                                <form action="/delete-category/<%= e._id %>" method="get" class="d-inline">
+                                    <button
+                                            class="btn btn-danger btn-delete btn-sm rounded-pill"
+                                            type="submit"
+                                    >
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    <% }) %>
+                    </tbody>
+                </table>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 <link
@@ -106,52 +142,6 @@
         type="text/css"
         href="/public/css/datatables.min.css"
 />
-<section>
-    <div class="container">
-        <!-- datatables -->
-        <table class="table table-borderless table-hover datatable">
-            <thead>
-            <tr>
-                <th>No</th>
-                <th>Role Title</th>
-                <th>Role Id</th>
-                <th>Description</th>
-                <th>Permission</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            <% let number = 1; role.forEach(e => { %>
-                <tr>
-                    <td><%= number++ %></td>
-                    <!-- <td><%= e.id %></td> -->
-                    <td><%= e.role %></td>
-                    <td><%= e.roleId %></td>
-                    <td><%= e.description %></td>
-                    <td><%= e.permission %></td>
-                    <td class="d-flex">
-                        <button
-                                class="btn btn-warning btn-edit mx-1 btn-sm rounded-pill"
-                                onclick="edit(`<%- number - 2 %>`)"
-                        >
-                            Edit
-                        </button>
-                        <form action="/delete-category/<%= e._id %>" method="get">
-                            <button
-                                    class="btn btn-danger btn-delete mx-1 btn-sm rounded-pill"
-                                    type="submit"
-                            >
-                                Delete
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            <% }) %>
-            </tbody>
-        </table>
-        <!-- datatable end -->
-    </div>
-</section>
 <script src="/public/js/datatables.min.js"></script>
 <script>
     $(document).ready(function () {
@@ -160,7 +150,7 @@
 </script>
 
 <!-- rhs -->
-<div class="data" hidden>
+<div class="data d-none">
     <% role.forEach(e => { %>
         <div class="roles">
             <div class="id"><%= e._id %></div>
@@ -205,6 +195,7 @@
     }
 
     function clearInput() {
+        inputID.value = "";
         inputRole.value = "";
         inputRoleID.value = "";
         inputDescription.value = "";

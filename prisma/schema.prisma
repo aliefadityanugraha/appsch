@@ -62,7 +62,7 @@ model Task {
   date      DateTime @default(now())
   staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   staffId   String
-  periode   Periode  @relation(fields: [periodeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  periode   Periode  @relation(fields: [periodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   periodeId String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
