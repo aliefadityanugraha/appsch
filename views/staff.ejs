@@ -1,72 +1,5 @@
-<div class="main-content position-relative border-radius-lg p-4">
-    <div class="container-fluid card p-4">
-        <%- include('./components/button-go-back.ejs') %>
-        <h3>Tambah Data Staff</h3>
-
-        <form action="/addStaff" method="post" class="row g-3">
-            <div class="col-md-6">
-                <label for="name" class="form-label">Nama:</label>
-                <input
-                        type="text"
-                        class="form-control"
-                        id="name"
-                        name="name"
-                        required
-                        placeholder="Masukkan Nama"
-                />
-            </div>
-            <div class="col-md-6">
-                <label for="jabatan" class="form-label">Jabatan:</label>
-                <input
-                        type="text"
-                        class="form-control"
-                        id="jabatan"
-                        name="jabatan"
-                        required
-                        placeholder="Masukkan Jabatan"
-                />
-            </div>
-            <div class="col-md-6">
-                <label for="nip" class="form-label">NIP:</label>
-                <input
-                        type="text"
-                        class="form-control"
-                        id="nip"
-                        name="nip"
-                        required
-                        placeholder="Masukkan NIP"
-                />
-            </div>
-            <div class="col-md-6">
-                <label for="tunjangan" class="form-label">Tunjangan:</label>
-                <input
-                        type="text"
-                        class="form-control"
-                        id="tunjangan"
-                        name="tunjangan"
-                        required
-                        placeholder="Masukkan Tunjangan"
-                />
-            </div>
-            <div class="col-12">
-                <button type="button" class="btn btn-secondary" onclick="clearForm()">
-                    Clear
-                </button>
-                <script>
-                    function clearForm() {
-                        document.getElementById("name").value = "";
-                        document.getElementById("jabatan").value = "";
-                        document.getElementById("nip").value = "";
-                        document.getElementById("tunjangan").value = "";
-                        document.querySelector("form").action = "/addStaff/";
-                    }
-                </script>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
-        </form>
-    </div>
-
-    <div class="container-fluid card p-4 mt-5">
+<div class="row p-1 p-md-4">
+    <div class="p-1 p-md-4 mt-2 mt-md-0 col-md-8 col-12 order-md-1 order-2">
         <style>
             @media (max-width: 768px) {
                 #myTable {
@@ -78,163 +11,405 @@
                 }
             }
         </style>
-
-        <table id="myTable" class="table display responsive" style="width: 100%;">
-            <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Jabatan</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            <% let no = 1; %>
-            <% data.forEach(e => { %>
+        <div class="table-responsive">
+            <table id="myTable" class="table table-striped align-middle">
+                <thead class="table-light">
                 <tr>
-                    <td><%= no %></td>
-                    <td><%= e.name %></td>
-                    <td><%= e.jabatan %></td>
-                    <td>
-                        <a
-                                href="javascript:void(0)"
-                                class="btn btn-sm btn-primary my-2"
-                                onclick="edit('<%= e.id %>', '<%= e.name %>', '<%= e.jabatan %>', '<%= e.nip %>', '<%= e.tunjangan %>')"
-                        ><i class="bi bi-pencil-fill"></i
-                            ></a>
-                        <a href="#" class="btn btn-sm btn-danger my-2" data-bs-toggle="modal"
-                           data-bs-target="#deleteModal<%= e.id %>">
-                            <i class="bi bi-trash3-fill"></i>
-                        </a>
-                        <div class="modal fade" id="deleteModal<%= e.id %>" tabindex="-1"
-                             aria-labelledby="deleteModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        Are you sure you want to delete staff <span
-                                                class="fst-italic fw-bold"><%= e.name %></span>?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
-                                            Cancel
-                                        </button>
-                                        <a href="/deleteStaff/<%= e.id %>" class="btn btn-danger">Delete</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <a
-                                href="/addTask/<%= e.id %>"
-                                class="btn btn-sm btn-success my-2"
-                        ><i class="bi bi-file-earmark-plus"></i
-                            ></a>
-
-                        <!-- modal -->
-                        <button type="button" class="btn btn-sm btn-info my-2 text-light" data-bs-toggle="modal"
-                                data-bs-target="#exampleModal<%= e.id %>">
-                            <i class="bi bi-plus-circle"></i> Add Record
-                        </button>
-                        <div class="modal modal-lg fade" id="exampleModal<%= e.id %>" tabindex="-1"
-                             aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel"> Add Task Record
-                                            for <%= e.name %></h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <!-- filter select -->
-
-                                        <select class="form-select mb-3" aria-label="Periode Task"
-                                                onchange="filterTasks(this.value)" style="width: auto !important;">
-                                            <option selected>Filter Periode Task</option>
-                                            <% listPeriode.forEach(periode => { %>
-                                                <option value="<%= periode.id %>"><%= periode.periode %></option>
-                                            <% }) %>
-                                            <option value="semua">Tampilkan Semua</option>
-                                        </select>
-
-                                        <!-- end filter select -->
-                                        <!-- form add records task -->
-                                        <form action="/addRecordTask/<%= e.id %>" method="post">
-                                            <div id="taskList">
-                                                <% let noLoop = 1; %>
-                                                <% e.task.forEach(task => { %>
-                                                    <div class="form-check task-item"
-                                                         data-periode="<%- task.periodeId %>">
-                                                        <input
-                                                                class="form-check-input"
-                                                                type="checkbox"
-                                                                id="<%= task.id %>"
-                                                                name="task"
-                                                                value="<%- [task.id, task.nilai, task.deskripsi] %>"
-                                                        />
-                                                        <label class="form-check-label" for="<%= task.id %>"
-                                                        ><%= task.deskripsi %></label
-                                                        >
-                                                    </div>
-                                                    <% noLoop++ %>
-                                                <% }) %>
-                                            </div>
-                                            <% if (e.task.length > 0) { %>
-                                                <button class="btn btn-info my-2 text-light" type="submit">
-                                                    <i class="bi bi-plus-circle"></i> Add Record</i>
-                                                </button>
-                                            <% } %>
-                                        </form>
-                                        <!-- end form add records task -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
+                    <th>Nama</th>
+                    <th>Jabatan</th>
+                    <th>Action</th>
                 </tr>
-                <% no++ %>
-            <% }) %>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                <% let no = 1; %>
+                <% data.forEach(e => { %>
+                    <tr>
+                        <td><%= e.name %></td>
+                        <td><%= e.jabatan %></td>
+                        <td>
+                            <a
+                                    href="javascript:void(0)"
+                                    class="btn btn-sm btn-primary my-2 text-white"
+                                    onclick="edit('<%= e.id %>', '<%= e.name %>', '<%= e.jabatan %>', '<%= e.nip %>', '<%= e.tunjangan %>')"
+                            ><i class="bi bi-pencil-fill"></i
+                                ></a>
+                            <button type="button" class="btn btn-sm btn-danger my-2 text-white" data-bs-toggle="modal"
+                                data-bs-target="#deleteStaffModal"
+                                data-staff-id="<%= e.id %>"
+                                data-staff-name="<%= e.name %>">
+                                <i class="bi bi-trash3-fill"></i>
+                            </button>
+                            <a
+                                    href="/addTask/<%= e.id %>"
+                                    class="btn btn-sm btn-success my-2 text-white"
+                            ><i class="bi bi-file-earmark-plus"></i
+                                ></a>
 
-        <!-- edit javascript -->
+                            <!-- modal -->
+                            <button type="button" class="btn btn-sm btn-info my-2 text-white"
+                                    data-bs-toggle="offcanvas"
+                                    data-bs-target="#addRecordModal"
+                                    data-staff-id="<%= e.id %>"
+                                    data-staff-name="<%= e.name %>">
+                                <i class="bi bi-plus-circle"></i> Penilaian
+                            </button>
+                        </td>
+                    </tr>
+                    <% no++ %>
+                <% }) %>
+                </tbody>
+            </table>
+            <!-- modal -->
+            <div class="offcanvas offcanvas-end offcanvas-record" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="addRecordModal" aria-labelledby="addRecordModalLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="addRecordModalLabel"> Penilaian Karyawan
+                        <span class="fw-bold" id="staffName"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <!-- form add records task -->
+                    <div id="recordAlertPlaceholder"></div>
+                    <form id="addRecordForm" action="" method="post">
+                        <div class="d-flex gap-2">
+                            <!-- filter select -->
+                            <select id="periodeFilter" class="form-select mb-3" aria-label="Periode Task" onchange="filterTasks(this.value)" style="width: auto !important;">
+                                <option selected>Filter Periode Task</option>
+                                <% listPeriode.forEach(periode => { %>
+                                    <option value="<%= periode.id %>"><%= periode.periode %></option>
+                                <% }) %>
+                                <option value="semua">Tampilkan Semua</option>
+                            </select>
+                            <!-- end filter select -->
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="inputGroup-sizing-default">State Date</span>
+                                <input type="date" id="start-date" class="form-control" name="date" value="<%= new Date().toISOString().slice(0,10) %>" required>
+                            </div>
+                        </div>
+                        <div id="taskList">
+                            <!-- tasks will be populated by javascript -->
+                        </div>
+                        <button id="addRecordSubmitButton" class="btn btn-info my-2 text-light" type="submit" style="display: none;">
+                            <i class="bi bi-plus-circle"></i> Update Penilaian
+                        </button>
+                    </form>
+                    <!-- end form add records task -->
+                </div>
+            </div>
+            <!-- modal delete staff (reusable) -->
+            <div class="modal fade" id="deleteStaffModal" tabindex="-1"
+                    aria-labelledby="deleteStaffModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteStaffModalLabel">Confirm Delete</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete staff <span
+                                    class="fst-italic fw-bold" id="deleteStaffName"></span>?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <a href="#" id="deleteStaffLink" class="btn btn-danger">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="p-1 p-md-4 mt-2 mt-md-0 col-md-4 col-12 order-md-2 order-1">
+        <h3>Tambah Karyawan</h3>
+        <form action="/addStaff" method="post">
+            <div class="p-2">
+                <label for="name" class="form-label">Nama:</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="name"
+                        name="name"
+                        required
+                        placeholder="Masukkan Nama"
+                />
+            </div>
+            <div class="p-2">
+                <label for="jabatan" class="form-label">Jabatan:</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="jabatan"
+                        name="jabatan"
+                        required
+                        placeholder="Masukkan Jabatan"
+                />
+            </div>
+            <div class="p-2">
+                <label for="nip" class="form-label">NIP:</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="nip"
+                        name="nip"
+                        required
+                        placeholder="Masukkan NIP"
+                />
+            </div>
+            <div class="p-2">
+                <label for="tunjangan" class="form-label">Tunjangan:</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="tunjangan"
+                        name="tunjangan"
+                        required
+                        placeholder="Masukkan Tunjangan"
+                />
+            </div>
+            <div class="py-2">
+                <button type="button" class="btn btn-sm btn-secondary text-white" onclick="clearForm()">Clear</button>
+                <button type="submit" class="btn btn-sm btn-primary text-white">Submit</button>
+            </div>
+        </form>
         <script>
-            function filterTasks(periode) {
-                const tasks = document.querySelectorAll('.task-item');
-                tasks.forEach(task => {
-                    if (periode.toLowerCase() === 'semua') {
-                        task.style.display = 'block';
-                    } else {
-                        if (task.dataset.periode.toLowerCase() === periode.toLowerCase()) {
-                            task.style.display = 'block';
-                        } else {
-                            task.style.display = 'none';
-                        }
-                    }
-                });
-            }
-        </script>
-        <script>
-            function edit(id, name, jabatan, nip, tunjangan) {
-                document.getElementById("name").value = name;
-                document.getElementById("jabatan").value = jabatan;
-                document.getElementById("nip").value = nip;
-                document.getElementById("tunjangan").value = tunjangan;
-                document.querySelector("form").action = "/updateStaff/" + id;
+            function clearForm() {
+                document.getElementById("name").value = "";
+                document.getElementById("jabatan").value = "";
+                document.getElementById("nip").value = "";
+                document.getElementById("tunjangan").value = "";
+                document.querySelector("form").action = "/addStaff/";
             }
         </script>
     </div>
-    <script>
-        $(document).ready(function () {
-            $("#myTable").DataTable({
-                responsive: true
-            });
-        });
-    </script>
 </div>
+
+
+<script>
+    function edit(id, name, jabatan, nip, tunjangan) {
+        document.getElementById("name").value = name;
+        document.getElementById("jabatan").value = jabatan;
+        document.getElementById("nip").value = nip;
+        document.getElementById("tunjangan").value = tunjangan;
+        document.querySelector("form").action = "/updateStaff/" + id;
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        $("#myTable").DataTable({
+            responsive: true
+        });
+
+        const addRecordModal = document.getElementById('addRecordModal');
+        if (addRecordModal) {
+            let currentStaffId = null;
+            let currentRecordId = null;
+
+            async function fetchAndRenderTasks(staffId, date) {
+                const taskListDiv = addRecordModal.querySelector('#taskList');
+                const submitButton = addRecordModal.querySelector('#addRecordSubmitButton');
+                taskListDiv.innerHTML = '<div class="text-center my-3">Loading tasks...</div>';
+                try {
+                    // Fetch all tasks (tanpa filter tanggal) dan recordList (berdasarkan tanggal)
+                    const [tasksRes, recordsRes] = await Promise.all([
+                        fetch(`/task/${staffId}`),
+                        fetch(`/records/${staffId}?date=${date}`)
+                    ]);
+                    if (!tasksRes.ok || !recordsRes.ok) throw new Error('Failed to fetch data');
+                    const tasks = await tasksRes.json();
+                    const recordData = await recordsRes.json(); // { recordId, taskIds }
+                    currentRecordId = recordData.recordId;
+                    const recordTaskList = recordData.taskList || [];
+
+                    console.log('Tasks:', tasks);
+                    console.log('RecordTaskList:', recordTaskList);
+
+                    taskListDiv.innerHTML = '';
+                    if (tasks.length > 0) {
+                        tasks.forEach(task => {
+                            // Cari task di recordTaskList
+                            const recordTask = recordTaskList.find(t => t.taskId === task.id);
+                            const checked = recordTask && recordTask.checked ? 'checked' : '';
+
+                            const value = `${task.id},${task.nilai},${task.deskripsi}`;
+                            const taskItem = document.createElement('div');
+                            taskItem.className = 'form-check task-item';
+                            taskItem.dataset.periode = task.periodeId;
+
+                            console.log('task.id:', task.id, 'checked:', checked);
+
+                            taskItem.innerHTML = `
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    id="task-${task.id}"
+                                    name="task"
+                                    value="${value.replace(/"/g, '&quot;')}"
+                                    ${checked}
+                                />
+                                <label class="form-check-label" for="task-${task.id}">
+                                    ${task.deskripsi}
+                                </label>
+                            `;
+                            taskListDiv.appendChild(taskItem);
+                        });
+                        if(submitButton) {
+                           submitButton.style.display = 'block';
+                        }
+                    } else {
+                        taskListDiv.innerHTML = '<p>No tasks available for this staff.</p>';
+                        if(submitButton) {
+                            submitButton.style.display = 'none';
+                        }
+                    }
+                } catch (err) {
+                    taskListDiv.innerHTML = '<div class="text-danger">Failed to load tasks.</div>';
+                    if(submitButton) {
+                        submitButton.style.display = 'none';
+                    }
+                }
+            }
+
+            addRecordModal.addEventListener('show.bs.offcanvas', function (event) {
+                const button = event.relatedTarget;
+                const staffId = button.getAttribute('data-staff-id');
+                const staffName = button.getAttribute('data-staff-name');
+                currentStaffId = staffId;
+
+                const modalTitle = addRecordModal.querySelector('#staffName');
+                const form = addRecordModal.querySelector('#addRecordForm');
+                const periodeFilter = addRecordModal.querySelector('#periodeFilter');
+                const dateInput = addRecordModal.querySelector('#start-date');
+
+                modalTitle.textContent = staffName;
+                form.action = '/addRecordTask/' + staffId;
+                if(periodeFilter) {
+                    periodeFilter.value = 'Filter Periode Task';
+                }
+
+                // Fetch tasks for the default date
+                fetchAndRenderTasks(staffId, dateInput.value);
+
+                // Set up event listener for date change
+                dateInput.onchange = function() {
+                    console.log('Tanggal berubah:', dateInput.value);
+                    fetchAndRenderTasks(currentStaffId, dateInput.value);
+                };
+
+                // Simpan state ke localStorage
+                localStorage.setItem('offcanvasOpen', 'true');
+                localStorage.setItem('offcanvasStaffId', currentStaffId);
+                localStorage.setItem('offcanvasDate', dateInput.value);
+            });
+
+            // Saat offcanvas ditutup
+            addRecordModal.addEventListener('hidden.bs.offcanvas', function () {
+                localStorage.setItem('offcanvasOpen', 'false');
+            });
+
+            // Saat submit
+            document.getElementById('addRecordForm').onsubmit = async function(e) {
+                if (currentRecordId) {
+                    e.preventDefault();
+
+                    // Ambil semua task yang ada di halaman
+                    const allTaskInputs = Array.from(this.querySelectorAll('input[name="task"]'));
+                    const taskList = allTaskInputs.map(input => {
+                        const [taskId, taskValue, taskDescription] = input.value.split(",");
+                        return {
+                            taskId,
+                            taskValue: parseInt(taskValue),
+                            taskDescription,
+                            checked: input.checked
+                        };
+                    });
+                    const date = this.querySelector('input[name="date"]').value;
+
+                    // Kirim sebagai JSON
+                    const response = await fetch(`/records/${currentRecordId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ taskList, date })
+                    });
+                    if (response.ok) {
+                        showRecordAlert('Record berhasil diupdate!', 'success');
+                        // Berhasil update, bisa tutup offcanvas atau refresh data
+                    }
+                }
+                // else, biarkan submit normal (POST)
+            };
+
+            // Fungsi untuk menampilkan Bootstrap alert
+            function showRecordAlert(message, type) {
+                const alertPlaceholder = document.getElementById('recordAlertPlaceholder');
+                alertPlaceholder.innerHTML = `
+                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                setTimeout(() => {
+                    const alert = alertPlaceholder.querySelector('.alert');
+                    if (alert) {
+                        alert.classList.remove('show');
+                        alert.classList.add('hide');
+                        setTimeout(() => { alertPlaceholder.innerHTML = ''; }, 500);
+                    }
+                }, 2500);
+            }
+        }
+
+
+        const deleteStaffModal = document.getElementById('deleteStaffModal');
+        if(deleteStaffModal) {
+            deleteStaffModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const staffId = button.getAttribute('data-staff-id');
+                const staffName = button.getAttribute('data-staff-name');
+                const nameSpan = deleteStaffModal.querySelector('#deleteStaffName');
+                const deleteLink = deleteStaffModal.querySelector('#deleteStaffLink');
+                if(nameSpan) {
+                    nameSpan.textContent = staffName;
+                }
+                if(deleteLink) {
+                    deleteLink.href = '/deleteStaff/' + staffId;
+                }
+            });
+        }
+
+        // Restore state offcanvas jika perlu
+        if (localStorage.getItem('offcanvasOpen') === 'true') {
+            const staffId = localStorage.getItem('offcanvasStaffId');
+            const date = localStorage.getItem('offcanvasDate');
+            if (staffId && date) {
+                // Temukan tombol Add Record yang sesuai dan trigger offcanvas
+                const btn = document.querySelector(`button[data-staff-id='${staffId}'][data-bs-target='#addRecordModal']`);
+                if (btn) {
+                    // Set tanggal sebelum buka offcanvas
+                    setTimeout(() => {
+                        const dateInput = document.getElementById('start-date');
+                        if (dateInput) dateInput.value = date;
+                        // Paksa buka offcanvas
+                        const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(addRecordModal);
+                        bsOffcanvas.show(btn);
+                    }, 300); // delay agar DOM siap
+                }
+            }
+        }
+    });
+
+    function filterTasks(periode) {
+        const tasks = document.querySelectorAll('.task-item');
+        tasks.forEach(task => {
+            if (periode.toLowerCase() === 'semua') {
+                task.style.display = 'block';
+            } else {
+                if (task.dataset.periode.toLowerCase() === periode.toLowerCase()) {
+                    task.style.display = 'block';
+                } else {
+                    task.style.display = 'none';
+                }
+            }
+        });
+    }
+</script>

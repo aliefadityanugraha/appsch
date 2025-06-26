@@ -52,11 +52,10 @@ module.exports = {
 
     deletePeriode: async (req, res) => {
 
-        await prisma.periode.delete({
-            where: {
-                id: req.params.id,
-            },
-        });
+        const idPeriode = req.params.id;
+
+        await prisma.periode.delete({ where: { id: idPeriode } });
+
         res.status(200).redirect("/periode");
 
     },

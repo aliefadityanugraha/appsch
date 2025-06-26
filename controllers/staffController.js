@@ -14,6 +14,7 @@ module.exports = {
                         periode: true,
                     },
                 },
+                records: true,
             },
             orderBy: {
                 createdAt: "asc",

@@ -63,6 +63,22 @@ router.get("/roles", authenticateToken, roles);
 /* refresh token route */
 router.get('/auth/refresh-token', refreshToken);
 
+// Route untuk mengambil data user yang sedang login
+router.get('/users/current-user', authenticateToken, async (req, res) => {
+    const { PrismaClient } = require('@prisma/client');
+    const prisma = new PrismaClient();
+    try {
+        // req.user diisi oleh authenticateToken, berisi { userId, email }
+        const user = await prisma.user.findUnique({ where: { id: req.user.userId } });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json({ email: user.email });
+    } catch (err) {
+        res.status(500).json({ error: 'Internal server error' });
+    } finally {
+        await prisma.$disconnect();
+    }
+});
+
 /* error handler route*/
 // router.get("*", errorController.error404);
 

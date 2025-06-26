@@ -1,71 +1,5 @@
-<div class="main-content position-relative border-radius-lg p-4">
-    <div class="container-fluid card p-5">
-        <style>
-            .form-section {
-                margin-bottom: 20px;
-            }
-
-            .table {
-                margin-top: 20px;
-            }
-        </style>
-
-        <%- include('./components/button-go-back.ejs') %>
-        <h3 class="mt-4 mb-3">Tambah Task Staff</h3>
-        <h4 class="mb-2"><%= staff[0].name %></h4>
-        <p>Staff ID : <%= staff[0].id %></p>
-        <% const nilai = data.reduce((acc, e) => acc + e.nilai, 0) %>
-        <p>Presentase Nilai : <%= Math.round(nilai * 100 / 100) %>%</p>
-
-        <form action="/addTask" method="post" class="mt-4">
-            <input type="hidden" id="id" name="id" value="<%= id %>" required/>
-            <div class="form-section">
-                <label for="deskripsi" class="form-label">Deskripsi Task:</label>
-                <textarea
-                        id="deskripsi"
-                        name="deskripsi"
-                        class="form-control"
-                        required
-                        rows="3"
-                ></textarea>
-            </div>
-            <div class="form-section">
-                <label for="periode" class="form-label">Periode:</label>
-                <select id="periode" name="periode" class="form-control" required>
-                    <% periodeData.forEach(e => { %>
-                        <option value="<%= e.id %>"><%= e.periode %></option>
-                    <% }); %>
-                </select>
-            </div>
-            <div class="form-section">
-                <label for="nilai" class="form-label">Nilai:</label>
-                <input
-                        type="number"
-                        id="nilai"
-                        name="nilai"
-                        class="form-control"
-                        required
-                        min="0"
-                        max="100" required
-                />
-            </div>
-            <div class="form-section">
-                <button type="button" class="btn btn-secondary" onclick="clearForm()">
-                    Clear
-                </button>
-                <script>
-                    function clearForm() {
-                        document.getElementById("deskripsi").value = "";
-                        document.getElementById("nilai").value = "";
-                        document.querySelector("form").action = "/addTask";
-                    }
-                </script>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
-        </form>
-    </div>
-    <div class="container-fluid card p-5 mt-5">
-        <h3 class="mt-4">Tasks</h3>
+<div class="row p-1 p-md-4">
+    <div class="p-1 p-md-4 mt-2 mt-md-0 col-md-8 col-12 order-md-1 order-2">
         <style>
             @media (max-width: 768px) {
                 #myTable {
@@ -77,102 +11,102 @@
                 }
             }
         </style>
-
-        <table
-                id="myTable"
-                class="table display responsive"
-                cellspacing="0"
-        >
-            <thead>
-            <tr>
-                <th>No</th>
-                <th>Deskripsi</th>
-                <th>Periode</th>
-                <th>Nilai</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            <% let no = 1; %>
-            <% data.forEach(e => { %>
-                <tr>
-                    <td><%= no %></td>
-                    <td><%= e.deskripsi %></td>
-                    <td><%= e.periode.periode %></td>
-                    <td><%= e.nilai %></td>
-                    <td>
-                        <script>
-                            function editTask(id, deskripsi, nilai, periode) {
-                                document.getElementById("deskripsi").value = deskripsi;
-                                document.getElementById("nilai").value = nilai;
-                                document.getElementById("periode").value = periode;
-                                document.querySelector("form").action = "/updateTask/" + id;
-                            }
-                        </script>
-                        <a
-                                href="javascript:void(0)"
-                                class="btn btn-sm btn-outline-primary my-2"
-                                onclick="editTask('<%= e.id %>', '<%= e.deskripsi %>', '<%= e.nilai %>', '<%= e.periodeId %>')"
-                        ><i class="bi bi-pencil-fill"></i
-                            ></a>
-                        <a
-                                href="#"
-                                class="btn btn-sm btn-outline-danger my-2"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal<%= e.id %>"
-                        >
-                            <i class="bi bi-trash3-fill"></i>
-                        </a>
-                        <div
-                                class="modal fade"
-                                id="deleteModal<%= e.id %>"
-                                tabindex="-1"
-                                aria-labelledby="deleteModalLabel"
-                                aria-hidden="true"
-                        >
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="deleteModalLabel">
-                                            Confirm Delete
-                                        </h5>
-                                        <button
-                                                type="button"
-                                                class="btn-close"
-                                                data-bs-dismiss="modal"
-                                                aria-label="Close"
-                                        ></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        Are you sure you want to delete this task?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button
-                                                type="button"
-                                                class="btn btn-secondary"
-                                                data-bs-dismiss="modal"
-                                        >
-                                            Cancel
-                                        </button>
-                                        <a href="/deleteTask/<%= e.id %>/<%= staff[0].id %>" class="btn btn-danger"
-                                        >Delete</a
-                                        >
+        <div class="table-responsive">
+            <table id="myTable" class="table table-striped align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>No</th>
+                        <th>Deskripsi</th>
+                        <th>Periode</th>
+                        <th>Nilai</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% let no = 1; %>
+                    <% data.forEach(e => { %>
+                        <tr>
+                            <td><%= no %></td>
+                            <td><%= e.deskripsi %></td>
+                            <td><%= e.periode.periode %></td>
+                            <td><%= e.nilai %></td>
+                            <td>
+                                <script>
+                                    function editTask(id, deskripsi, nilai, periode) {
+                                        document.getElementById("deskripsi").value = deskripsi;
+                                        document.getElementById("nilai").value = nilai;
+                                        document.getElementById("periode").value = periode;
+                                        document.querySelector("form").action = "/updateTask/" + id;
+                                    }
+                                </script>
+                                <a href="javascript:void(0)" class="btn btn-sm btn-outline-primary my-2" onclick="editTask('<%= e.id %>', '<%= e.deskripsi %>', '<%= e.nilai %>', '<%= e.periodeId %>')">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                                <a href="#" class="btn btn-sm btn-outline-danger my-2" data-bs-toggle="modal" data-bs-target="#deleteModal<%= e.id %>">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </a>
+                                <div class="modal fade" id="deleteModal<%= e.id %>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">Are you sure you want to delete this task?</div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <a href="/deleteTask/<%= e.id %>/<%= staff[0].id %>" class="btn btn-danger">Delete</a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <% no++ %>
-            <% }) %>
-            </tbody>
-        </table>
+                            </td>
+                        </tr>
+                        <% no++ %>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
         <script>
             $(document).ready(function () {
-                $("#myTable").DataTable({
-                    responsive: true,
-                });
+                $("#myTable").DataTable({ responsive: true });
             });
+        </script>
+    </div>
+    <div class="p-1 p-md-4 mt-2 mt-md-0 col-md-4 col-12 order-md-2 order-1">
+        <h3>Tambah tugas untuk <%= staff[0].name %></h3>
+        <p>Staff ID : <%= staff[0].id %></p>
+        <% const nilai = data.reduce((acc, e) => acc + e.nilai, 0) %>
+        <p>Presentase Nilai : <%= Math.round(nilai * 100 / 100) %>%</p>
+        <form action="/addTask" method="post" class="mt-4">
+            <input type="hidden" id="id" name="id" value="<%= id %>" required/>
+            <div class="mb-3">
+                <label for="deskripsi" class="form-label">Deskripsi Task:</label>
+                <textarea id="deskripsi" name="deskripsi" class="form-control" required rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="periode" class="form-label">Instrumen:</label>
+                <select id="periode" name="periode" class="form-select" required>
+                    <% periodeData.forEach(e => { %>
+                        <option value="<%= e.id %>"><%= e.periode %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="nilai" class="form-label">Nilai:</label>
+                <input type="number" id="nilai" name="nilai" class="form-control" required min="0" max="100" />
+            </div>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-secondary text-white" onclick="clearForm()">Clear</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+        <script>
+            function clearForm() {
+                document.getElementById("deskripsi").value = "";
+                document.getElementById("nilai").value = "";
+                document.querySelector("form").action = "/addTask";
+            }
         </script>
     </div>
 </div>

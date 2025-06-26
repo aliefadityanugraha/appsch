@@ -1,42 +1,106 @@
-<!-- Navbar -->
-<nav
-        class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl "
-        id="navbarBlur"
-        data-scroll="false"
->
-    <div class="container-fluid py-1">
+<nav class="navbar p-3 bg-body-tertiary">
+    <div class="container-fluid">
         <div>
-            <h4><%= title %> page</h4>
-        </div>
-        <div
-                class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4"
-                id="navbar"
-        >
-            <ul class="navbar-nav w-100 justify-content-end align-content-center">
-                <li class="nav-item d-flex align-items-center">
-                    <a
-                            href="javascript:void(0);"
-                            class="nav-link font-weight-bold px-0"
-                    >
-                        <i class="fa fa-user me-sm-1"></i>
-                        <a href="/logout" class="d-sm-inline d-none">Logout</a>
-                    </a>
-                </li>
-                <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
-                    <a
-                            href="javascript:void(0);"
-                            class="nav-link text-white p-0"
-                            id="iconNavbarSidenav"
-                    >
-                        <div class="sidenav-toggler-inner">
-                            <i class="sidenav-toggler-line bg-dark"></i>
-                            <i class="sidenav-toggler-line bg-dark"></i>
-                            <i class="sidenav-toggler-line bg-dark"></i>
-                        </div>
-                    </a>
-                </li>
-            </ul>
+            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+                <i class="bi bi-list"></i>
+            </button>
+            <a class="navbar-brand px-4" href="#">
+            <img src="/public/img/logo-smata.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+                TUKIN SMATAJAYA
+            </a>
         </div>
     </div>
 </nav>
-<!-- End Navbar -->
+
+<!-- ofcanvas navbar -->
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="addRecordModalLabel">TUKIN SMATAJAYA</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="position-relative h-100">
+        <ul class="navbar-nav p-5">
+            <li class="text-white my-1 px-4 rounded-2 <%= req === '/' ? 'bg-primary' : 'bg-secondary' %>">
+                <a class="nav-link d-flex" href="/">
+                    <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+                    >
+                        <i class="bi bi-box-fill text-lg"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Dashboard</span>
+                </a>
+            </li>
+            <li class="text-white my-1 px-4 rounded-2 <%= req === '/staff' ? 'bg-primary' : 'bg-secondary' %>">
+                <a class="nav-link d-flex"href="/staff">
+                    <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+                    >
+                        <i class="bi bi-people-fill text-lg"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Karyawan & Penilaian</span>
+                </a>
+            </li>
+            <li class="text-white my-1 px-4 rounded-2 <%= req === '/periode' ? 'bg-primary' : 'bg-secondary' %>">
+                <a class="nav-link d-flex" href="/periode">
+                    <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+                    >
+                        <i class="bi bi-calendar-day-fill text-lg"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Kategori Instrumen</span>
+                </a>
+            </li>
+            <li class="text-white my-1 px-4 rounded-2 <%= req === '/data' ? 'bg-primary' : 'bg-secondary' %>">
+                <a class="nav-link d-flex" href="/data">
+                    <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+                    >
+                        <i class="bi bi-card-checklist text-lg"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Laporan</span>
+                </a>
+            </li>
+            <li class="text-white my-1 px-4 rounded-2 <%= req === '/settings' ? 'bg-primary' : 'bg-secondary' %>">
+                <a class="nav-link d-flex" href="/settings">
+                    <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+                    >
+                        <i class="bi bi-gear-fill text-lg"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Settings</span>
+                </a>
+            </li>
+        </ul>
+        <div class="position-absolute bottom-0 p-5 text-white my-1 d-flex gap-2">
+            <a class="nav-link d-flex bg-secondary rounded-2 py-2 px-3" href="/logout">
+                <span id="user-info"></span>
+            </a>
+            </a>
+            <a class="nav-link d-flex bg-secondary rounded-2 py-2 px-3" href="/logout">
+                <div
+                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
+                >
+                <i class="bi bi-box-arrow-right"></i>
+                </div>
+                <span class="nav-link-text ms-1">Logout</span>
+            </a>
+        </div>
+    </div>
+</div>
+<!-- end ofcanvas navbar -->
+
+<style>
+    ul li:hover {
+        opacity: 0.5;
+        transition: all 0.5s;
+    }
+</style>
+
+<script>
+fetch('/users/current-user')
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('user-info').innerText = data.email; // atau data.name jika ada
+  });
+</script>

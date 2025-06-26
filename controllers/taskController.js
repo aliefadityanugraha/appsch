@@ -91,4 +91,30 @@ module.exports = {
         res.status(200).redirect(`/addTask/${staffId}`);
 
     },
+
+    getTasksByStaffId: async (req, res) => {
+        const staffId = req.params.id;
+        const date = req.query.date;
+        let whereClause = { staffId };
+        if (date) {
+            const start = new Date(date);
+            start.setHours(0,0,0,0);
+            const end = new Date(date);
+            end.setHours(23,59,59,999);
+            whereClause.createdAt = {
+                gte: start,
+                lte: end
+            };
+        }
+        const tasks = await prisma.task.findMany({
+            where: whereClause,
+            select: {
+                id: true,
+                deskripsi: true,
+                nilai: true,
+                periodeId: true
+            }
+        });
+        res.json(tasks);
+    },
 };
