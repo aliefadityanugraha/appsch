@@ -22,12 +22,16 @@ module.exports = {
         });
 
         const listPeriode = await prisma.periode.findMany({});
+        const message = req.flash('message');
+        const type = req.flash('type');
         res.status(200).render("staff", {
             layout: "layouts/main-layouts",
             title: "Data Staff",
             data,
             listPeriode: listPeriode,
             req: req.path,
+            message: message.length > 0 ? message[0] : '',
+            type: type.length > 0 ? type[0] : 'success'
         });
 
     },
@@ -39,7 +43,9 @@ module.exports = {
         await prisma.staff.create({
             data: {name, jabatan, nip, tunjangan},
         });
-        res.status(200).redirect("/staff");
+        req.flash('message', 'Data karyawan berhasil ditambahkan!');
+        req.flash('type', 'success');
+        res.redirect('/staff');
 
     },
 
@@ -52,7 +58,9 @@ module.exports = {
             where: {id},
             data: {name, jabatan, nip, tunjangan, updatedAt: new Date()},
         });
-        res.status(200).redirect("/staff");
+        req.flash('message', 'Data karyawan berhasil diupdate!');
+        req.flash('type', 'success');
+        res.redirect('/staff');
 
     },
 

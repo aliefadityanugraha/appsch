@@ -37,7 +37,7 @@ module.exports = {
             const accessToken = jsonWebToken.sign(
                 {userId: user.id, email: user.email},
                 process.env.ACCESS_SECRET_KEY,
-                {expiresIn: "5h"}
+                {expiresIn: "15m"}
             );
 
             const refreshToken = jsonWebToken.sign(
@@ -88,7 +88,7 @@ module.exports = {
                 req.flash("message", "Email already in use");
                 return res.status(400).redirect("/auth/register");
             }
-``
+
             const hashedPassword = crypto.createHash("sha256").update(password).digest("hex");
 
             const newUser = await prisma.user.create({
@@ -127,17 +127,34 @@ module.exports = {
 
             if (!user) return res.status(403).redirect("/auth/login");
 
-            jsonWebToken.verify(refreshToken, process.env.REFRESH_SECRET_KEY, (err, decoded) => {
+            jsonWebToken.verify(refreshToken, process.env.REFRESH_SECRET_KEY, async (err, decoded) => {
                 if (err) return res.status(403).redirect("/auth/login");
 
                 const accessToken = jsonWebToken.sign(
                     {userId: user.id, email: user.email},
                     process.env.ACCESS_SECRET_KEY,
-                    {expiresIn: "5m"}
+                    {expiresIn: "15m"}
                 );
 
                 console.log("Get Refresh token:", accessToken);
                 req.session.token = accessToken;
+
+                const newRefreshToken = jsonWebToken.sign(
+                    {userId: user.id, email: user.email},
+                    process.env.REFRESH_SECRET_KEY,
+                    {expiresIn: "7d"}
+                );
+
+                await prisma.user.update({
+                    where: {id: user.id},
+                    data: {refreshToken: newRefreshToken},
+                });
+
+                res.cookie("refreshToken", newRefreshToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    maxAge: 3 * 24 * 60 * 60 * 1000,
+                });
 
                 res.redirect('/');
             });
