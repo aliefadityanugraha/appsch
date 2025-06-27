@@ -133,7 +133,7 @@ module.exports = {
                 const accessToken = jsonWebToken.sign(
                     {userId: user.id, email: user.email},
                     process.env.ACCESS_SECRET_KEY,
-                    {expiresIn: "15m"}
+                    {expiresIn: "1h"}
                 );
 
                 console.log("Get Refresh token:", accessToken);

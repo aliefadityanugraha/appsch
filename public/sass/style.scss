@@ -73,73 +73,73 @@ $offcanvas-backdrop-opacity:        $modal-backdrop-opacity;
   }
 }
 
-.pagination {
-  justify-content: center; // Tengah
-  margin-top: 1rem;
-}
+// .pagination {
+//   justify-content: center; // Tengah
+//   margin-top: 1rem;
+//   width: 100%;
+// }
 
-.page-item.active .page-link {
-  background-color: $custom-primary; // atau warna lain
-  border-color: $custom-primary;
-  color: #fff;
-}
+// .page-item.active .page-link {
+//   background-color: $custom-primary; // atau warna lain
+//   border-color: $custom-primary;
+//   color: #fff;
+// }
 
-.page-link {
-  color: $custom-primary;
-  border-radius: 50% !important;
-  margin: 0 2px;
-  transition: background 0.2s;
-}
+// .page-link {
+//   color: $custom-primary;
+//   border-radius: 50% !important;
+//   margin: 0 2px;
+//   transition: background 0.2s;
+// }
 
-.page-link:hover {
-  background: lighten($custom-primary, 20%);
-  color: #fff;
-}
+// .page-link:hover {
+//   background: lighten($custom-primary, 20%);
+//   color: #fff;
+// }
 
-// Untuk DataTables pagination
-.dataTables_paginate .pagination {
-  justify-content: flex-end; // atau flex-start, center, dsb
-}
+// // Untuk DataTables pagination
+// .dataTables_paginate .pagination {
+//   justify-content: flex-end; // atau flex-start, center, dsb
+// }
 
-.dataTables_paginate .page-item.active .page-link {
-  background-color: $custom-success;
-  border-color: $custom-success;
-  color: #fff;
-}
+// .dataTables_paginate .page-item.active .page-link {
+//   background-color: $custom-success;
+//   border-color: $custom-success;
+//   color: #fff;
+// }
 
-.dataTables_paginate .page-link {
-  color: $custom-dark;
-  border-radius: 0.5rem;
-  font-weight: bold;
-}
+// .dataTables_paginate .page-link {
+//   color: $custom-dark;
+//   border-radius: 1rem;
+// }
 
-.dt-paging-button {
-  background: $custom-primary;
-  color: #fff;
-  border: 0px solid ;
-  border-radius: 20% !important;
-  margin: 0 2px;
-  width: 2rem;
-  height: 2rem;
-  font-weight: bold;
-  transition: background 0.2s, color 0.2s;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-}
+// .dt-paging-button {
+//   background: $custom-primary;
+//   color: #fff;
+//   border: 0px solid ;
+//   border-radius: 20% !important;
+//   margin: 0 2px;
+//   width: 2rem;
+//   height: 2rem;
+//   font-weight: bold;
+//   transition: background 0.2s, color 0.2s;
+//   box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+// }
 
-.dt-paging-button.current,
-.dt-paging-button:active {
-  background: $custom-primary;
-  color: #fff;
-  border-color: $custom-primary;
-}
+// .dt-paging-button.current,
+// .dt-paging-button:active {
+//   background: $custom-primary;
+//   color: #fff;
+//   border-color: $custom-primary;
+// }
 
-.dt-paging-button:hover:not(.disabled):not(.current) {
-  background: lighten($custom-primary, 20%);
-  color: #fff;
-  cursor: pointer;
-}
+// .dt-paging-button:hover:not(.disabled):not(.current) {
+//   background: lighten($custom-primary, 20%);
+//   color: #fff;
+//   cursor: pointer;
+// }
 
-.dt-paging-button.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+// .dt-paging-button.disabled {
+//   opacity: 0.5;
+//   cursor: not-allowed;
+// }

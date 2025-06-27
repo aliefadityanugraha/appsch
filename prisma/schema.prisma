@@ -56,24 +56,24 @@ model Staff {
 }
 
 model Task {
-  id        String   @unique @default(uuid())
-  deskripsi String
-  nilai     Int
-  date      DateTime @default(now())
+  id        String    @id @default(uuid())
+  description String
+  value     Float
   staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   staffId   String
   periode   Periode  @relation(fields: [periodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   periodeId String
+  records   Records[] @relation("RecordTasks")
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Records {
-  id        String   @unique @default(uuid())
+  id        String   @id @default(uuid())
   value     Float
-  taskList  Json
   staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   staffId   String
+  tasks     Task[]   @relation("RecordTasks")
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }

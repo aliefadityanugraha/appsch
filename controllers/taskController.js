@@ -59,23 +59,20 @@ module.exports = {
     },
 
     updateTask: async (req, res) => {
-
-        const {deskripsi, periode, nilai} = req.body;
+        const {description, periode, value} = req.body;
         const taskId = req.params.id;
-
         await prisma.task.update({
             where: {
                 id: taskId,
             },
             data: {
-                deskripsi,
-                nilai: parseInt(nilai),
+                description,
+                value: parseFloat(value),
                 periodeId: periode,
                 updatedAt: new Date(),
             },
         });
         res.status(200).redirect(`/addTask/${req.body.id}`);
-
     },
 
     deleteTask: async (req, res) => {
@@ -110,11 +107,26 @@ module.exports = {
             where: whereClause,
             select: {
                 id: true,
-                deskripsi: true,
-                nilai: true,
+                description: true,
+                value: true,
                 periodeId: true
             }
         });
         res.json(tasks);
+    },
+
+    createRecord: async (req, res) => {
+        const { value, staffId, taskIds } = req.body;
+        const record = await prisma.records.create({
+            data: {
+                value,
+                staffId,
+            },
+        });
+        await prisma.task.updateMany({
+            where: { id: { in: taskIds } },
+            data: { recordId: record.id },
+        });
+        res.status(200).redirect(`/addTask/${staffId}`);
     },
 };

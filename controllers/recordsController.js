@@ -24,7 +24,8 @@ module.exports = {
                         tunjangan: true,
                         jabatan: true
                     }
-                }
+                },
+                tasks: true
             },
             orderBy: {
                 createdAt: "asc",
@@ -42,31 +43,13 @@ module.exports = {
 
     addRecords: async (req, res) => {
         try {
-            let data = req.body["task"] || [];
-            if (typeof data === "string") {
-                data = [data];
+            let taskIds = req.body["taskIds"] || [];
+            if (typeof taskIds === "string") {
+                taskIds = [taskIds];
             }
 
-            console.log('data:', data, 'typeof:', typeof data, 'isArray:', Array.isArray(data));
-
-            const taskList = [];
-            data.forEach(taskStr => {
-                const parts = taskStr.split(','); // Memisahkan string menjadi maksimal 3 bagian: id, nilai, deskripsi
-                const taskObject = {
-                    taskId: parts[0],
-                    taskValue: parseInt(parts[1]), // Mengubah nilai menjadi integer
-                    deskripsi: parts[2],
-                    checked: true
-                };
-                console.log(parts)
-                taskList.push(taskObject);
-            });
-
-            // Hitung total nilai hanya dari task yang tercentang
-            const totalTaskValue = taskList
-                .filter(task => task.checked)
-                .reduce((sum, task) => sum + (task.taskValue || 0), 0);
-                
+            const tasks = await prisma.task.findMany({ where: { id: { in: taskIds } } });
+            const totalTaskValue = tasks.reduce((sum, task) => sum + (task.value || 0), 0);
             let createdAt = new Date();
             if (req.body.date) {
                 createdAt = new Date(req.body.date);
@@ -76,8 +59,10 @@ module.exports = {
                 data: {
                     staffId: req.params.id,
                     value: totalTaskValue,
-                    taskList: taskList,
                     createdAt: createdAt,
+                    tasks: {
+                        connect: taskIds.map(id => ({ id }))
+                    }
                 },
             });
             res.status(200).redirect("/staff");
@@ -103,7 +88,8 @@ module.exports = {
                         tunjangan: true,
                         jabatan: true
                     }
-                }
+                },
+                tasks: true
             },
             orderBy: {
                 createdAt: "asc",
@@ -135,40 +121,39 @@ module.exports = {
         }
         const records = await prisma.records.findMany({
             where: whereClause,
-            select: { id: true, taskList: true }
+            include: { tasks: true }
         });
         let recordId = null;
-        let taskList = [];
+        let tasks = [];
         if (records.length > 0) {
             recordId = records[0].id;
-            taskList = records[0].taskList || [];
+            tasks = records[0].tasks || [];
         }
-        res.json({ recordId, taskList });
+        res.json({ recordId, tasks });
     },
 
     updateRecord: async (req, res) => {
         try {
             const recordId = req.params.id;
-            let taskList = req.body.taskList;
-            if (typeof taskList === "string") {
-                taskList = JSON.parse(taskList);
+            let taskIds = req.body.taskIds;
+            if (typeof taskIds === "string") {
+                taskIds = [taskIds];
             }
-            if (!Array.isArray(taskList)) {
-                taskList = [];
+            if (!Array.isArray(taskIds)) {
+                taskIds = [];
             }
 
-            console.log(taskList)
-            const totalTaskValue = taskList
-                .filter(task => task.checked)
-                .reduce((sum, task) => sum + task.taskValue, 0);
-            console.log(totalTaskValue)
+            const tasks = await prisma.task.findMany({ where: { id: { in: taskIds } } });
+            const totalTaskValue = tasks.reduce((sum, task) => sum + (task.value || 0), 0);
 
             await prisma.records.update({
                 where: { id: recordId },
                 data: {
                     value: totalTaskValue,
-                    taskList: taskList,
                     updatedAt: new Date(),
+                    tasks: {
+                        set: taskIds.map(id => ({ id }))
+                    }
                 },
             });
             res.status(200).json({ success: true });

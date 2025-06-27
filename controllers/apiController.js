@@ -26,9 +26,9 @@ module.exports = {
     const data = await prisma.records.findMany({
       include: {
         staff: true,
+        tasks: true
       },
     });
-
     res.json(data);
   },
 };
