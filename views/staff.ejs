@@ -72,25 +72,25 @@
                     <form id="addRecordForm" action="" method="post">
                         <div class="d-xxl-flex gap-2 d-block">
                             <!-- filter select -->
-                            <div class="input-group mb-3">
+                            <div class="input-group input-group-sm mb-3">
                                 <label class="input-group-text" for="periodeFilter"><i class="bi bi-funnel-fill px-1"></i>Filter by Instrumen</label>
-                                <select id="periodeFilter" class="form-select" aria-label="Periode Task" onchange="filterTasks(this.value)" style="width: auto !important;">
+                                <select id="periodeFilter" class="form-select form-select-sm" aria-label="Periode Task" onchange="filterTasks(this.value)" style="width: auto !important;">
+                                    <option selected value="semua">Tampilkan Semua</option>
                                     <% listPeriode.forEach(periode => { %>
                                         <option value="<%= periode.id %>"><%= periode.periode %></option>
                                     <% }) %>
-                                    <option value="semua">Tampilkan Semua</option>
                                 </select>
                             </div>
                             <!-- end filter select -->
-                            <div class="input-group mb-3">
+                            <div class="input-group input-group-sm mb-3">
                                 <span class="input-group-text"><i class="bi bi-calendar-date-fill px-1"></i> State Date</span>
-                                <input type="date" id="start-date" class="form-control" name="date" value="<%= new Date().toISOString().slice(0,10) %>" required>
+                                <input type="date" id="start-date" class="form-control form-control-sm" name="date" value="<%= new Date().toISOString().slice(0,10) %>" required>
                             </div>
                         </div>
                         <ul id="taskList" class="list-group">
                             <!-- tasks will be populated by javascript -->
                         </ul>
-                        <button id="addRecordSubmitButton" class="btn btn-info my-2 text-white" type="submit" style="display: none;">
+                        <button id="addRecordSubmitButton" class="btn btn-sm btn-info my-2 text-white" type="submit" style="display: none;">
                             <i class="bi bi-plus-circle"></i> Update Penilaian
                         </button>
                     </form>
@@ -129,7 +129,7 @@
                 <label for="name" class="form-label">Nama:</label>
                 <input
                         type="text"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         id="name"
                         name="name"
                         required
@@ -140,7 +140,7 @@
                 <label for="jabatan" class="form-label">Jabatan:</label>
                 <input
                         type="text"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         id="jabatan"
                         name="jabatan"
                         required
@@ -151,7 +151,7 @@
                 <label for="nip" class="form-label">NIP:</label>
                 <input
                         type="text"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         id="nip"
                         name="nip"
                         required
@@ -162,7 +162,7 @@
                 <label for="tunjangan" class="form-label">Tunjangan:</label>
                 <input
                         type="text"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         id="tunjangan"
                         name="tunjangan"
                         required
@@ -305,6 +305,16 @@
         document.getElementById('addRecordForm').onsubmit = async function(e) {
             await handleRecordFormSubmit(e, this);
         };
+
+        document.getElementById('addRecordForm').addEventListener('submit', function(e) {
+            if (!currentRecordId) {
+                // Hanya enable input yang dicentang
+                const allTaskInputs = Array.from(this.querySelectorAll('input[name="task"]'));
+                allTaskInputs.forEach(input => {
+                    if (!input.checked) input.disabled = true;
+                });
+            }
+        });
     }
 
     function handleOffcanvasShow(event, addRecordModal) {
@@ -346,49 +356,20 @@
     }
 
     async function handleRecordFormSubmit(e, formElement) {
-        console.log('Form submit - currentRecordId:', currentRecordId);
-        
-        // Jika ada currentRecordId, berarti update record (gunakan AJAX)
         if (currentRecordId) {
             e.preventDefault();
-            console.log('Updating existing record...');
-
-            const allTaskInputs = Array.from(formElement.querySelectorAll('input[name="task"]'));
-            const taskList = allTaskInputs.map(input => {
-                const [taskId, taskValue, taskDescription] = input.value.split(",");
-                return {
-                    taskId,
-                    taskValue: parseInt(taskValue),
-                    taskDescription,
-                    checked: input.checked  
-                };
-            });
+            // Ambil semua task yang tercentang
+            const checkedTaskInputs = Array.from(formElement.querySelectorAll('input[name="taskIds"]:checked'));
+            const taskIds = checkedTaskInputs.map(input => input.value);
             const date = formElement.querySelector('input[name="date"]').value;
-
             const response = await fetch(`/records/${currentRecordId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ taskList, date })
+                body: JSON.stringify({ taskIds, date })
             });
             if (response.ok) {
                 showRecordAlert('Record berhasil diupdate!', 'success');
             }
-        } else {
-            // Jika tidak ada currentRecordId, berarti add new record
-            console.log('Adding new record...');
-            
-            // Hanya kirim task yang tercentang
-            const checkedTaskInputs = Array.from(formElement.querySelectorAll('input[name="task"]:checked'));
-            console.log('Checked tasks:', checkedTaskInputs.length);
-            
-            // Hapus semua input task yang tidak tercentang
-            const uncheckedTaskInputs = Array.from(formElement.querySelectorAll('input[name="task"]:not(:checked)'));
-            uncheckedTaskInputs.forEach(input => {
-                input.disabled = true; // Disable input yang tidak tercentang
-            });
-            
-            // Biarkan form submit normal ke /addRecordTask/
-            // Form akan mengirim hanya task yang tercentang
         }
     }
 
@@ -397,44 +378,32 @@
         const taskListDiv = addRecordModal.querySelector('#taskList');
         const submitButton = addRecordModal.querySelector('#addRecordSubmitButton');
         taskListDiv.innerHTML = '<div class="text-center my-3">Loading tasks...</div>';
-        
         try {
             const [tasksRes, recordsRes] = await Promise.all([
                 fetch(`/task/${staffId}`),
                 fetch(`/records/${staffId}?date=${date}`)
             ]);
             if (!tasksRes.ok || !recordsRes.ok) throw new Error('Failed to fetch data');
-            
             const tasks = await tasksRes.json();
             const recordData = await recordsRes.json();
-            currentRecordId = recordData.recordId; // Update global variable
-            console.log('Updated currentRecordId:', currentRecordId);
-            
-            const recordTaskList = recordData.taskList || [];
-
-            console.log('Tasks:', tasks);
-            console.log('RecordTaskList:', recordTaskList);
-
-            renderTaskList(taskListDiv, tasks, recordTaskList, submitButton);
+            currentRecordId = recordData.recordId;
+            // recordData.tasks adalah array of task yang sudah terhubung ke record
+            const recordTaskIds = (recordData.tasks || []).map(t => t.id);
+            renderTaskList(taskListDiv, tasks, recordTaskIds, submitButton);
         } catch (err) {
             handleTaskFetchError(taskListDiv, submitButton);
         }
     }
 
-    function renderTaskList(taskListDiv, tasks, recordTaskList, submitButton) {
+    function renderTaskList(taskListDiv, tasks, recordTaskIds, submitButton) {
         taskListDiv.innerHTML = '';
         if (tasks.length > 0) {
             tasks.forEach(task => {
-                const recordTask = recordTaskList.find(t => t.taskId === task.id);
-                const checked = recordTask && recordTask.checked ? 'checked' : '';
-
-                const value = `${task.id},${task.nilai},${task.deskripsi}`;
+                const checked = recordTaskIds.includes(task.id) ? 'checked' : '';
+                const value = task.id;
                 const taskItem = document.createElement('div');
                 taskItem.className = 'form-check task-item';
                 taskItem.dataset.periode = task.periodeId;
-
-                console.log('task.id:', task.id, 'checked:', checked);
-
                 taskItem.innerHTML = `
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
@@ -442,21 +411,21 @@
                                 class="form-check-input"
                                 type="checkbox"
                                 id="task-${task.id}"
-                                name="task"
-                                value="${value.replace(/"/g, '&quot;')}"
+                                name="taskIds"
+                                value="${value}"
                                 ${checked}
                             />
                             <label class="form-check-label" for="task-${task.id}">
-                                ${task.deskripsi}
+                                ${task.description || ''}
                             </label>
                         </div>
-                        <span class="badge text-bg-success text-white rounded-pill">${task.nilai}</span>
+                        <span class="badge text-bg-danger text-white rounded-pill">${task.value || 0}</span>
                     </li>
                 `;
                 taskListDiv.appendChild(taskItem);
             });
             if(submitButton) {
-               submitButton.style.display = 'block';
+                submitButton.style.display = 'block';
             }
         } else {
             taskListDiv.innerHTML = '<p>Tidak ada tugas untuk karyawan ini</p>';
@@ -524,4 +493,34 @@
             }
         });
     }
+
+    function updateCheckedBg() {
+        document.querySelectorAll('.list-group-item').forEach(function(item) {
+            var checkbox = item.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                if (checkbox.checked) {
+                    item.classList.add('checked-bg');
+                } else {
+                    item.classList.remove('checked-bg');
+                }
+                checkbox.addEventListener('change', function() {
+                    if (checkbox.checked) {
+                        item.classList.add('checked-bg');
+                    } else {
+                        item.classList.remove('checked-bg');
+                    }
+                });
+            }
+        });
+    }
+
+    if (typeof renderTaskList === 'function') {
+        const origRenderTaskList = renderTaskList;
+        renderTaskList = function(...args) {
+            origRenderTaskList.apply(this, args);
+            setTimeout(updateCheckedBg, 0);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', updateCheckedBg);
 </script>

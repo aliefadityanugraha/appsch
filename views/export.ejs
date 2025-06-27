@@ -8,36 +8,57 @@
             <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
-            <form action="/filterRecords" method="POST" class="mb-4">
-                <div class="row g-3 align-items-center">
-                    <div class="col-auto">
-                        <label for="start-date" class="col-form-label">Start Date</label>
+            <div class="d-flex justify-content-between">
+                <form id="filter-form" action="/filterRecords" method="POST" class="mb-4">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-auto">
+                            <label for="month" class="col-form-label">Month</label>
+                        </div>
+                        <div class="col-auto">
+                            <select id="month" class="form-control-sm form-control" required>
+                                <% for(let m=1; m<=12; m++) { %>
+                                    <option value="<%= m %>"><%= new Date(0, m-1).toLocaleString('default', { month: 'long' }) %></option>
+                                <% } %>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <label for="year" class="col-form-label">Year</label>
+                        </div>
+                        <div class="col-auto">
+                            <select id="year" class="form-control form-control-sm" required>
+                                <% const currentYear = new Date().getFullYear(); %>
+                                <%  for(let y=currentYear; y>=currentYear-10; y--) { %>
+                                    <option value="<%= y %>"><%= y %></option>
+                                <% } %>
+                            </select>
+                        </div>
+                        <input type="hidden" id="start-date" name="gte" required>
+                        <input type="hidden" id="end-date" name="lte" required>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-funnel-fill px-2"></i>Filter</button>
+                        </div>
                     </div>
-                    <div class="col-auto">
-                        <input type="date" id="start-date" class="form-control" name="gte" required>
-                    </div>
-                    <div class="col-auto">
-                        <label for="end-date" class="col-form-label">End Date</label>
-                    </div>
-                    <div class="col-auto">
-                        <input type="date" id="end-date" class="form-control" name="lte" required>
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-primary">Filter</button>
-                    </div>
+                </form>
+    
+                <div class="d-flex gap-2 my-3">
+                    <button id="exportExcel" class="btn btn-sm btn-success text-white"><i class="bi bi-download px-2"></i>Export to Excel</button>
                 </div>
-            </form>
-
+            </div>
             <div style="width: 100%; height: auto;" id="excelTableContainer">
                 <div id="excelTable" style="width: 100%; height: 100%;"></div>
             </div>
 
-            <div class="d-flex gap-2 my-3">
-                <button id="exportExcel" class="btn btn-success">Export to Excel</button>
-            </div>
-
             <script>const jsonData = JSON.parse('<%- JSON.stringify(records) %>');</script>
             <script>
+
+                const now = new Date();
+                const monthNames = [
+                    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                ];
+                const month = monthNames[now.getMonth()];
+                const year = now.getFullYear();
+
                 const totalDays = 31;
                 const grouped = {};
 
@@ -50,11 +71,14 @@
                     if (!grouped[staffName]) {
                         grouped[staffName] = { name: staffName, tanggal: Array(totalDays).fill(0) };
                     }
-                    let value = entry.value || 0;
-                    if (entry.taskList && entry.taskList.length > 0) {
-                        const getValue = entry.taskList.filter(task => task.checked).reduce((sum, task) => sum + (task.taskValue || 0), 0);
-                        value = (getValue/100*(100/22)).toFixed(1)
+                    let value = 0;
+                    if (entry.tasks && entry.tasks.length > 0) {
+                        const getValue = entry.tasks.reduce((sum, task) => sum + (task.value || 0), 0);
+                        value = (getValue/100*(100/22));
+                    } else {
+                        value = (entry.value/100*(100/22));
                     }
+                    value = value.toFixed(2);
                     grouped[staffName].tanggal[entryDate - 1] += parseFloat(value);
                     grouped[staffName].tunjangan = tunjangan;
                 });
@@ -72,7 +96,6 @@
                     }
                     row.total_skor = total_skor;
                     
-                    // Fix tunjangan calculation
                     const tunjanganValue = parseFloat(staffData.tunjangan) || 0;
                     row.total_tukin = total_skor * tunjanganValue / 100;
                     
@@ -91,8 +114,8 @@
                             if (value === 0) td.textContent = '';
                         }
                     })),
-                    { data: 'total_skor', readOnly: true, width: 80 },
-                    { data: 'total_tukin', readOnly: true, width: 80, renderer: function(instance, td, row, col, prop, value) {
+                    { data: 'total_skor', readOnly: true, width: 100 },
+                    { data: 'total_tukin', readOnly: true, width: 100, renderer: function(instance, td, row, col, prop, value) {
                         Handsontable.renderers.TextRenderer.apply(this, arguments);
                         if (value !== null && value !== undefined && !isNaN(value)) {
                             td.textContent = parseFloat(value).toFixed(2);
@@ -128,43 +151,58 @@
 
                     const totalCols = 2 + totalDays + 2;
 
-                    worksheet.mergeCells(1, 1, 1, totalCols);
-                    worksheet.getCell('A1').value = 'PENILAIAN TUNJANGAN KINERJA';
-                    worksheet.getCell('A1').alignment = { horizontal: 'center' };
-                    worksheet.getCell('A1').font = { bold: true, size: 14 };
-
+                    worksheet.addRow([]);
                     worksheet.mergeCells(2, 1, 2, totalCols);
-                    worksheet.getCell('A2').value = 'SMAN 5 TARUNA BRAWIJAYA JAWA TIMUR';
+                    worksheet.getCell('A2').value = 'PENILAIAN TUNJANGAN KINERJA';
                     worksheet.getCell('A2').alignment = { horizontal: 'center' };
-                    worksheet.getCell('A2').font = { bold: true };
+                    worksheet.getCell('A2').font = { bold: true, size: 14 };
 
                     worksheet.mergeCells(3, 1, 3, totalCols);
-                    worksheet.getCell('A3').value = 'REKAP BULAN 01 2025';
+                    worksheet.getCell('A3').value = 'SMAN 5 TARUNA BRAWIJAYA JAWA TIMUR';
                     worksheet.getCell('A3').alignment = { horizontal: 'center' };
                     worksheet.getCell('A3').font = { bold: true };
 
-                    // Header tabel
-                    const header = ['No', 'Nama Karyawan', ...Array.from({ length: totalDays }, (_, i) => `${i + 1}`), 'Total Skor', "Total Tukin"];
-                    worksheet.addRow([]);
-                    worksheet.addRow(header); // baris ke-4
+                    worksheet.mergeCells(4, 1, 4, totalCols);
+                    worksheet.getCell('A4').value = `REKAP BULAN ${month.toUpperCase()} ${year}`;
+                    worksheet.getCell('A4').alignment = { horizontal: 'center' };
+                    worksheet.getCell('A4').font = { bold: true };
 
-                    // Data rows
+                    worksheet.addRow([]);
+                    const header = ['No', 'Nama Karyawan', ...Array.from({ length: totalDays }, (_, i) => `${i + 1}`), 'Total Skor', "Total Tukin"];
+                    const adedRowBoder = worksheet.addRow(header);
+                    adedRowBoder.eachCell((cell) => {
+                          cell.border = {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                          };
+                        });
+
                     tableData.forEach(row => {
                         const rowData = [row.no, row.nama ];
                         for (let i = 1; i <= totalDays; i++) {
                             rowData.push(row[`tanggal_${i}`] || 0);
                         }
                         rowData.push(row.total_skor || 0);
-                        // Handle NaN values for total_tukin
-                        const totalTukin = isNaN(row.total_tukin) ? 0 : row.total_tukin;
-                        rowData.push(totalTukin);
-                        worksheet.addRow(rowData);
+
+                        let totalTukin = isNaN(row.total_tukin) ? 0 : row.total_tukin;
+                        const formattedTukin = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(totalTukin);
+                        rowData.push(formattedTukin);
+
+                        const addedRow = worksheet.addRow(rowData);
+                        addedRow.eachCell((cell) => {
+                          cell.border = {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                          };
+                        });
                     });
 
-                    // Hitung baris terakhir dari data
                     const lastRowIndex = worksheet.lastRow.number + 2;
 
-                    // Tambah header tanda tangan
                     worksheet.mergeCells(`C${lastRowIndex}:D${lastRowIndex}`);
                     worksheet.getCell(`C${lastRowIndex}`).value = "Kepala Sekolah";
                     worksheet.getCell(`C${lastRowIndex}`).alignment = { horizontal: 'center' };
@@ -177,40 +215,45 @@
                     worksheet.getCell(`T${lastRowIndex}`).value = "Penilai 2";
                     worksheet.getCell(`T${lastRowIndex}`).alignment = { horizontal: 'center' };
 
-                    // Tambah baris kosong (untuk tempat tanda tangan)
                     worksheet.addRow([]);
 
-                    // Tambah nama-nama
                     const nameRow = worksheet.addRow([]);
                     nameRow.getCell('C').value = "Eko Agus Suwandi, S.Pd, MM";
                     nameRow.getCell('M').value = "Suhardi";
                     nameRow.getCell('T').value = "Saelan";
 
-                    // Posisikan & format rata tengah
                     nameRow.getCell('C').alignment = { horizontal: 'center' };
                     nameRow.getCell('M').alignment = { horizontal: 'center' };
                     nameRow.getCell('T').alignment = { horizontal: 'center' };
 
-
-                    // Kolom width
                     worksheet.columns = [
                         { width: 5 },
                         { width: 30 },
                         ...Array.from({ length: totalDays }, () => ({ width: 4 })),
                         { width: 10 },
-                        { width: 10 }
+                        { width: 15 }
                     ];
 
-                    // Header style
                     const headerRow = worksheet.getRow(5);
                     headerRow.font = { bold: true };
                     headerRow.alignment = { horizontal: 'center' };
 
-                    // Simpan file
                     const buffer = await workbook.xlsx.writeBuffer();
-                    saveAs(new Blob([buffer]), `Data_Karyawan_${new Date().toISOString().slice(0,10)}.xlsx`);
+                    const fileName = `PENILAIAN TUNJANGAN KINERJA BULAN ${month.toUpperCase()} ${year}.xlsx`;
+                    saveAs(new Blob([buffer]), fileName);
                 });
 
+                document.getElementById('filter-form').addEventListener('submit', function(e) {
+                    const month = document.getElementById('month').value;
+                    const year = document.getElementById('year').value;
+                    // Start date: first day of month
+                    const startDate = new Date(year, month - 1, 1);
+                    // End date: last day of month
+                    const endDate = new Date(year, month, 0);
+                    // Format as yyyy-mm-dd
+                    document.getElementById('start-date').value = startDate.toISOString().slice(0,10);
+                    document.getElementById('end-date').value = endDate.toISOString().slice(0,10);
+                });
 
             </script>
         </div>
