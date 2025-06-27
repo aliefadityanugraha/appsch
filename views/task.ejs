@@ -39,10 +39,10 @@
                                         document.querySelector("form").action = "/updateTask/" + id;
                                     }
                                 </script>
-                                <a href="javascript:void(0)" class="btn btn-sm btn-outline-primary my-2" onclick="editTask('<%= e.id %>', '<%= e.deskripsi %>', '<%= e.nilai %>', '<%= e.periodeId %>')">
+                                <a href="javascript:void(0)" class="btn btn-sm btn-primary my-2" onclick="editTask('<%= e.id %>', '<%= e.deskripsi %>', '<%= e.nilai %>', '<%= e.periodeId %>')">
                                     <i class="bi bi-pencil-fill"></i>
                                 </a>
-                                <a href="#" class="btn btn-sm btn-outline-danger my-2" data-bs-toggle="modal" data-bs-target="#deleteModal<%= e.id %>">
+                                <a href="#" class="btn btn-sm btn-danger my-2 text-white" data-bs-toggle="modal" data-bs-target="#deleteModal<%= e.id %>">
                                     <i class="bi bi-trash3-fill"></i>
                                 </a>
                                 <div class="modal fade" id="deleteModal<%= e.id %>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -54,8 +54,8 @@
                                             </div>
                                             <div class="modal-body">Are you sure you want to delete this task?</div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                <a href="/deleteTask/<%= e.id %>/<%= staff[0].id %>" class="btn btn-danger">Delete</a>
+                                                <button type="button" class="btn btn-sm btn-secondary text-white" data-bs-dismiss="modal">Cancel</button>
+                                                <a href="/deleteTask/<%= e.id %>/<%= staff[0].id %>" class="btn btn-sm btn-danger text-white">Delete</a>
                                             </div>
                                         </div>
                                     </div>
@@ -97,8 +97,8 @@
                 <input type="number" id="nilai" name="nilai" class="form-control" required min="0" max="100" />
             </div>
             <div class="d-flex gap-2">
-                <button type="button" class="btn btn-secondary text-white" onclick="clearForm()">Clear</button>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-sm btn-danger text-white" onclick="clearForm()"><i class="bi bi-x-circle px-1"></i>Clear</button>
+                <button type="submit" class="btn btn-sm btn-success text-white"><i class="bi bi-floppy px-1"></i> Simpan</button>
             </div>
         </form>
         <script>

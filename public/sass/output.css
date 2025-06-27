@@ -11876,6 +11876,11 @@ textarea.form-control-lg {
   --bs-offcanvas-border-color: rgba(0, 0, 0, 0.1);
 }
 
+@media (max-width: 576px) {
+  .offcanvas-record {
+    --bs-offcanvas-width: 100vw;
+  }
+}
 .pagination {
   justify-content: center;
   margin-top: 1rem;

@@ -70,25 +70,27 @@
                     <!-- form add records task -->
                     <div id="recordAlertPlaceholder"></div>
                     <form id="addRecordForm" action="" method="post">
-                        <div class="d-flex gap-2">
+                        <div class="d-xxl-flex gap-2 d-block">
                             <!-- filter select -->
-                            <select id="periodeFilter" class="form-select mb-3" aria-label="Periode Task" onchange="filterTasks(this.value)" style="width: auto !important;">
-                                <option selected>Filter Periode Task</option>
-                                <% listPeriode.forEach(periode => { %>
-                                    <option value="<%= periode.id %>"><%= periode.periode %></option>
-                                <% }) %>
-                                <option value="semua">Tampilkan Semua</option>
-                            </select>
+                            <div class="input-group mb-3">
+                                <label class="input-group-text" for="periodeFilter"><i class="bi bi-funnel-fill px-1"></i>Filter by Instrumen</label>
+                                <select id="periodeFilter" class="form-select" aria-label="Periode Task" onchange="filterTasks(this.value)" style="width: auto !important;">
+                                    <% listPeriode.forEach(periode => { %>
+                                        <option value="<%= periode.id %>"><%= periode.periode %></option>
+                                    <% }) %>
+                                    <option value="semua">Tampilkan Semua</option>
+                                </select>
+                            </div>
                             <!-- end filter select -->
                             <div class="input-group mb-3">
-                                <span class="input-group-text" id="inputGroup-sizing-default">State Date</span>
+                                <span class="input-group-text"><i class="bi bi-calendar-date-fill px-1"></i> State Date</span>
                                 <input type="date" id="start-date" class="form-control" name="date" value="<%= new Date().toISOString().slice(0,10) %>" required>
                             </div>
                         </div>
-                        <div id="taskList">
+                        <ul id="taskList" class="list-group">
                             <!-- tasks will be populated by javascript -->
-                        </div>
-                        <button id="addRecordSubmitButton" class="btn btn-info my-2 text-light" type="submit" style="display: none;">
+                        </ul>
+                        <button id="addRecordSubmitButton" class="btn btn-info my-2 text-white" type="submit" style="display: none;">
                             <i class="bi bi-plus-circle"></i> Update Penilaian
                         </button>
                     </form>
@@ -110,10 +112,10 @@
                                     class="fst-italic fw-bold" id="deleteStaffName"></span>?
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+                            <button type="button" class="btn btn-sm btn-secondary text-white" data-bs-dismiss="modal">
                                 Cancel
                             </button>
-                            <a href="#" id="deleteStaffLink" class="btn btn-danger">Delete</a>
+                            <a href="#" id="deleteStaffLink" class="btn btn-sm btn-danger text-white">Delete</a>
                         </div>
                     </div>
                 </div>
@@ -122,7 +124,7 @@
     </div>
     <div class="p-1 p-md-4 mt-2 mt-md-0 col-md-4 col-12 order-md-2 order-1">
         <h3>Tambah Karyawan</h3>
-        <form action="/addStaff" method="post">
+        <form id="form-karyawan" action="/addStaff" method="post">
             <div class="p-2">
                 <label for="name" class="form-label">Nama:</label>
                 <input
@@ -168,8 +170,8 @@
                 />
             </div>
             <div class="py-2">
-                <button type="button" class="btn btn-sm btn-secondary text-white" onclick="clearForm()">Clear</button>
-                <button type="submit" class="btn btn-sm btn-primary text-white">Submit</button>
+                <button type="button" class="btn btn-sm btn-danger text-white" onclick="clearForm()"><i class="bi bi-x-circle px-1"></i>Clear</button>
+                <button type="submit" class="btn btn-sm btn-success text-white"><i class="bi bi-floppy px-1"></i> Simpan</button>
             </div>
         </form>
         <script>
@@ -191,175 +193,287 @@
         document.getElementById("jabatan").value = jabatan;
         document.getElementById("nip").value = nip;
         document.getElementById("tunjangan").value = tunjangan;
-        document.querySelector("form").action = "/updateStaff/" + id;
+        document.querySelector("#form-karyawan").action = "/updateStaff/" + id;
     }
 </script>
 <script>
+    // Global variables untuk state management
+    let currentStaffId = null;
+    let currentRecordId = null;
+
     $(document).ready(function () {
         $("#myTable").DataTable({
-            responsive: true
+            responsive: true,
+            initComplete: function() {
+                console.log('DataTable initialization complete');
+                initializeOffcanvasSystem();
+            }
         });
+    });
 
+    // Fungsi untuk menginisialisasi sistem offcanvas
+    function initializeOffcanvasSystem() {
         const addRecordModal = document.getElementById('addRecordModal');
-        if (addRecordModal) {
-            let currentStaffId = null;
-            let currentRecordId = null;
+        if (!addRecordModal) return;
 
-            async function fetchAndRenderTasks(staffId, date) {
-                const taskListDiv = addRecordModal.querySelector('#taskList');
-                const submitButton = addRecordModal.querySelector('#addRecordSubmitButton');
-                taskListDiv.innerHTML = '<div class="text-center my-3">Loading tasks...</div>';
-                try {
-                    // Fetch all tasks (tanpa filter tanggal) dan recordList (berdasarkan tanggal)
-                    const [tasksRes, recordsRes] = await Promise.all([
-                        fetch(`/task/${staffId}`),
-                        fetch(`/records/${staffId}?date=${date}`)
-                    ]);
-                    if (!tasksRes.ok || !recordsRes.ok) throw new Error('Failed to fetch data');
-                    const tasks = await tasksRes.json();
-                    const recordData = await recordsRes.json(); // { recordId, taskIds }
-                    currentRecordId = recordData.recordId;
-                    const recordTaskList = recordData.taskList || [];
+        // Restore state offcanvas
+        restoreOffcanvasState(addRecordModal);
 
-                    console.log('Tasks:', tasks);
-                    console.log('RecordTaskList:', recordTaskList);
+        // Setup event listeners
+        setupOffcanvasEventListeners(addRecordModal);
+        setupDeleteModalListeners();
+    }
 
-                    taskListDiv.innerHTML = '';
-                    if (tasks.length > 0) {
-                        tasks.forEach(task => {
-                            // Cari task di recordTaskList
-                            const recordTask = recordTaskList.find(t => t.taskId === task.id);
-                            const checked = recordTask && recordTask.checked ? 'checked' : '';
-
-                            const value = `${task.id},${task.nilai},${task.deskripsi}`;
-                            const taskItem = document.createElement('div');
-                            taskItem.className = 'form-check task-item';
-                            taskItem.dataset.periode = task.periodeId;
-
-                            console.log('task.id:', task.id, 'checked:', checked);
-
-                            taskItem.innerHTML = `
-                                <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    id="task-${task.id}"
-                                    name="task"
-                                    value="${value.replace(/"/g, '&quot;')}"
-                                    ${checked}
-                                />
-                                <label class="form-check-label" for="task-${task.id}">
-                                    ${task.deskripsi}
-                                </label>
-                            `;
-                            taskListDiv.appendChild(taskItem);
-                        });
-                        if(submitButton) {
-                           submitButton.style.display = 'block';
+    function restoreOffcanvasState(addRecordModal) {
+        console.log('=== DEBUG RESTORE STATE ===');
+        console.log('localStorage offcanvasOpen:', localStorage.getItem('offcanvasOpen'));
+        console.log('localStorage offcanvasStaffId:', localStorage.getItem('offcanvasStaffId'));
+        console.log('localStorage offcanvasDate:', localStorage.getItem('offcanvasDate'));
+        
+        if (localStorage.getItem('offcanvasOpen') === 'true') {
+            console.log('Condition met: offcanvasOpen is true');
+            const staffId = localStorage.getItem('offcanvasStaffId');
+            let date = localStorage.getItem('offcanvasDate');
+            console.log('StaffId from localStorage:', staffId);
+            console.log('Date from localStorage:', date);
+            
+            // Jika date null, gunakan tanggal hari ini
+            if (!date) {
+                date = new Date().toISOString().slice(0,10);
+                console.log('Date was null, using today:', date);
+            }
+            
+            if (staffId) {
+                console.log('StaffId exists, proceeding with restore...');
+                // Pastikan Bootstrap sudah ter-load dan DOM siap
+                setTimeout(() => {
+                    console.log('Inside setTimeout - checking state again...');
+                    // Cek lagi apakah state masih valid
+                    if (localStorage.getItem('offcanvasOpen') === 'true') {
+                        console.log('State still valid, looking for button...');
+                        const btn = document.querySelector(`button[data-staff-id='${staffId}'][data-bs-target='#addRecordModal']`);
+                        console.log('Button found:', btn);
+                        console.log('addRecordModal:', addRecordModal);
+                        
+                        if (btn && addRecordModal) {
+                            console.log('Both button and modal found, proceeding...');
+                            // Set tanggal sebelum buka offcanvas
+                            const dateInput = document.getElementById('start-date');
+                            if (dateInput) dateInput.value = date;
+                            
+                            // Pastikan offcanvas instance sudah ada
+                            const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(addRecordModal);
+                            console.log('Bootstrap offcanvas instance:', bsOffcanvas);
+                            console.log('Bootstrap available:', typeof bootstrap !== 'undefined');
+                            
+                            if (bsOffcanvas) {
+                                console.log('Showing offcanvas...');
+                                bsOffcanvas.show(btn);
+                            }
+                        } else {
+                            console.log("Button or modal not found, clearing state");
+                            clearOffcanvasState();
                         }
                     } else {
-                        taskListDiv.innerHTML = '<p>No tasks available for this staff.</p>';
-                        if(submitButton) {
-                            submitButton.style.display = 'none';
-                        }
+                        console.log('State no longer valid, skipping restore');
                     }
-                } catch (err) {
-                    taskListDiv.innerHTML = '<div class="text-danger">Failed to load tasks.</div>';
-                    if(submitButton) {
-                        submitButton.style.display = 'none';
-                    }
-                }
+                }, 200);
+            } else {
+                console.log('Missing staffId, skipping restore');
             }
+        } else {
+            console.log('Condition not met: offcanvasOpen is not true');
+        }
+        console.log('=== END DEBUG RESTORE STATE ===');
+    }
 
-            addRecordModal.addEventListener('show.bs.offcanvas', function (event) {
-                const button = event.relatedTarget;
-                const staffId = button.getAttribute('data-staff-id');
-                const staffName = button.getAttribute('data-staff-name');
-                currentStaffId = staffId;
+    function clearOffcanvasState() {
+        localStorage.setItem('offcanvasOpen', 'false');
+        localStorage.removeItem('offcanvasStaffId');
+        localStorage.removeItem('offcanvasDate');
+    }
 
-                const modalTitle = addRecordModal.querySelector('#staffName');
-                const form = addRecordModal.querySelector('#addRecordForm');
-                const periodeFilter = addRecordModal.querySelector('#periodeFilter');
-                const dateInput = addRecordModal.querySelector('#start-date');
+    function setupOffcanvasEventListeners(addRecordModal) {
+        addRecordModal.addEventListener('show.bs.offcanvas', function (event) {
+            handleOffcanvasShow(event, addRecordModal);
+        });
 
-                modalTitle.textContent = staffName;
-                form.action = '/addRecordTask/' + staffId;
-                if(periodeFilter) {
-                    periodeFilter.value = 'Filter Periode Task';
-                }
+        addRecordModal.addEventListener('hidden.bs.offcanvas', function () {
+            handleOffcanvasHidden();
+        });
 
-                // Fetch tasks for the default date
-                fetchAndRenderTasks(staffId, dateInput.value);
+        document.getElementById('addRecordForm').onsubmit = async function(e) {
+            await handleRecordFormSubmit(e, this);
+        };
+    }
 
-                // Set up event listener for date change
-                dateInput.onchange = function() {
-                    console.log('Tanggal berubah:', dateInput.value);
-                    fetchAndRenderTasks(currentStaffId, dateInput.value);
-                };
+    function handleOffcanvasShow(event, addRecordModal) {
+        const button = event.relatedTarget;
+        const staffId = button.getAttribute('data-staff-id');
+        const staffName = button.getAttribute('data-staff-name');
+        currentStaffId = staffId; // Update global variable
 
-                // Simpan state ke localStorage
-                localStorage.setItem('offcanvasOpen', 'true');
-                localStorage.setItem('offcanvasStaffId', currentStaffId);
-                localStorage.setItem('offcanvasDate', dateInput.value);
-            });
+        const modalTitle = addRecordModal.querySelector('#staffName');
+        const form = addRecordModal.querySelector('#addRecordForm');
+        const periodeFilter = addRecordModal.querySelector('#periodeFilter');
+        const dateInput = addRecordModal.querySelector('#start-date');
 
-            // Saat offcanvas ditutup
-            addRecordModal.addEventListener('hidden.bs.offcanvas', function () {
-                localStorage.setItem('offcanvasOpen', 'false');
-            });
-
-            // Saat submit
-            document.getElementById('addRecordForm').onsubmit = async function(e) {
-                if (currentRecordId) {
-                    e.preventDefault();
-
-                    // Ambil semua task yang ada di halaman
-                    const allTaskInputs = Array.from(this.querySelectorAll('input[name="task"]'));
-                    const taskList = allTaskInputs.map(input => {
-                        const [taskId, taskValue, taskDescription] = input.value.split(",");
-                        return {
-                            taskId,
-                            taskValue: parseInt(taskValue),
-                            taskDescription,
-                            checked: input.checked
-                        };
-                    });
-                    const date = this.querySelector('input[name="date"]').value;
-
-                    // Kirim sebagai JSON
-                    const response = await fetch(`/records/${currentRecordId}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ taskList, date })
-                    });
-                    if (response.ok) {
-                        showRecordAlert('Record berhasil diupdate!', 'success');
-                        // Berhasil update, bisa tutup offcanvas atau refresh data
-                    }
-                }
-                // else, biarkan submit normal (POST)
-            };
-
-            // Fungsi untuk menampilkan Bootstrap alert
-            function showRecordAlert(message, type) {
-                const alertPlaceholder = document.getElementById('recordAlertPlaceholder');
-                alertPlaceholder.innerHTML = `
-                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                        ${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                `;
-                setTimeout(() => {
-                    const alert = alertPlaceholder.querySelector('.alert');
-                    if (alert) {
-                        alert.classList.remove('show');
-                        alert.classList.add('hide');
-                        setTimeout(() => { alertPlaceholder.innerHTML = ''; }, 500);
-                    }
-                }, 2500);
-            }
+        modalTitle.textContent = staffName;
+        form.action = '/addRecordTask/' + staffId;
+        if(periodeFilter) {
+            periodeFilter.value = 'Filter Periode Task';
         }
 
+        fetchAndRenderTasks(staffId, dateInput.value);
 
+        dateInput.onchange = function() {
+            console.log('Tanggal berubah:', dateInput.value);
+            fetchAndRenderTasks(currentStaffId, dateInput.value);
+            localStorage.setItem('offcanvasDate', dateInput.value);
+        };
+
+        setTimeout(() => {
+            localStorage.setItem('offcanvasOpen', 'true');
+            localStorage.setItem('offcanvasStaffId', currentStaffId);
+            localStorage.setItem('offcanvasDate', dateInput.value);
+        }, 100);
+    }
+
+    function handleOffcanvasHidden() {
+        setTimeout(() => {
+            clearOffcanvasState();
+        }, 100);
+    }
+
+    async function handleRecordFormSubmit(e, formElement) {
+        console.log('Form submit - currentRecordId:', currentRecordId);
+        
+        // Jika ada currentRecordId, berarti update record (gunakan AJAX)
+        if (currentRecordId) {
+            e.preventDefault();
+            console.log('Updating existing record...');
+
+            const allTaskInputs = Array.from(formElement.querySelectorAll('input[name="task"]'));
+            const taskList = allTaskInputs.map(input => {
+                const [taskId, taskValue, taskDescription] = input.value.split(",");
+                return {
+                    taskId,
+                    taskValue: parseInt(taskValue),
+                    taskDescription,
+                    checked: input.checked  
+                };
+            });
+            const date = formElement.querySelector('input[name="date"]').value;
+
+            const response = await fetch(`/records/${currentRecordId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ taskList, date })
+            });
+            if (response.ok) {
+                showRecordAlert('Record berhasil diupdate!', 'success');
+            }
+        } else {
+            // Jika tidak ada currentRecordId, berarti add new record
+            console.log('Adding new record...');
+            
+            // Hanya kirim task yang tercentang
+            const checkedTaskInputs = Array.from(formElement.querySelectorAll('input[name="task"]:checked'));
+            console.log('Checked tasks:', checkedTaskInputs.length);
+            
+            // Hapus semua input task yang tidak tercentang
+            const uncheckedTaskInputs = Array.from(formElement.querySelectorAll('input[name="task"]:not(:checked)'));
+            uncheckedTaskInputs.forEach(input => {
+                input.disabled = true; // Disable input yang tidak tercentang
+            });
+            
+            // Biarkan form submit normal ke /addRecordTask/
+            // Form akan mengirim hanya task yang tercentang
+        }
+    }
+
+    async function fetchAndRenderTasks(staffId, date) {
+        const addRecordModal = document.getElementById('addRecordModal');
+        const taskListDiv = addRecordModal.querySelector('#taskList');
+        const submitButton = addRecordModal.querySelector('#addRecordSubmitButton');
+        taskListDiv.innerHTML = '<div class="text-center my-3">Loading tasks...</div>';
+        
+        try {
+            const [tasksRes, recordsRes] = await Promise.all([
+                fetch(`/task/${staffId}`),
+                fetch(`/records/${staffId}?date=${date}`)
+            ]);
+            if (!tasksRes.ok || !recordsRes.ok) throw new Error('Failed to fetch data');
+            
+            const tasks = await tasksRes.json();
+            const recordData = await recordsRes.json();
+            currentRecordId = recordData.recordId; // Update global variable
+            console.log('Updated currentRecordId:', currentRecordId);
+            
+            const recordTaskList = recordData.taskList || [];
+
+            console.log('Tasks:', tasks);
+            console.log('RecordTaskList:', recordTaskList);
+
+            renderTaskList(taskListDiv, tasks, recordTaskList, submitButton);
+        } catch (err) {
+            handleTaskFetchError(taskListDiv, submitButton);
+        }
+    }
+
+    function renderTaskList(taskListDiv, tasks, recordTaskList, submitButton) {
+        taskListDiv.innerHTML = '';
+        if (tasks.length > 0) {
+            tasks.forEach(task => {
+                const recordTask = recordTaskList.find(t => t.taskId === task.id);
+                const checked = recordTask && recordTask.checked ? 'checked' : '';
+
+                const value = `${task.id},${task.nilai},${task.deskripsi}`;
+                const taskItem = document.createElement('div');
+                taskItem.className = 'form-check task-item';
+                taskItem.dataset.periode = task.periodeId;
+
+                console.log('task.id:', task.id, 'checked:', checked);
+
+                taskItem.innerHTML = `
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="task-${task.id}"
+                                name="task"
+                                value="${value.replace(/"/g, '&quot;')}"
+                                ${checked}
+                            />
+                            <label class="form-check-label" for="task-${task.id}">
+                                ${task.deskripsi}
+                            </label>
+                        </div>
+                        <span class="badge text-bg-success text-white rounded-pill">${task.nilai}</span>
+                    </li>
+                `;
+                taskListDiv.appendChild(taskItem);
+            });
+            if(submitButton) {
+               submitButton.style.display = 'block';
+            }
+        } else {
+            taskListDiv.innerHTML = '<p>Tidak ada tugas untuk karyawan ini</p>';
+            if(submitButton) {
+                submitButton.style.display = 'none';
+            }
+        }
+    }
+
+    function handleTaskFetchError(taskListDiv, submitButton) {
+        taskListDiv.innerHTML = '<div class="text-danger">Failed to load tasks.</div>';
+        if(submitButton) {
+            submitButton.style.display = 'none';
+        }
+    }
+
+    function setupDeleteModalListeners() {
         const deleteStaffModal = document.getElementById('deleteStaffModal');
         if(deleteStaffModal) {
             deleteStaffModal.addEventListener('show.bs.modal', function (event) {
@@ -376,27 +490,25 @@
                 }
             });
         }
+    }
 
-        // Restore state offcanvas jika perlu
-        if (localStorage.getItem('offcanvasOpen') === 'true') {
-            const staffId = localStorage.getItem('offcanvasStaffId');
-            const date = localStorage.getItem('offcanvasDate');
-            if (staffId && date) {
-                // Temukan tombol Add Record yang sesuai dan trigger offcanvas
-                const btn = document.querySelector(`button[data-staff-id='${staffId}'][data-bs-target='#addRecordModal']`);
-                if (btn) {
-                    // Set tanggal sebelum buka offcanvas
-                    setTimeout(() => {
-                        const dateInput = document.getElementById('start-date');
-                        if (dateInput) dateInput.value = date;
-                        // Paksa buka offcanvas
-                        const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(addRecordModal);
-                        bsOffcanvas.show(btn);
-                    }, 300); // delay agar DOM siap
-                }
+    function showRecordAlert(message, type) {
+        const alertPlaceholder = document.getElementById('recordAlertPlaceholder');
+        alertPlaceholder.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        setTimeout(() => {
+            const alert = alertPlaceholder.querySelector('.alert');
+            if (alert) {
+                alert.classList.remove('show');
+                alert.classList.add('hide');
+                setTimeout(() => { alertPlaceholder.innerHTML = ''; }, 500);
             }
-        }
-    });
+        }, 2500);
+    }
 
     function filterTasks(periode) {
         const tasks = document.querySelectorAll('.task-item');

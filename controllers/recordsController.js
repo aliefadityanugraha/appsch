@@ -18,7 +18,13 @@ module.exports = {
                 },
             },
             include: {
-                staff: true,
+                staff: {
+                    select: {
+                        name: true,
+                        tunjangan: true,
+                        jabatan: true
+                    }
+                }
             },
             orderBy: {
                 createdAt: "asc",
@@ -40,16 +46,27 @@ module.exports = {
             if (typeof data === "string") {
                 data = [data];
             }
-            const taskList = Array.isArray(data)
-                ? data.map((item) => {
-                    const [taskId, taskValue, taskDescription] = item.split(",");
-                    return {taskId, taskValue: parseInt(taskValue), taskDescription};
-                })
-                : [];
-            const totalTaskValue = taskList.reduce(
-                (sum, task) => sum + task.taskValue,
-                0
-            );
+
+            console.log('data:', data, 'typeof:', typeof data, 'isArray:', Array.isArray(data));
+
+            const taskList = [];
+            data.forEach(taskStr => {
+                const parts = taskStr.split(','); // Memisahkan string menjadi maksimal 3 bagian: id, nilai, deskripsi
+                const taskObject = {
+                    taskId: parts[0],
+                    taskValue: parseInt(parts[1]), // Mengubah nilai menjadi integer
+                    deskripsi: parts[2],
+                    checked: true
+                };
+                console.log(parts)
+                taskList.push(taskObject);
+            });
+
+            // Hitung total nilai hanya dari task yang tercentang
+            const totalTaskValue = taskList
+                .filter(task => task.checked)
+                .reduce((sum, task) => sum + (task.taskValue || 0), 0);
+                
             let createdAt = new Date();
             if (req.body.date) {
                 createdAt = new Date(req.body.date);
@@ -80,14 +97,20 @@ module.exports = {
                 },
             },
             include: {
-                staff: true,
+                staff: {
+                    select: {
+                        name: true,
+                        tunjangan: true,
+                        jabatan: true
+                    }
+                }
             },
             orderBy: {
                 createdAt: "asc",
             },
         });
 
-        res.status(200).render("data", {
+        res.status(200).render("export", {
             layout: "layouts/main-layouts",
             title: "Data Filtered",
             req: req.path,
@@ -133,9 +156,12 @@ module.exports = {
             if (!Array.isArray(taskList)) {
                 taskList = [];
             }
+
+            console.log(taskList)
             const totalTaskValue = taskList
                 .filter(task => task.checked)
-                .reduce((sum, task) => sum + (task.taskValue || 0), 0);
+                .reduce((sum, task) => sum + task.taskValue, 0);
+            console.log(totalTaskValue)
 
             await prisma.records.update({
                 where: { id: recordId },

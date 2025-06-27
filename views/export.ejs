@@ -1,196 +1,217 @@
-<div class="p-1 p-md-4">
-    <div class="p-1 p-md-4 mt-2 mt-md-0">
-        <%- include('./components/button-go-back.ejs') %>
+    <div class="p-1 p-md-4">
+        <div class="p-1 p-md-4 mt-2 mt-md-0">
 
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@12.1.0/dist/handsontable.full.min.css">
-        <script src="https://cdn.jsdelivr.net/npm/handsontable@12.1.0/dist/handsontable.full.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@12.1.0/dist/handsontable.full.min.css">
+            <script src="https://cdn.jsdelivr.net/npm/handsontable@12.1.0/dist/handsontable.full.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 
-        <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
-        <form action="/filterRecords" method="POST" class="mb-4">
-            <div class="row g-3 align-items-center">
-                <div class="col-auto">
-                    <label for="start-date" class="col-form-label">Start Date</label>
+            <form action="/filterRecords" method="POST" class="mb-4">
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label for="start-date" class="col-form-label">Start Date</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" id="start-date" class="form-control" name="gte" required>
+                    </div>
+                    <div class="col-auto">
+                        <label for="end-date" class="col-form-label">End Date</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" id="end-date" class="form-control" name="lte" required>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                    </div>
                 </div>
-                <div class="col-auto">
-                    <input type="date" id="start-date" class="form-control" name="gte" required>
-                </div>
-                <div class="col-auto">
-                    <label for="end-date" class="col-form-label">End Date</label>
-                </div>
-                <div class="col-auto">
-                    <input type="date" id="end-date" class="form-control" name="lte" required>
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">Filter</button>
-                </div>
+            </form>
+
+            <div style="width: 100%; height: auto;" id="excelTableContainer">
+                <div id="excelTable" style="width: 100%; height: 100%;"></div>
             </div>
-        </form>
 
-        <div id="excelTable" style="width: 100%;"></div>
+            <div class="d-flex gap-2 my-3">
+                <button id="exportExcel" class="btn btn-success">Export to Excel</button>
+            </div>
 
-        <div class="d-flex gap-2 my-3">
-            <button id="exportExcel" class="btn btn-success">Export to Excel</button>
-        </div>
+            <script>const jsonData = JSON.parse('<%- JSON.stringify(records) %>');</script>
+            <script>
+                const totalDays = 31;
+                const grouped = {};
 
-        <script>const jsonData = JSON.parse('<%- JSON.stringify(records) %>');</script>
-        <script>
-            const totalDays = 31;
-            const grouped = {};
-
-            jsonData.forEach(entry => {
-                if (!entry.staff || !entry.createdAt) return;
-                const staffName = entry.staff.name;
-                const entryDate = new Date(entry.createdAt).getDate();
-                if (entryDate < 1 || entryDate > totalDays) return;
-                if (!grouped[staffName]) {
-                    grouped[staffName] = { name: staffName, tanggal: Array(totalDays).fill(0) };
-                }
-                let value = entry.value || 0;
-                if (entry.taskList && entry.taskList.length > 0) {
-                    value = entry.taskList.reduce((sum, task) => sum + (task.taskValue || 0), 0);
-                }
-                grouped[staffName].tanggal[entryDate - 1] += value;
-            });
-
-            const tableData = [];
-            let no = 1;
-            for (const staffName in grouped) {
-                const staffData = grouped[staffName];
-                const row = { no: no++, nama: staffData.name };
-                let total = 0;
-                for (let i = 0; i < totalDays; i++) {
-                    const val = staffData.tanggal[i] || 0;
-                    row[`tanggal_${i + 1}`] = val;
-                    total += val;
-                }
-                row.total = total;
-                tableData.push(row);
-            }
-
-            const columns = [
-                { data: 'no', readOnly: true, width: 45 },
-                { data: 'nama', readOnly: true, width: 200 },
-                ...Array.from({ length: totalDays }, (_, i) => ({
-                    data: `tanggal_${i + 1}`,
-                    readOnly: true,
-                    width: 40,
-                    renderer: function(instance, td, row, col, prop, value) {
-                        Handsontable.renderers.TextRenderer.apply(this, arguments);
-                        if (value === 0) td.textContent = '';
+                jsonData.forEach(entry => {
+                    if (!entry.staff || !entry.createdAt) return;
+                    const staffName = entry.staff.name;
+                    const tunjangan = entry.staff.tunjangan;
+                    const entryDate = new Date(entry.createdAt).getDate();
+                    if (entryDate < 1 || entryDate > totalDays) return;
+                    if (!grouped[staffName]) {
+                        grouped[staffName] = { name: staffName, tanggal: Array(totalDays).fill(0) };
                     }
-                })),
-                { data: 'total', readOnly: true, width: 80 }
-            ];
-
-            const colHeaders = ['No', 'Nama', ...Array.from({ length: totalDays }, (_, i) => `${i + 1}`), 'Total'];
-
-            const container = document.getElementById('excelTable');
-            const hot = new Handsontable(container, {
-                data: tableData,
-                colHeaders: colHeaders,
-                columns: columns,
-                rowHeaders: false,
-                licenseKey: 'non-commercial-and-evaluation',
-                width: '100%',
-                stretchH: 'all',
-                manualColumnResize: true,
-                manualRowResize: true,
-                contextMenu: false,
-                filters: true,
-                dropdownMenu: true,
-                cellStyles: true
-            });
-
-            document.getElementById("exportExcel").addEventListener("click", async function () {
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet("Data Karyawan");
-
-                const totalCols = 2 + totalDays + 1;
-
-                // Merge & judul
-                worksheet.mergeCells(1, 1, 1, totalCols);
-                worksheet.getCell('A1').value = 'PENILAIAN TUNJANGAN KINERJA';
-                worksheet.getCell('A1').alignment = { horizontal: 'center' };
-                worksheet.getCell('A1').font = { bold: true, size: 14 };
-
-                worksheet.mergeCells(2, 1, 2, totalCols);
-                worksheet.getCell('A2').value = 'SMAN 5 TARUNA BRAWIJAYA JAWA TIMUR';
-                worksheet.getCell('A2').alignment = { horizontal: 'center' };
-                worksheet.getCell('A2').font = { bold: true };
-
-                worksheet.mergeCells(3, 1, 3, totalCols);
-                worksheet.getCell('A3').value = 'REKAP BULAN 01 2025';
-                worksheet.getCell('A3').alignment = { horizontal: 'center' };
-                worksheet.getCell('A3').font = { bold: true };
-
-                // Header tabel
-                const header = ['No', 'Nama', ...Array.from({ length: totalDays }, (_, i) => `${i + 1}`), 'Total'];
-                worksheet.addRow([]);
-                worksheet.addRow(header); // baris ke-4
-
-                // Data rows
-                tableData.forEach(row => {
-                    const rowData = [row.no, row.nama];
-                    for (let i = 1; i <= totalDays; i++) {
-                        rowData.push(row[`tanggal_${i}`] || 0);
+                    let value = entry.value || 0;
+                    if (entry.taskList && entry.taskList.length > 0) {
+                        const getValue = entry.taskList.filter(task => task.checked).reduce((sum, task) => sum + (task.taskValue || 0), 0);
+                        value = (getValue/100*(100/22)).toFixed(1)
                     }
-                    rowData.push(row.total);
-                    worksheet.addRow(rowData);
+                    grouped[staffName].tanggal[entryDate - 1] += parseFloat(value);
+                    grouped[staffName].tunjangan = tunjangan;
                 });
 
-                // Hitung baris terakhir dari data
-                const lastRowIndex = worksheet.lastRow.number + 2;
+                const tableData = [];
+                let no = 1;
+                for (const staffName in grouped) {
+                    const staffData = grouped[staffName];
+                    const row = { no: no++, nama: staffData.name };
+                    let total_skor = 0;
+                    for (let i = 0; i < totalDays; i++) {
+                        const val = staffData.tanggal[i] || 0;
+                        row[`tanggal_${i + 1}`] = val;
+                        total_skor += val;
+                    }
+                    row.total_skor = total_skor;
+                    
+                    // Fix tunjangan calculation
+                    const tunjanganValue = parseFloat(staffData.tunjangan) || 0;
+                    row.total_tukin = total_skor * tunjanganValue / 100;
+                    
+                    tableData.push(row);
+                }
 
-                // Tambah header tanda tangan
-                worksheet.mergeCells(`C${lastRowIndex}:D${lastRowIndex}`);
-                worksheet.getCell(`C${lastRowIndex}`).value = "Kepala Sekolah";
-                worksheet.getCell(`C${lastRowIndex}`).alignment = { horizontal: 'center' };
-
-                worksheet.mergeCells(`M${lastRowIndex}:K${lastRowIndex}`);
-                worksheet.getCell(`M${lastRowIndex}`).value = "Penilai 1";
-                worksheet.getCell(`M${lastRowIndex}`).alignment = { horizontal: 'center' };
-
-                worksheet.mergeCells(`T${lastRowIndex}:S${lastRowIndex}`);
-                worksheet.getCell(`T${lastRowIndex}`).value = "Penilai 2";
-                worksheet.getCell(`T${lastRowIndex}`).alignment = { horizontal: 'center' };
-
-                // Tambah baris kosong (untuk tempat tanda tangan)
-                worksheet.addRow([]);
-
-                // Tambah nama-nama
-                const nameRow = worksheet.addRow([]);
-                nameRow.getCell('C').value = "Eko Agus Suwandi, S.Pd, MM";
-                nameRow.getCell('M').value = "Suhardi";
-                nameRow.getCell('T').value = "Saelan";
-
-                // Posisikan & format rata tengah
-                nameRow.getCell('C').alignment = { horizontal: 'center' };
-                nameRow.getCell('M').alignment = { horizontal: 'center' };
-                nameRow.getCell('T').alignment = { horizontal: 'center' };
-
-
-                // Kolom width
-                worksheet.columns = [
-                    { width: 5 },
-                    { width: 20 },
-                    ...Array.from({ length: totalDays }, () => ({ width: 4 })),
-                    { width: 10 }
+                const columns = [
+                    { data: 'no', readOnly: true, width: 45 },
+                    { data: 'nama', readOnly: true, width: 200 },
+                    ...Array.from({ length: totalDays }, (_, i) => ({
+                        data: `tanggal_${i + 1}`,
+                        readOnly: true,
+                        width: 40,
+                        renderer: function(instance, td, row, col, prop, value) {
+                            Handsontable.renderers.TextRenderer.apply(this, arguments);
+                            if (value === 0) td.textContent = '';
+                        }
+                    })),
+                    { data: 'total_skor', readOnly: true, width: 80 },
+                    { data: 'total_tukin', readOnly: true, width: 80, renderer: function(instance, td, row, col, prop, value) {
+                        Handsontable.renderers.TextRenderer.apply(this, arguments);
+                        if (value !== null && value !== undefined && !isNaN(value)) {
+                            td.textContent = parseFloat(value).toFixed(2);
+                        } else {
+                            td.textContent = '0.00';
+                        }
+                    }}
                 ];
 
-                // Header style
-                const headerRow = worksheet.getRow(5);
-                headerRow.font = { bold: true };
-                headerRow.alignment = { horizontal: 'center' };
+                const colHeaders = ['No', 'Nama', ...Array.from({ length: totalDays }, (_, i) => `${i + 1}`), 'Total Skor', "Total Tukin"];
 
-                // Simpan file
-                const buffer = await workbook.xlsx.writeBuffer();
-                saveAs(new Blob([buffer]), `Data_Karyawan_${new Date().toISOString().slice(0,10)}.xlsx`);
-            });
+                const container = document.getElementById('excelTable');
+                const hot = new Handsontable(container, {
+                    data: tableData,
+                    colHeaders: colHeaders,
+                    columns: columns,
+                    rowHeaders: false,
+                    licenseKey: 'non-commercial-and-evaluation',
+                    width: '100%',
+                    manualColumnResize: true,
+                    manualRowResize: true,
+                    contextMenu: true,
+                    filters: true,
+                    dropdownMenu: false,
+                    cellStyles: true
+                });
+
+                document.getElementById('excelTableContainer').style.overflowX = "scroll";
+
+                document.getElementById("exportExcel").addEventListener("click", async function () {
+                    const workbook = new ExcelJS.Workbook();
+                    const worksheet = workbook.addWorksheet("Data Karyawan");
+
+                    const totalCols = 2 + totalDays + 2;
+
+                    worksheet.mergeCells(1, 1, 1, totalCols);
+                    worksheet.getCell('A1').value = 'PENILAIAN TUNJANGAN KINERJA';
+                    worksheet.getCell('A1').alignment = { horizontal: 'center' };
+                    worksheet.getCell('A1').font = { bold: true, size: 14 };
+
+                    worksheet.mergeCells(2, 1, 2, totalCols);
+                    worksheet.getCell('A2').value = 'SMAN 5 TARUNA BRAWIJAYA JAWA TIMUR';
+                    worksheet.getCell('A2').alignment = { horizontal: 'center' };
+                    worksheet.getCell('A2').font = { bold: true };
+
+                    worksheet.mergeCells(3, 1, 3, totalCols);
+                    worksheet.getCell('A3').value = 'REKAP BULAN 01 2025';
+                    worksheet.getCell('A3').alignment = { horizontal: 'center' };
+                    worksheet.getCell('A3').font = { bold: true };
+
+                    // Header tabel
+                    const header = ['No', 'Nama Karyawan', ...Array.from({ length: totalDays }, (_, i) => `${i + 1}`), 'Total Skor', "Total Tukin"];
+                    worksheet.addRow([]);
+                    worksheet.addRow(header); // baris ke-4
+
+                    // Data rows
+                    tableData.forEach(row => {
+                        const rowData = [row.no, row.nama ];
+                        for (let i = 1; i <= totalDays; i++) {
+                            rowData.push(row[`tanggal_${i}`] || 0);
+                        }
+                        rowData.push(row.total_skor || 0);
+                        // Handle NaN values for total_tukin
+                        const totalTukin = isNaN(row.total_tukin) ? 0 : row.total_tukin;
+                        rowData.push(totalTukin);
+                        worksheet.addRow(rowData);
+                    });
+
+                    // Hitung baris terakhir dari data
+                    const lastRowIndex = worksheet.lastRow.number + 2;
+
+                    // Tambah header tanda tangan
+                    worksheet.mergeCells(`C${lastRowIndex}:D${lastRowIndex}`);
+                    worksheet.getCell(`C${lastRowIndex}`).value = "Kepala Sekolah";
+                    worksheet.getCell(`C${lastRowIndex}`).alignment = { horizontal: 'center' };
+
+                    worksheet.mergeCells(`M${lastRowIndex}:N${lastRowIndex}`);
+                    worksheet.getCell(`M${lastRowIndex}`).value = "Penilai 1";
+                    worksheet.getCell(`M${lastRowIndex}`).alignment = { horizontal: 'center' };
+
+                    worksheet.mergeCells(`T${lastRowIndex}:U${lastRowIndex}`);
+                    worksheet.getCell(`T${lastRowIndex}`).value = "Penilai 2";
+                    worksheet.getCell(`T${lastRowIndex}`).alignment = { horizontal: 'center' };
+
+                    // Tambah baris kosong (untuk tempat tanda tangan)
+                    worksheet.addRow([]);
+
+                    // Tambah nama-nama
+                    const nameRow = worksheet.addRow([]);
+                    nameRow.getCell('C').value = "Eko Agus Suwandi, S.Pd, MM";
+                    nameRow.getCell('M').value = "Suhardi";
+                    nameRow.getCell('T').value = "Saelan";
+
+                    // Posisikan & format rata tengah
+                    nameRow.getCell('C').alignment = { horizontal: 'center' };
+                    nameRow.getCell('M').alignment = { horizontal: 'center' };
+                    nameRow.getCell('T').alignment = { horizontal: 'center' };
 
 
-        </script>
+                    // Kolom width
+                    worksheet.columns = [
+                        { width: 5 },
+                        { width: 30 },
+                        ...Array.from({ length: totalDays }, () => ({ width: 4 })),
+                        { width: 10 },
+                        { width: 10 }
+                    ];
+
+                    // Header style
+                    const headerRow = worksheet.getRow(5);
+                    headerRow.font = { bold: true };
+                    headerRow.alignment = { horizontal: 'center' };
+
+                    // Simpan file
+                    const buffer = await workbook.xlsx.writeBuffer();
+                    saveAs(new Blob([buffer]), `Data_Karyawan_${new Date().toISOString().slice(0,10)}.xlsx`);
+                });
+
+
+            </script>
+        </div>
     </div>
-</div>

@@ -56,3 +56,42 @@ To run this project, you will need to add the following environment variables to
 
 - [@aliefadityanugraha](https://www.github.com/aliefadityanugraha)
 
+
+[
+    {
+        "taskId": "123e4567-e89b-12d3-a456-426614174037",
+        "taskValue": 10,
+        "taskDescription": "Coordinate project schedules"
+    },
+    {
+        "taskId": "123e4567-e89b-12d3-a456-426614174038",
+        "taskValue": 9,
+        "taskDescription": "Monitor project progress"
+    },
+    {
+        "taskId": "123e4567-e89b-12d3-a456-426614174039",
+        "taskValue": 11,
+        "taskDescription": "Prepare project status reports"
+    }
+]
+
+[
+    {
+        "taskId": "123e4567-e89b-12d3-a456-426614174019",
+        "checked": true,
+        "taskValue": 13,
+        "taskDescription": "Oversee marketing campaigns"
+    },
+    {
+        "taskId": "123e4567-e89b-12d3-a456-426614174020",
+        "checked": true,
+        "taskValue": 11,
+        "taskDescription": "Analyze campaign ROI"
+    },
+    {
+        "taskId": "123e4567-e89b-12d3-a456-426614174021",
+        "checked": true,
+        "taskValue": 15,
+        "taskDescription": "Develop new promotional strategies"
+    }
+]
