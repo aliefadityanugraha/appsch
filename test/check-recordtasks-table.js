@@ -1,0 +1,3 @@
+const { knex } = require('../config/database');
+
+// ... existing code ... 

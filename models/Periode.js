@@ -1,9 +1,9 @@
 const { Model } = require('objection');
 const { v4: uuidv4 } = require('uuid');
 
-class Staff extends Model {
+class Periode extends Model {
   static get tableName() {
-    return 'Staff';
+    return 'Periode';
   }
 
   static get idColumn() {
@@ -13,14 +13,11 @@ class Staff extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['name', 'jabatan', 'nip', 'tunjangan'],
+      required: ['periode', 'nilai'],
       properties: {
         id: { type: 'string', format: 'uuid' },
-        name: { type: 'string', minLength: 1 },
-        jabatan: { type: 'string', minLength: 1 },
-        nip: { type: 'string', minLength: 1 },
-        tunjangan: { type: 'string', minLength: 1 },
-        date: { type: 'string', format: 'date-time' },
+        periode: { type: 'string', minLength: 1 },
+        nilai: { type: 'integer' },
         createdAt: { type: 'string', format: 'date-time' },
         updatedAt: { type: 'string', format: 'date-time' }
       }
@@ -29,23 +26,14 @@ class Staff extends Model {
 
   static get relationMappings() {
     const Task = require('./Task');
-    const Records = require('./Records');
 
     return {
       task: {
         relation: Model.HasManyRelation,
         modelClass: Task,
         join: {
-          from: 'Staff.id',
-          to: 'Task.staffId'
-        }
-      },
-      records: {
-        relation: Model.HasManyRelation,
-        modelClass: Records,
-        join: {
-          from: 'Staff.id',
-          to: 'Records.staffId'
+          from: 'Periode.id',
+          to: 'Task.periodeId'
         }
       }
     };
@@ -73,4 +61,4 @@ class Staff extends Model {
   }
 }
 
-module.exports = Staff;
+module.exports = Periode;

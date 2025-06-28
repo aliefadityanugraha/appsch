@@ -1,4 +1,5 @@
 const { Model } = require('objection');
+const { v4: uuidv4 } = require('uuid');
 
 class Task extends Model {
   static get tableName() {
@@ -53,8 +54,8 @@ class Task extends Model {
         join: {
           from: 'Task.id',
           through: {
-            from: 'RecordTasks.taskId',
-            to: 'RecordTasks.recordId'
+            from: '_RecordTasks.B',
+            to: '_RecordTasks.A'
           },
           to: 'Records.id'
         }
@@ -63,13 +64,25 @@ class Task extends Model {
   }
 
   $beforeInsert() {
-    this.createdAt = new Date().toISOString();
-    this.updatedAt = new Date().toISOString();
+    this.id = this.id || uuidv4();
+    if (this.createdAt && this.createdAt instanceof Date) {
+      this.createdAt = this.createdAt.toISOString().slice(0, 19).replace('T', ' ');
+    } else if (!this.createdAt) {
+      const now = new Date();
+      this.createdAt = now.toISOString().slice(0, 19).replace('T', ' ');
+    }
+    const now = new Date();
+    this.updatedAt = now.toISOString().slice(0, 19).replace('T', ' ');
   }
 
   $beforeUpdate() {
-    this.updatedAt = new Date().toISOString();
+    if (this.updatedAt && this.updatedAt instanceof Date) {
+      this.updatedAt = this.updatedAt.toISOString().slice(0, 19).replace('T', ' ');
+    } else {
+      const now = new Date();
+      this.updatedAt = now.toISOString().slice(0, 19).replace('T', ' ');
+    }
   }
 }
 
-module.exports = Task; 
+module.exports = Task;

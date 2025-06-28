@@ -1,4 +1,4 @@
-const { checkDatabaseConnection, closeDatabaseConnection } = require('./config/database');
+const { checkDatabaseConnection, closeDatabaseConnection } = require('../config/database');
 
 async function testDatabaseConnection() {
     console.log('🧪 Testing database connection...');

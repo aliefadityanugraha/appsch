@@ -6,7 +6,28 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
-    "test:db": "node test-db-connection.js"
+    "dev:objection": "nodemon indexObjection.js",
+    "test:db": "node test-db-connection.js",
+    "test:objection": "node test-objection-connection.js",
+    "test:routes": "node test-objection-routes.js",
+    "test:login": "node test-login.js",
+    "test:login:fixed": "node test-login-fixed.js",
+    "test:data": "node test-data-endpoint.js",
+    "debug:data": "node debug-data-endpoint.js",
+    "start:objection": "node indexObjection.js",
+    "check:db": "node check-database.js",
+    "check:users": "node check-users.js",
+    "debug:login": "node debug-login.js",
+    "setup:db": "node setup-database.js",
+    "setup:db:simple": "node setup-database-simple.js",
+    "setup:tables": "node setup-tables.js",
+    "setup:full": "npm run setup:db:simple && npm run setup:tables",
+    "check:recordtasks": "node check-recordtasks-table.js",
+    "create:recordtasks": "node create-recordtasks-table.js",
+    "add:sample:recordtasks": "node add-sample-recordtasks.js",
+    "fix:recordtasks": "node fix-recordtasks-issue.js",
+    "debug:add:record": "node debug-add-record.js",
+    "test:addrecords:endpoint": "node test-addrecords-endpoint.js"
   },
   "author": "Alief Aditya Nugraha",
   "license": "ISC",
@@ -27,7 +48,8 @@
     "method-override": "^3.0.0",
     "objection": "^3.0.1",
     "knex": "^3.1.0",
-    "mysql2": "^3.9.2"
+    "mysql2": "^3.9.2",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.5.1",
