@@ -1,10 +1,32 @@
-
 # Appsch
 
 A appliaction to manage staff administration allowance based on performance ever day in school. this appliaction collect data about staff, task, allowance, and performance on working.
 
+## Database Connection Checking
 
+The application now includes automatic database connection checking with the following features:
 
+- **Startup Check**: Database connection is verified when the server starts
+- **Request-time Check**: Every request (except static files) is checked for database connectivity
+- **Error Page**: If database connection fails, a user-friendly error page is displayed
+- **Auto-refresh**: The error page automatically refreshes every 30 seconds
+- **Manual Retry**: Users can manually retry the connection
+
+### Testing Database Connection
+
+To test the database connection separately:
+
+```bash
+npm run test:db
+```
+
+### Error Handling
+
+When database connection fails:
+- The server will still start but show error pages for all requests
+- Detailed error messages are logged to the console
+- Users see a friendly error page with retry options
+- Static files (CSS, JS, images) are still served normally
 
 ## Screenshots
 

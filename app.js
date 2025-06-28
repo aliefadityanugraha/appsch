@@ -12,6 +12,8 @@ const flash = require("connect-flash");
 
 const flashConfig = require("./config/flash");
 const sessionConfig = require("./config/session");
+const { checkDatabaseConnection } = require("./config/database");
+const { renderDatabaseError } = require("./controllers/errorController");
 
 const webRoute = require("./routes/web");
 const apiRoute = require("./routes/api");
@@ -27,6 +29,24 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
 app.use("/public", express.static(path.join(__dirname, "public")));
+
+// Database connection check middleware
+app.use(async (req, res, next) => {
+    // Skip database check for static files
+    if (req.path.startsWith('/public/')) {
+        return next();
+    }
+    
+    try {
+        const dbCheck = await checkDatabaseConnection();
+        if (!dbCheck.success) {
+            return renderDatabaseError(req, res, dbCheck.error);
+        }
+        next();
+    } catch (error) {
+        return renderDatabaseError(req, res, error.message);
+    }
+});
 
 app.use("/", apiRoute);
 app.use("/", webRoute);
