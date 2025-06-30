@@ -1,132 +1,139 @@
 "use strict";
 
-const {PrismaClient} = require("@prisma/client");
-const prisma = new PrismaClient();
+const Task = require('../models/Task');
+const Staff = require('../models/Staff');
+const Periode = require('../models/Periode');
+const Records = require('../models/Records');
+const { knex } = require('../config/database');
 
 module.exports = {
 
     task: async (req, res) => {
+        try {
+            const staffId = req.params.id;
 
-        const staffId = req.params.id;
+            const staff = await Staff.query().where('id', staffId);
 
-        const staff = await prisma.staff.findMany({
-            where: {
-                id: staffId,
-            },
-        });
+            const tasks = await Task.query()
+                .where('staffId', staffId)
+                .withGraphFetched('periode');
 
-        const tasks = await prisma.task.findMany({
-            where: {
-                staffId: staffId,
-            },
-            include: {
-                periode: true,
-            },
-        });
+            const periodeData = await Periode.query().orderBy('createdAt', 'asc');
 
-        const periodeData = await prisma.periode.findMany({
-            orderBy: {
-                createdAt: "asc",
-            },
-        });
-
-        res.status(200).render("task", {
-            layout: "layouts/main-layouts",
-            title: staff[0].name,
-            data: tasks,
-            staff,
-            id: req.params.id,
-            periodeData,
-            req: req.path,
-        });
-
+            res.status(200).render("task", {
+                layout: "layouts/main-layouts",
+                title: staff[0].name,
+                data: tasks,
+                staff,
+                id: req.params.id,
+                periodeData,
+                req: req.path,
+            });
+        } catch (error) {
+            console.error('Error fetching task:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
     },
 
     addTask: async (req, res) => {
+        try {
+            const { description, value, id, periode } = req.body;
 
-        const {deskripsi, nilai, id, periode} = req.body;
-
-        await prisma.task.create({
-            data: {
-                deskripsi,
-                nilai: parseInt(nilai),
+            await Task.query().insert({
+                description: description,
+                value: parseInt(value),
                 staffId: id,
                 periodeId: periode,
-            },
-        });
-        res.status(200).redirect(`/addTask/${id}`);
-
+            });
+            
+            res.status(200).redirect(`/addTask/${id}`);
+        } catch (error) {
+            console.error('Error adding task:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
     },
 
     updateTask: async (req, res) => {
-        const {description, periode, value} = req.body;
-        const taskId = req.params.id;
-        await prisma.task.update({
-            where: {
-                id: taskId,
-            },
-            data: {
-                description,
-                value: parseFloat(value),
-                periodeId: periode,
-                updatedAt: new Date(),
-            },
-        });
-        res.status(200).redirect(`/addTask/${req.body.id}`);
+        try {
+            const { description, periode, value } = req.body;
+            const taskId = req.params.id;
+            
+            await Task.query()
+                .findById(taskId)
+                .patch({
+                    description,
+                    value: parseFloat(value),
+                    periodeId: periode,
+                });
+                
+            res.status(200).redirect(`/addTask/${req.body.id}`);
+        } catch (error) {
+            console.error('Error updating task:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
     },
 
     deleteTask: async (req, res) => {
+        try {
+            const taskId = req.params.id;
+            const staffId = req.params.staffId;
 
-        const taskId = req.params.id;
-        const staffId = req.params.staffId;
-
-        await prisma.task.delete({
-            where: {
-                id: taskId,
-            },
-        });
-        res.status(200).redirect(`/addTask/${staffId}`);
-
+            await Task.query().deleteById(taskId);
+            
+            res.status(200).redirect(`/addTask/${staffId}`);
+        } catch (error) {
+            console.error('Error deleting task:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
     },
 
     getTasksByStaffId: async (req, res) => {
-        const staffId = req.params.id;
-        const date = req.query.date;
-        let whereClause = { staffId };
-        if (date) {
-            const start = new Date(date);
-            start.setHours(0,0,0,0);
-            const end = new Date(date);
-            end.setHours(23,59,59,999);
-            whereClause.createdAt = {
-                gte: start,
-                lte: end
-            };
-        }
-        const tasks = await prisma.task.findMany({
-            where: whereClause,
-            select: {
-                id: true,
-                description: true,
-                value: true,
-                periodeId: true
+        try {
+            const staffId = req.params.id;
+            const date = req.query.date;
+            let query = Task.query().where('staffId', staffId);
+            
+            if (date) {
+                const start = new Date(date);
+                start.setHours(0, 0, 0, 0);
+                const end = new Date(date);
+                end.setHours(23, 59, 59, 999);
+                
+                query = query.whereBetween('createdAt', [start, end]);
             }
-        });
-        res.json(tasks);
+
+            const tasks = await query.select('id', 'description', 'value', 'periodeId');
+            
+            res.json(tasks);
+        } catch (error) {
+            console.error('Error getting tasks by staff ID:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
     },
 
     createRecord: async (req, res) => {
-        const { value, staffId, taskIds } = req.body;
-        const record = await prisma.records.create({
-            data: {
+        try {
+            const { value, staffId, taskIds } = req.body;
+            
+            const record = await Records.query().insert({
                 value,
                 staffId,
-            },
-        });
-        await prisma.task.updateMany({
-            where: { id: { in: taskIds } },
-            data: { recordId: record.id },
-        });
-        res.status(200).redirect(`/addTask/${staffId}`);
-    },
+            });
+
+            // For many-to-many relation, we need to handle the junction table manually
+            if (taskIds && taskIds.length > 0) {
+                const junctionData = taskIds.map(taskId => ({
+                    recordId: record.id,
+                    taskId: taskId
+                }));
+                
+                await knex('RecordTasks').insert(junctionData);
+            }
+
+            res.status(200).redirect(`/addTask/${staffId}`);
+        } catch (error) {
+            console.error('Error creating record:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    }
 };

@@ -1,13 +1,13 @@
 "use strict";
 
 const app = require("./app");
-const { checkDatabaseConnection, closeDatabaseConnection } = require("./config/database");
+const { checkObjectionConnection, closeDatabaseConnection } = require("./config/database");
 
 async function startServer() {
     try {
         // Check database connection before starting server
         console.log("🔍 Checking database connection...");
-        const dbCheck = await checkDatabaseConnection();
+        const dbCheck = await checkObjectionConnection();
         
         if (!dbCheck.success) {
             console.error("❌ Failed to connect to database during startup:");

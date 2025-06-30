@@ -23,34 +23,11 @@ async function setupTables() {
         
         try {
             await knex.raw('SELECT COUNT(*) as count FROM User LIMIT 1');
-            console.log('✅ Tables already exist (Prisma migrations applied)\n');
+            console.log('✅ Tables already exist!\n');
         } catch (error) {
             if (error.code === 'ER_NO_SUCH_TABLE') {
-                console.log('❌ Tables do not exist. Running Prisma migrations...\n');
-                
-                try {
-                    // Run Prisma migrations
-                    console.log('🔄 Running Prisma migrations...');
-                    execSync('npx prisma migrate deploy', { 
-                        stdio: 'inherit',
-                        cwd: process.cwd()
-                    });
-                    console.log('✅ Prisma migrations completed successfully\n');
-                    
-                    // Generate Prisma client
-                    console.log('🔄 Generating Prisma client...');
-                    execSync('npx prisma generate', { 
-                        stdio: 'inherit',
-                        cwd: process.cwd()
-                    });
-                    console.log('✅ Prisma client generated\n');
-                    
-                } catch (migrationError) {
-                    console.error('❌ Prisma migration failed:', migrationError.message);
-                    console.error('💡 Please check your DATABASE_URL and run migrations manually:');
-                    console.error('   npx prisma migrate deploy');
-                    process.exit(1);
-                }
+                console.log('❌ Tables do not exist. Please create tables manually or via Knex migration.\n');
+                process.exit(1);
             } else {
                 throw error;
             }

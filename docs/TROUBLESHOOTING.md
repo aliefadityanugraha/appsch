@@ -14,13 +14,6 @@ npm run check:db
 npm run setup:db:simple
 ```
 
-#### Error: "This command is not supported in the prepared statement protocol yet"
-**Solution:**
-```bash
-# Use the simple setup script instead
-npm run setup:db:simple
-```
-
 #### Error: "ECONNREFUSED"
 **Solution:**
 - Check if MySQL server is running
@@ -37,21 +30,14 @@ npm run setup:db:simple
 
 #### Error: "ER_NO_SUCH_TABLE"
 **Solution:**
-```bash
-# Run Prisma migrations to create tables
-npm run setup:tables
-```
+- Make sure your tables have been created in the database. You may need to run SQL scripts or Knex migrations manually.
 
 ### 3. Environment Configuration
 
-#### Missing DATABASE_URL
+#### Missing DB variables
 **Solution:**
 Add to `.env` file:
 ```env
-# Option 1: DATABASE_URL (recommended)
-DATABASE_URL="mysql://username:password@localhost:3306/appsch"
-
-# Option 2: Separate variables
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
@@ -69,16 +55,10 @@ npm run check:db
 # 2. Setup database (if needed)
 npm run setup:db:simple
 
-# 3. Setup tables (if needed)
-npm run setup:tables
-
-# 4. Or run everything at once
-npm run setup:full
-
-# 5. Test Objection.js connection
+# 3. Test Objection.js connection
 npm run test:objection
 
-# 6. Start application
+# 4. Start application
 npm run dev:objection
 ```
 
@@ -96,25 +76,10 @@ CREATE DATABASE appsch;
 SHOW DATABASES;
 ```
 
-#### Run Prisma Migrations Manually
-```bash
-# Generate Prisma client
-npx prisma generate
-
-# Run migrations
-npx prisma migrate deploy
-
-# Check migration status
-npx prisma migrate status
-```
-
 ### 6. Testing Commands
 
 #### Test Database Connection
 ```bash
-# Test Prisma connection
-npm run test:db
-
 # Test Objection.js connection
 npm run test:objection
 
@@ -149,7 +114,7 @@ console.log('Knex Config:', knex.client.config);
 | `ECONNREFUSED` | Cannot connect to server | Check MySQL is running |
 | `ER_ACCESS_DENIED_ERROR` | Wrong credentials | Check username/password |
 | `ER_BAD_DB_ERROR` | Database doesn't exist | Run `npm run setup:db:simple` |
-| `ER_NO_SUCH_TABLE` | Tables don't exist | Run `npm run setup:tables` |
+| `ER_NO_SUCH_TABLE` | Tables don't exist | Create tables manually/via migration |
 | `ER_DBACCESS_DENIED_ERROR` | No database access | Check user privileges |
 
 ### 9. Environment Variables Checklist

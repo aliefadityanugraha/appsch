@@ -10,11 +10,8 @@ const recordsController = require("../controllers/recordsController");
 const periodeController = require("../controllers/periodeController");
 const settingsController = require("../controllers/settingController");
 const authController = require("../controllers/authController");
-
 const apiController = require("../controllers/apiController");
-
 const errorController = require("../controllers/errorController");
-
 const {isLogin, authenticateToken} = require("../middleware/authMidleware");
 const {refreshToken} = require("../controllers/authController");
 const {roles} = require("../controllers/roleController");
@@ -25,10 +22,8 @@ router.get("/", authenticateToken, mainController.dashboard);
 /* auth route */
 router.get("/auth/login", isLogin, authController.login);
 router.post("/auth/login", authController.loginPost);
-
 router.get("/auth/register", authController.register);
 router.post("/auth/register", authController.registerPost);
-
 router.get("/logout", authController.logout);
 
 /* staff route */
@@ -62,20 +57,6 @@ router.get("/roles", authenticateToken, roles);
 
 /* refresh token route */
 router.get('/auth/refresh-token', refreshToken);
-
-router.get('/users/current-user', authenticateToken, async (req, res) => {
-    const { PrismaClient } = require('@prisma/client');
-    const prisma = new PrismaClient();
-    try {
-        const user = await prisma.user.findUnique({ where: { id: req.user.userId } });
-        if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json({ email: user.email });
-    } catch (err) {
-        res.status(500).json({ error: 'Internal server error' });
-    } finally {
-        await prisma.$disconnect();
-    }
-});
 
 router.get('/dashboard', mainController.dashboard);
 

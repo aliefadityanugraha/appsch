@@ -12,7 +12,7 @@ async function fixRecordTasksIssue() {
     if (!tableExists) {
       console.log('📋 Creating _RecordTasks table...');
       
-      // Create the table based on Prisma migration
+      // Create the table for the many-to-many relationship
       await knex.schema.createTable('_RecordTasks', (table) => {
         table.string('A', 191).notNullable();
         table.string('B', 191).notNullable();

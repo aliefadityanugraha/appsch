@@ -37,7 +37,7 @@ When database connection fails:
 
 **Client:** Html, Css, Bootstrap CSS, Jquery, Datatable, Hansontable, Chart.js
 
-**Server:** Node, Express, Prisma, Mysql
+**Server:** Node, Express, Objection.js, Knex, Mysql
 
 
 ## Environment Variables
@@ -117,3 +117,33 @@ To run this project, you will need to add the following environment variables to
         "taskDescription": "Develop new promotional strategies"
     }
 ]
+
+### Version
+1.0.4
+
+### Features
+- **Authentication**: JWT, Session, Cookies
+- **Authorization**: Role-based access control
+- **Database**: MySQL with Objection.js ORM
+- **Views**: EJS templating with layouts
+- **Styling**: Bootstrap 5
+- **Deployment**: Ready for production
+
+### Available Routes
+- `/` - Dashboard
+- `/staff` - Staff management
+- `/addTask/:id` - Task management
+- `/periode` - Period management
+- `/data` - Records & export
+- `/settings` - Application settings
+- `/roles` - Role management
+- `/auth/login` - Login page
+- `/auth/register` - Registration page
+- `/logout` - Logout
+
+### Scripts
+- `npm run dev:objection` - Start development server
+- `npm run start:objection` - Start production server
+- `npm run test:objection` - Test database connection
+
+This updated `readme.md` provides a clear and concise overview of the project, reflecting the current technology stack and features. It's designed to be easy for new developers to understand and get started with the project.

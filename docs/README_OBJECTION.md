@@ -1,6 +1,6 @@
 # 🚀 Objection.js Migration Guide
 
-This guide explains how to run the application using Objection.js ORM instead of Prisma.
+This guide explains how to run the application using Objection.js ORM.
 
 ## 📋 Prerequisites
 
@@ -19,9 +19,6 @@ npm run check:db
 ```bash
 # Simple setup (recommended)
 npm run setup:db:simple
-
-# Or full setup (database + tables)
-npm run setup:full
 ```
 
 ### 3. Test Connection
@@ -36,19 +33,17 @@ npm run dev:objection
 
 ## 📁 File Structure
 
-### New Objection.js Files
+### Key Files
 - `appObjection.js` - Express app with Objection.js
 - `indexObjection.js` - Server entry point
-- `routes/webObjection.js` - Web routes using Objection.js
-- `routes/apiObjection.js` - API routes using Objection.js
-- `controllers/*Objection.js` - Controllers using Objection.js
+- `routes/` - Web and API routes
+- `controllers/` - Controllers using Objection.js
 - `models/` - Objection.js models
 - `config/database.js` - Database configuration
 
 ### Setup Scripts
 - `setup-database.js` - Database creation (async/await)
 - `setup-database-simple.js` - Database creation (callback-based)
-- `setup-tables.js` - Table creation via Prisma migrations
 - `check-database.js` - Database status checker
 
 ## 🔧 Available Scripts
@@ -64,13 +59,10 @@ npm run start:objection        # Start production server
 npm run check:db              # Check database status
 npm run setup:db:simple       # Create database (simple)
 npm run setup:db              # Create database (async)
-npm run setup:tables          # Create tables via Prisma
-npm run setup:full            # Complete setup
 ```
 
 ### Testing
 ```bash
-npm run test:db               # Test Prisma connection
 npm run test:objection        # Test Objection.js connection
 npm run test:routes           # Test all routes
 ```
@@ -79,9 +71,6 @@ npm run test:routes           # Test all routes
 
 ### Environment Variables
 ```env
-# Option 1: DATABASE_URL (recommended)
-DATABASE_URL="mysql://username:password@localhost:3306/appsch"
-
 # Option 2: Separate variables
 DB_HOST=localhost
 DB_PORT=3306
@@ -98,20 +87,6 @@ DB_NAME=appsch
 - `Periode` - Time periods
 - `Records` - Data records
 - `Settings` - Application settings
-
-## 🔄 Migration from Prisma
-
-### What Changed
-1. **ORM**: Prisma → Objection.js
-2. **Query Builder**: Prisma Client → Knex.js
-3. **Models**: Prisma Schema → Objection.js Models
-4. **Relations**: Prisma Relations → Objection.js Relations
-
-### Key Differences
-- **Queries**: `prisma.user.findMany()` → `User.query()`
-- **Relations**: `include: { role: true }` → `.withGraphFetched('role')`
-- **Transactions**: `prisma.$transaction()` → `User.transaction()`
-- **Raw Queries**: `prisma.$queryRaw` → `knex.raw()`
 
 ## 🧪 Testing
 
@@ -150,16 +125,7 @@ npm run setup:db:simple
 ```
 
 #### 2. Tables Not Found
-```bash
-# Run Prisma migrations
-npm run setup:tables
-```
-
-#### 3. Prepared Statement Error
-```bash
-# Use simple setup instead
-npm run setup:db:simple
-```
+If you see a "Table not found" error, you may need to set up your tables manually using SQL or a Knex migration.
 
 ### Debug Mode
 ```bash
@@ -175,9 +141,6 @@ mysql -u root -p
 
 -- Create database
 CREATE DATABASE appsch;
-
--- Run Prisma migrations
-npx prisma migrate deploy
 ```
 
 ## 📊 Performance

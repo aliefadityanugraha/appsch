@@ -1,4 +1,53 @@
-# 🔐 Login Troubleshooting Guide
+# 🐞 Login Troubleshooting
+
+This guide helps debug login issues related to database connections, password hashing, and JWT tokens.
+
+## ✅ Checklist
+
+1.  **Database Connection**: Is the database running and accessible?
+2.  **User Exists**: Does the user exist in the `User` table?
+3.  **Password Match**: Is the hashed password correct?
+4.  **JWT Secrets**: Are `ACCESS_SECRET_KEY` and `REFRESH_SECRET_KEY` set in `.env`?
+5.  **Session & Cookies**: Are sessions and cookies configured correctly?
+
+## 🔧 Debugging Steps
+
+### 1. Check Database Connection
+```bash
+npm run test:objection
+```
+If this fails, check your `.env` file and ensure MySQL is running.
+
+### 2. Verify User in Database
+Connect to your database and run:
+```sql
+SELECT * FROM User WHERE email = 'test@example.com';
+```
+- **If no user is returned**: The user does not exist.
+- **If user is returned**: Check the `password` hash.
+
+### 3. Verify Password Hash
+The application uses a `sha256` hash without a salt. You can verify the hash manually:
+```javascript
+const crypto = require('crypto');
+const hashedPassword = crypto.createHash('sha256').update('your_password').digest('hex');
+console.log('Expected hash:', hashedPassword);
+```
+Compare this with the hash stored in the database.
+
+### 4. Check JWT Secrets
+Ensure `.env` contains:
+```env
+ACCESS_SECRET_KEY=your_access_secret
+REFRESH_SECRET_KEY=your_refresh_secret
+```
+
+### 5. Enable Debugging
+Run the server with debug flags to see more details:
+```bash
+DEBUG=knex:query,knex:tx,objection npm run dev:objection
+```
+This will log all database queries and transaction details.
 
 ## 🚨 Error: "An error occurred during login"
 

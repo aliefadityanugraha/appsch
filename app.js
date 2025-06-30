@@ -12,7 +12,7 @@ const flash = require("connect-flash");
 
 const flashConfig = require("./config/flash");
 const sessionConfig = require("./config/session");
-const { checkDatabaseConnection } = require("./config/database");
+const { checkObjectionConnection } = require("./config/database");
 const { renderDatabaseError } = require("./controllers/errorController");
 
 const webRoute = require("./routes/web");
@@ -38,7 +38,7 @@ app.use(async (req, res, next) => {
     }
     
     try {
-        const dbCheck = await checkDatabaseConnection();
+        const dbCheck = await checkObjectionConnection();
         if (!dbCheck.success) {
             return renderDatabaseError(req, res, dbCheck.error);
         }
