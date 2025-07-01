@@ -197,32 +197,38 @@ module.exports = {
 
     refreshToken: async (req, res) => {
         const { refreshToken } = req.cookies;
-        if (!refreshToken) return res.sendStatus(401);
+        if (!refreshToken) return res.redirect("/auth/login");
 
         try {
             const user = await User.query().where('refreshToken', refreshToken).first();
-            if (!user) return res.sendStatus(403);
+            if (!user) return res.redirect("/auth/login");
 
             jsonWebToken.verify(refreshToken, process.env.REFRESH_SECRET_KEY, (err, decoded) => {
-                if (err) return res.sendStatus(403);
-                
+                if (err) return res.redirect("/auth/login");
+
                 const accessToken = jsonWebToken.sign(
                     { userId: user.id, email: user.email },
                     process.env.ACCESS_SECRET_KEY,
                     { expiresIn: '15m' }
                 );
-                
+
+                // Set session/cookie baru
+                req.session.token = accessToken;
+
+                // Jika request dari browser, redirect ke dashboard
+                if (req.headers.accept && req.headers.accept.includes('text/html')) {
+                    return res.redirect("/");
+                }
+
+                // Jika request dari API, return JSON
                 res.json({ accessToken });
             });
         } catch (error) {
             console.error(error);
-            res.sendStatus(500);
+            res.redirect("/auth/login");
         }
     },
 
-    handleNewUser: async (req, res) => {
-        // ... existing code ...
-    },
 
     handleLogin: async (req, res) => {
         const { email, password } = req.body;

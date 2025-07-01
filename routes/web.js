@@ -58,6 +58,19 @@ router.get("/roles", authenticateToken, roles);
 /* refresh token route */
 router.get('/auth/refresh-token', refreshToken);
 
+/* current user route - Updated to use Objection.js */
+router.get('/users/current-user', authenticateToken, async (req, res) => {
+    const User = require('../models/User');
+    try {
+        const user = await User.query().findById(req.user.userId);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json({ email: user.email });
+    } catch (err) {
+        console.error('Error fetching current user:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 router.get('/dashboard', mainController.dashboard);
 
 router.use(errorController.error404);
