@@ -1,7 +1,7 @@
 "use strict";
 
 const User = require('../models/User');
-const crypto = require("crypto");
+const bcrypt = require('bcrypt');
 const jsonWebToken = require("jsonwebtoken");
 
 module.exports = {
@@ -46,18 +46,18 @@ module.exports = {
             console.log('   Has password:', user.password ? 'Yes' : 'No');
             console.log('   Password length:', user.password ? user.password.length : 0);
 
-            const hashedPassword = crypto.createHash("sha256").update(password).digest("hex");
-            console.log('🔐 Password hashing:');
-            console.log('   Original password:', password);
-            console.log('   Hashed password:', hashedPassword);
-            console.log('   Hash length:', hashedPassword.length);
+            // Check if user has a password set
+            if (!user.password || user.password.trim() === '') {
+                console.log('❌ User has no password set');
+                req.flash("message", "Account requires password setup. Please contact administrator.");
+                return res.redirect("/auth/login");
+            }
 
-            console.log('🔍 Comparing passwords...');
-            console.log('   Stored hash:', user.password);
-            console.log('   Computed hash:', hashedPassword);
-            console.log('   Match:', user.password === hashedPassword);
+            console.log('🔐 Verifying password with bcrypt...');
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            console.log('   Password match:', isPasswordValid);
 
-            if (user.password !== hashedPassword) {
+            if (!isPasswordValid) {
                 console.log('❌ Password does not match');
                 req.flash("message", "Invalid email or password");
                 return res.redirect("/auth/login");
@@ -159,7 +159,8 @@ module.exports = {
                 return res.status(400).redirect("/auth/register");
             }
 
-            const hashedPassword = crypto.createHash("sha256").update(password).digest("hex");
+            const saltRounds = 12;
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
 
             const newUser = await User.query().insert({
                 email,
@@ -258,4 +259,4 @@ module.exports = {
             res.sendStatus(401);
         }
     }
-}; 
+};

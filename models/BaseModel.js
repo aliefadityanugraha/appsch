@@ -2,6 +2,21 @@ const { Model } = require('objection');
 const { v4: uuidv4 } = require('uuid');
 
 class BaseModel extends Model {
+    static get idColumn() {
+        return 'id';
+    }
+
+    static get jsonSchema() {
+        return {
+            type: 'object',
+            properties: {
+                id: { type: 'string', format: 'uuid' },
+                createdAt: { type: 'string', format: 'date-time' },
+                updatedAt: { type: 'string', format: 'date-time' }
+            }
+        };
+    }
+
     $beforeInsert() {
         // Generate UUID if not provided
         if (!this.id) {
@@ -48,4 +63,4 @@ class BaseModel extends Model {
     }
 }
 
-module.exports = BaseModel; 
+module.exports = BaseModel;

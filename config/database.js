@@ -1,3 +1,4 @@
+require('dotenv').config();
 const knex = require('knex');
 const { Model } = require('objection');
 const fs = require('fs');
@@ -7,10 +8,14 @@ function getSSLOptions() {
     const sslCaPath = process.env.DB_SSL_CA;
     if (sslCaPath && fs.existsSync(sslCaPath)) {
         return {
-            ca: fs.readFileSync(sslCaPath)
+            ca: fs.readFileSync(sslCaPath),
+            rejectUnauthorized: true
         };
     }
-    return undefined;
+    // Untuk TiDB Cloud, paksa menggunakan SSL
+    return {
+        rejectUnauthorized: true
+    };
 }
 
 // --- Knex/Objection.js Configuration ---
@@ -62,4 +67,4 @@ module.exports = {
     knex: knexInstance,
     checkObjectionConnection,
     closeDatabaseConnection
-}; 
+};

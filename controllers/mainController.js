@@ -37,7 +37,8 @@ module.exports = {
             // Proses data chart
             const monthMap = {};
             records.forEach(r => {
-                const month = r.createdAt.toLocaleString('default', { month: 'short', year: '2-digit' });
+                const created = typeof r.createdAt === 'string' ? new Date(r.createdAt) : r.createdAt;
+                const month = created.toLocaleString('default', { month: 'short', year: '2-digit' });
                 if (!monthMap[month]) monthMap[month] = 0;
                 monthMap[month] += Number(r.value);
             });

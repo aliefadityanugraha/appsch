@@ -1,22 +1,194 @@
-<div class="grid h-screen place-content-center bg-white px-4 dark:bg-gray-900">
-  <div class="text-center">
-    <h1 class="text-9xl font-black text-gray-200 dark:text-gray-700">404</h1>
-
-    <p
-      class="text-2xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white"
-    >
-      Uh-oh!
-    </p>
-
-    <p class="mt-4 text-gray-500 dark:text-gray-400">
-      We can't find that page.
-    </p>
-
-    <a
-      href="#"
-      class="mt-6 inline-block rounded-sm bg-indigo-600 px-5 py-3 text-sm font-medium text-white hover:bg-indigo-700 focus:ring-3 focus:outline-hidden"
-    >
-      Go Back Home
-    </a>
-  </div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - <%= title || 'Page Not Found' %> | Appsch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+        
+        .error-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 60px 40px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        
+        .error-code {
+            font-size: 120px;
+            font-weight: 900;
+            color: #667eea;
+            line-height: 1;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .error-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 16px;
+        }
+        
+        .error-message {
+            font-size: 18px;
+            color: #718096;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .error-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+        
+        .error-details {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #495057;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .error-details h4 {
+            margin-bottom: 10px;
+            color: #dc3545;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .error-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .error-container {
+                padding: 40px 20px;
+            }
+            
+            .error-code {
+                font-size: 80px;
+            }
+            
+            .error-title {
+                font-size: 24px;
+            }
+            
+            .error-message {
+                font-size: 16px;
+            }
+            
+            .error-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">
+            🔍
+        </div>
+        
+        <div class="error-code"><%= statusCode || 404 %></div>
+        
+        <h1 class="error-title"><%= title || 'Page Not Found' %></h1>
+        
+        <p class="error-message">
+            <%= message || 'Halaman yang Anda cari tidak dapat ditemukan. Mungkin halaman telah dipindahkan, dihapus, atau URL yang Anda masukkan salah.' %>
+        </p>
+        
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">🏠 Kembali ke Beranda</a>
+            <a href="javascript:history.back()" class="btn btn-secondary">← Kembali</a>
+        </div>
+        
+        <% if (showDetails && details) { %>
+        <div class="error-details">
+            <h4>Detail Error (Development Mode):</h4>
+            <pre><%= details %></pre>
+        </div>
+        <% } %>
+    </div>
+    
+    <script>
+        // Auto redirect after 30 seconds
+        setTimeout(() => {
+            if (confirm('Halaman tidak ditemukan. Apakah Anda ingin kembali ke beranda?')) {
+                window.location.href = '/';
+            }
+        }, 30000);
+        
+        // Track 404 errors for analytics
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'page_not_found', {
+                'page_location': window.location.href,
+                'page_title': document.title
+            });
+        }
+    </script>
+</body>
+</html>

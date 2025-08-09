@@ -1,4 +1,4 @@
-    <div class="p-1 p-md-4">
+<div class="p-1 p-md-4">
         <div class="p-1 p-md-4 mt-2 mt-md-0">
 
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@12.1.0/dist/handsontable.full.min.css">
@@ -10,6 +10,7 @@
 
             <div class="d-flex justify-content-between">
                 <form id="filter-form" action="/filterRecords" method="POST" class="mb-4">
+                    <input type="hidden" name="_token" value="<%= csrfToken %>">
                     <div class="row g-3 align-items-center">
                         <div class="col-auto">
                             <label for="month" class="col-form-label">Month</label>
@@ -94,7 +95,8 @@
                         row[`tanggal_${i + 1}`] = val;
                         total_skor += val;
                     }
-                    row.total_skor = total_skor;
+                    // Custom rounding: 0.5 rounds down, 0.6+ rounds up
+                    row.total_skor = Math.floor(total_skor + 0.4);
                     
                     const tunjanganValue = parseFloat(staffData.tunjangan) || 0;
                     row.total_tukin = total_skor * tunjanganValue / 100;
@@ -184,7 +186,9 @@
                         for (let i = 1; i <= totalDays; i++) {
                             rowData.push(row[`tanggal_${i}`] || 0);
                         }
-                        rowData.push(row.total_skor || 0);
+                        // Apply same custom rounding for Excel export
+                        const roundedTotalSkor = Math.floor((row.total_skor || 0) + 0.4);
+                        rowData.push(roundedTotalSkor);
 
                         let totalTukin = isNaN(row.total_tukin) ? 0 : row.total_tukin;
                         const formattedTukin = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(totalTukin);

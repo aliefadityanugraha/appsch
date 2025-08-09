@@ -13,11 +13,15 @@
                     </div>
                     <% } %>
                     <form role="form" action="/auth/login" method="POST">
+                        <input type="hidden" name="_token" value="<%= csrfToken %>">
                     <div class="my-3">
                         <input type="email" name="email" class="form-control form-control-sm" placeholder="Email" aria-label="Email" required>
                     </div>
                     <div class="my-3">
                         <input type="password" name="password" class="form-control form-control-sm" placeholder="Password" aria-label="Password" required>
+                    </div>
+                    <div class="text-end mb-3">
+                        <a href="/auth/reset-password" class="text-primary text-sm">Lupa Password?</a>
                     </div>
                     <div class="text-center">
                         <button type="submit" class="btn btn-sm btn-primary w-100 mt-4 mb-0">Sign in</button>

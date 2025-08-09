@@ -10,14 +10,17 @@ const recordsController = require("../controllers/recordsController");
 const periodeController = require("../controllers/periodeController");
 const settingsController = require("../controllers/settingController");
 const authController = require("../controllers/authController");
+const passwordResetController = require("../controllers/passwordResetController");
 const apiController = require("../controllers/apiController");
 const errorController = require("../controllers/errorController");
 const {isLogin, authenticateToken} = require("../middleware/authMidleware");
+const checkPasswordReset = require("../middleware/checkPasswordReset");
+const {isRole} = require("../middleware/roleMidleware");
 const {refreshToken} = require("../controllers/authController");
-const {roles} = require("../controllers/roleController");
+const {roles, insertRole, editRole, deleteRole} = require("../controllers/roleController");
 
 /* main route */
-router.get("/", authenticateToken, mainController.dashboard);
+router.get("/", authenticateToken, checkPasswordReset, mainController.dashboard);
 
 /* auth route */
 router.get("/auth/login", isLogin, authController.login);
@@ -26,34 +29,47 @@ router.get("/auth/register", authController.register);
 router.post("/auth/register", authController.registerPost);
 router.get("/logout", authController.logout);
 
-/* staff route */
-router.get("/staff", authenticateToken, staffController.staff);
-router.post("/addStaff", authenticateToken, staffController.addStaff);
-router.post("/updateStaff/:id", authenticateToken, staffController.updateStaff);
-router.get("/deleteStaff/:id", authenticateToken, staffController.deleteStaff);
+/* password reset routes */
+router.get("/auth/reset-password", passwordResetController.showResetForm);
+router.post("/auth/generate-reset-token", passwordResetController.generateResetToken);
+router.post("/auth/reset-password-with-token", passwordResetController.resetPasswordWithToken);
+router.get("/auth/force-reset", authenticateToken, passwordResetController.showForceResetForm);
+router.post("/auth/force-reset-password", authenticateToken, passwordResetController.forceResetPassword);
 
-/* task route */
-router.get("/addTask/:id", authenticateToken, taskController.task);
-router.post("/addTask", authenticateToken, taskController.addTask);
-router.post("/updateTask/:id", authenticateToken, taskController.updateTask);
-router.get("/deleteTask/:id/:staffId", authenticateToken, taskController.deleteTask);
-
-/* periode route */
-router.get("/periode", authenticateToken, periodeController.periode);
-router.post("/addPeriode", authenticateToken, periodeController.addPeriode);
-router.post("/updatePeriode/:id", authenticateToken, periodeController.updatePeriode);
-router.get("/deletePeriode/:id", authenticateToken, periodeController.deletePeriode);
-
-/* records route */
-router.get("/data", authenticateToken, recordsController.records);
-router.post("/addRecordTask/:id", authenticateToken, recordsController.addRecords);
-router.post('/filterRecords', authenticateToken, recordsController.filterRecords);
+/* Note: Staff, Task, Periode, and Records routes are now defined below with role-based access control */
 
 /* settings route */
-router.get("/settings", authenticateToken, settingsController.settings);
+router.get("/settings", authenticateToken, checkPasswordReset, isRole(4), settingsController.settings);
+router.post("/settings/update-profile", authenticateToken, checkPasswordReset, isRole(4), settingsController.updateProfile);
 
-/**/
-router.get("/roles", authenticateToken, roles);
+/* role management routes - require role management permission (3) */
+router.get("/roles", authenticateToken, checkPasswordReset, isRole(3), roles);
+router.post("/administrator/insert-role", authenticateToken, isRole(3), insertRole);
+router.post("/administrator/edit-role", authenticateToken, isRole(3), editRole);
+router.get("/delete-role/:id", authenticateToken, isRole(3), deleteRole);
+
+/* staff management routes - require user management permission (4) */
+router.get("/staff", authenticateToken, checkPasswordReset, isRole(4), staffController.staff);
+router.post("/addStaff", authenticateToken, isRole(4), staffController.addStaff);
+router.post("/updateStaff/:id", authenticateToken, isRole(4), staffController.updateStaff);
+router.get("/deleteStaff/:id", authenticateToken, isRole(4), staffController.deleteStaff);
+
+/* task management routes - require posts management permission (1) */
+router.get("/addTask/:id", authenticateToken, checkPasswordReset, isRole(1), taskController.task);
+router.post("/addTask", authenticateToken, isRole(1), taskController.addTask);
+router.post("/updateTask/:id", authenticateToken, isRole(1), taskController.updateTask);
+router.get("/deleteTask/:id/:staffId", authenticateToken, isRole(1), taskController.deleteTask);
+
+/* periode management routes - require categories management permission (2) */
+router.get("/periode", authenticateToken, checkPasswordReset, isRole(2), periodeController.periode);
+router.post("/addPeriode", authenticateToken, isRole(2), periodeController.addPeriode);
+router.post("/updatePeriode/:id", authenticateToken, isRole(2), periodeController.updatePeriode);
+router.get("/deletePeriode/:id", authenticateToken, isRole(2), periodeController.deletePeriode);
+
+/* records routes - require posts management permission (1) */
+router.get("/data", authenticateToken, checkPasswordReset, isRole(1), recordsController.records);
+router.post("/addRecordTask/:id", authenticateToken, isRole(1), recordsController.addRecords);
+router.post('/filterRecords', authenticateToken, isRole(1), recordsController.filterRecords);
 
 /* refresh token route */
 router.get('/auth/refresh-token', refreshToken);

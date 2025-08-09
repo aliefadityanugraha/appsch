@@ -1,9 +1,8 @@
-const { Model } = require('objection');
-const { v4: uuidv4 } = require('uuid');
+const BaseModel = require('./BaseModel');
 
-class Settings extends Model {
+class Settings extends BaseModel {
   static get tableName() {
-    return 'Settings';
+    return 'settings';
   }
 
   static get idColumn() {
@@ -15,11 +14,9 @@ class Settings extends Model {
       type: 'object',
       required: ['tunjangan', 'color'],
       properties: {
-        id: { type: 'string', format: 'uuid' },
+        ...super.jsonSchema.properties,
         tunjangan: { type: 'string', minLength: 1 },
-        color: { type: 'string', minLength: 1 },
-        createdAt: { type: 'string', format: 'date-time' },
-        updatedAt: { type: 'string', format: 'date-time' }
+        color: { type: 'string', minLength: 1 }
       }
     };
   }
@@ -30,26 +27,7 @@ class Settings extends Model {
     };
   }
 
-  $beforeInsert() {
-    this.id = this.id || uuidv4();
-    if (this.createdAt && this.createdAt instanceof Date) {
-      this.createdAt = this.createdAt.toISOString().slice(0, 19).replace('T', ' ');
-    } else if (!this.createdAt) {
-      const now = new Date();
-      this.createdAt = now.toISOString().slice(0, 19).replace('T', ' ');
-    }
-    const now = new Date();
-    this.updatedAt = now.toISOString().slice(0, 19).replace('T', ' ');
-  }
-
-  $beforeUpdate() {
-    if (this.updatedAt && this.updatedAt instanceof Date) {
-      this.updatedAt = this.updatedAt.toISOString().slice(0, 19).replace('T', ' ');
-    } else {
-      const now = new Date();
-      this.updatedAt = now.toISOString().slice(0, 19).replace('T', ' ');
-    }
-  }
+  // BaseModel handles $beforeInsert and $beforeUpdate
 }
 
 module.exports = Settings;

@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 
 class Role extends BaseModel {
   static get tableName() {
-    return 'Role';
+    return 'role';
   }
 
   static get idColumn() {
@@ -16,19 +16,26 @@ class Role extends BaseModel {
       type: 'object',
       required: ['role', 'permission', 'description'],
       properties: {
-        id: { type: 'string', format: 'uuid' },
+        ...super.jsonSchema.properties,
         role: { type: 'string', minLength: 1 },
-        permission: { type: 'object' },
-        description: { type: 'string', minLength: 1 },
-        createdAt: { type: 'string', format: 'date-time' },
-        updatedAt: { type: 'string', format: 'date-time' }
+        permission: { type: 'string' },
+        description: { type: 'string', minLength: 1 }
       }
     };
   }
 
   static get relationMappings() {
+    const User = require('./User');
+    
     return {
-      // Add relations here if needed
+      users: {
+        relation: Model.HasManyRelation,
+        modelClass: User,
+        join: {
+          from: 'role.id',
+          to: 'user.role'
+        }
+      }
     };
   }
 

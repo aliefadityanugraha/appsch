@@ -7,7 +7,9 @@
                 <div class="card shadow-sm p-4 mb-4">
                     <h3 class="text-center mb-4">Roles Management</h3>
                     <form action="/administrator/insert-role" method="POST" class="form-edit">
+                        <input type="hidden" name="_token" value="<%= csrfToken %>">
                         <input type="text" name="_id" class="idInput" hidden/>
+                        <input type="hidden" name="editMode" class="editModeInput" value="false" />
                         <div class="mb-3">
                             <label for="role" class="form-label">Role</label>
                             <input
@@ -50,6 +52,7 @@
                                         role="switch"
                                         id="postPermit"
                                         name="postPermit"
+                                        value="1"
                                 />
                                 <label class="form-check-label" for="postPermit">(1) Posts Management</label>
                             </div>
@@ -60,6 +63,7 @@
                                         role="switch"
                                         id="categoryPermit"
                                         name="categoryPermit"
+                                        value="2"
                                 />
                                 <label class="form-check-label" for="categoryPermit">(2) Categories Management</label>
                             </div>
@@ -70,6 +74,7 @@
                                         role="switch"
                                         id="rolePermit"
                                         name="rolePermit"
+                                        value="3"
                                 />
                                 <label class="form-check-label" for="rolePermit">(3) Role Management</label>
                             </div>
@@ -80,6 +85,7 @@
                                         role="switch"
                                         id="userPermit"
                                         name="userPermit"
+                                        value="4"
                                 />
                                 <label class="form-check-label" for="userPermit">(4) User Management</label>
                             </div>
@@ -120,7 +126,7 @@
                                 >
                                     Edit
                                 </button>
-                                <form action="/delete-category/<%= e._id %>" method="get" class="d-inline">
+                                <form action="/delete-role/<%= e.id %>" method="get" class="d-inline">
                                     <button
                                             class="btn btn-danger btn-delete btn-sm rounded-pill"
                                             type="submit"
@@ -170,6 +176,7 @@
     const categoryRadio = document.querySelector(".categoryRadio");
     const roleRadio = document.querySelector(".roleRadio");
     const userRadio = document.querySelector(".userRadio");
+    const editModeInput = document.querySelector(".editModeInput");
     const form = document.querySelector(".form-edit");
 
     function edit(target) {
@@ -183,6 +190,7 @@
         inputRole.value = role[target].innerHTML;
         inputRoleID.value = roleId[target].innerHTML;
         inputDescription.value = description[target].innerHTML;
+        editModeInput.value = "true";
 
         const splitPermit = permission[target].innerHTML.split("");
 
@@ -204,5 +212,15 @@
         roleRadio.checked = false;
         userRadio.checked = false;
         form.action = "/administrator/insert-role";
+        editModeInput.value = "false";
     }
+    
+    // Reset form to insert mode
+    function resetForm() {
+        form.action = "/administrator/insert-role";
+        editModeInput.value = "false";
+    }
+    
+    // Add event listener to form reset
+    form.addEventListener('reset', resetForm);
 </script>

@@ -1,28 +1,23 @@
+const BaseModel = require('./BaseModel');
 const { Model } = require('objection');
-const { v4: uuidv4 } = require('uuid');
 
-class Staff extends Model {
+class Staff extends BaseModel {
   static get tableName() {
-    return 'Staff';
-  }
-
-  static get idColumn() {
-    return 'id';
+    return 'staff';
   }
 
   static get jsonSchema() {
+    const baseSchema = super.jsonSchema;
     return {
-      type: 'object',
+      ...baseSchema,
       required: ['name', 'jabatan', 'nip', 'tunjangan'],
       properties: {
-        id: { type: 'string', format: 'uuid' },
-        name: { type: 'string', minLength: 1 },
-        jabatan: { type: 'string', minLength: 1 },
-        nip: { type: 'string', minLength: 1 },
-        tunjangan: { type: 'string', minLength: 1 },
-        date: { type: 'string', format: 'date-time' },
-        createdAt: { type: 'string', format: 'date-time' },
-        updatedAt: { type: 'string', format: 'date-time' }
+        ...baseSchema.properties,
+        name: { type: 'string', minLength: 1, maxLength: 100 },
+        jabatan: { type: 'string', minLength: 1, maxLength: 50 },
+        nip: { type: 'string', minLength: 8, maxLength: 20, pattern: '^[0-9]+$' },
+        tunjangan: { type: 'string', minLength: 1, maxLength: 100 },
+        date: { type: 'string', format: 'date-time' }
       }
     };
   }
@@ -36,41 +31,22 @@ class Staff extends Model {
         relation: Model.HasManyRelation,
         modelClass: Task,
         join: {
-          from: 'Staff.id',
-          to: 'Task.staffId'
+          from: 'staff.id',
+          to: 'task.staffId'
         }
       },
       records: {
         relation: Model.HasManyRelation,
         modelClass: Records,
         join: {
-          from: 'Staff.id',
-          to: 'Records.staffId'
+          from: 'staff.id',
+          to: 'records.staffId'
         }
       }
     };
   }
 
-  $beforeInsert() {
-    this.id = this.id || uuidv4();
-    if (this.createdAt && this.createdAt instanceof Date) {
-      this.createdAt = this.createdAt.toISOString().slice(0, 19).replace('T', ' ');
-    } else if (!this.createdAt) {
-      const now = new Date();
-      this.createdAt = now.toISOString().slice(0, 19).replace('T', ' ');
-    }
-    const now = new Date();
-    this.updatedAt = now.toISOString().slice(0, 19).replace('T', ' ');
-  }
-
-  $beforeUpdate() {
-    if (this.updatedAt && this.updatedAt instanceof Date) {
-      this.updatedAt = this.updatedAt.toISOString().slice(0, 19).replace('T', ' ');
-    } else {
-      const now = new Date();
-      this.updatedAt = now.toISOString().slice(0, 19).replace('T', ' ');
-    }
-  }
+  // BaseModel handles $beforeInsert and $beforeUpdate
 }
 
 module.exports = Staff;

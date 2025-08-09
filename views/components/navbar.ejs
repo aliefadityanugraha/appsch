@@ -1,106 +1,475 @@
-<nav class="navbar p-3 bg-primary">
+<nav class="navbar p-3 modern-navbar">
     <div class="container-fluid">
-        <div>
-            <button class="btn btn-primary" aria-label="menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+        <div class="d-flex align-items-center">
+            <button class="btn modern-menu-btn" aria-label="menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
                 <i class="bi bi-list"></i>
             </button>
-            <a class="navbar-brand px-4 text-white" href="#">
-            <img src="/public/img/logo-smata.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
-                TUKIN SMATAJAYA
+            <a class="navbar-brand px-4 text-white modern-brand" href="/">
+                <img src="/public/img/logo-smata.png" alt="Logo" width="35" height="35" class="d-inline-block align-text-top logo-animate">
+                <span class="brand-text">TUKIN SMATAJAYA</span>
             </a>
+        </div>
+        <div class="navbar-actions">
+            <div class="time-display">
+                <i class="bi bi-clock"></i>
+                <span id="current-time"></span>
+            </div>
         </div>
     </div>
 </nav>
 
 <!-- ofcanvas navbar -->
 
-<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="addRecordModalLabel">TUKIN SMATAJAYA</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+<div class="offcanvas offcanvas-start modern-sidebar" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+    <div class="offcanvas-header modern-header">
+        <h5 class="offcanvas-title gradient-text" id="addRecordModalLabel">
+            <i class="bi bi-grid-3x3-gap-fill me-2"></i>
+            TUKIN SMATAJAYA
+        </h5>
+        <button type="button" class="btn-close modern-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="position-relative h-100">
-        <ul class="navbar-nav p-5">
-            <li class="text-white my-1 px-4 rounded-2 <%= req === '/' ? 'bg-primary' : 'bg-secondary' %>">
-                <a class="nav-link d-flex" href="/">
-                    <div
-                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
-                    >
-                        <i class="bi bi-box-fill text-lg"></i>
+        <ul class="navbar-nav p-4">
+            <li class="modern-nav-item <%= req === '/' ? 'active' : '' %>">
+                <a class="nav-link modern-nav-link" href="/">
+                    <div class="nav-icon dashboard-icon">
+                        <i class="bi bi-speedometer2"></i>
                     </div>
-                    <span class="nav-link-text ms-1">Dashboard</span>
+                    <span class="nav-link-text">Dashboard</span>
+                    <div class="nav-indicator"></div>
                 </a>
             </li>
-            <li class="text-white my-1 px-4 rounded-2 <%= req === '/staff' ? 'bg-primary' : 'bg-secondary' %>">
-                <a class="nav-link d-flex"href="/staff">
-                    <div
-                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
-                    >
-                        <i class="bi bi-people-fill text-lg"></i>
+            <li class="modern-nav-item <%= req === '/staff' ? 'active' : '' %>">
+                <a class="nav-link modern-nav-link" href="/staff">
+                    <div class="nav-icon staff-icon">
+                        <i class="bi bi-people-fill"></i>
                     </div>
-                    <span class="nav-link-text ms-1">Karyawan & Penilaian</span>
+                    <span class="nav-link-text">Karyawan & Penilaian</span>
+                    <div class="nav-indicator"></div>
                 </a>
             </li>
-            <li class="text-white my-1 px-4 rounded-2 <%= req === '/periode' ? 'bg-primary' : 'bg-secondary' %>">
-                <a class="nav-link d-flex" href="/periode">
-                    <div
-                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
-                    >
-                        <i class="bi bi-calendar-day-fill text-lg"></i>
+            <li class="modern-nav-item <%= req === '/periode' ? 'active' : '' %>">
+                <a class="nav-link modern-nav-link" href="/periode">
+                    <div class="nav-icon periode-icon">
+                        <i class="bi bi-calendar-event"></i>
                     </div>
-                    <span class="nav-link-text ms-1">Kategori Instrumen</span>
+                    <span class="nav-link-text">Kategori Instrumen</span>
+                    <div class="nav-indicator"></div>
                 </a>
             </li>
-            <li class="text-white my-1 px-4 rounded-2 <%= req === '/data' ? 'bg-primary' : 'bg-secondary' %>">
-                <a class="nav-link d-flex" href="/data">
-                    <div
-                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
-                    >
-                        <i class="bi bi-card-checklist text-lg"></i>
+            <li class="modern-nav-item <%= req === '/data' ? 'active' : '' %>">
+                <a class="nav-link modern-nav-link" href="/data">
+                    <div class="nav-icon data-icon">
+                        <i class="bi bi-bar-chart-fill"></i>
                     </div>
-                    <span class="nav-link-text ms-1">Laporan</span>
+                    <span class="nav-link-text">Laporan</span>
+                    <div class="nav-indicator"></div>
                 </a>
             </li>
-            <li class="text-white my-1 px-4 rounded-2 <%= req === '/settings' ? 'bg-primary' : 'bg-secondary' %>">
-                <a class="nav-link d-flex" href="/settings">
-                    <div
-                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
-                    >
-                        <i class="bi bi-gear-fill text-lg"></i>
+            <li class="modern-nav-item <%= req === '/settings' ? 'active' : '' %>">
+                <a class="nav-link modern-nav-link" href="/settings">
+                    <div class="nav-icon settings-icon">
+                        <i class="bi bi-gear-fill"></i>
                     </div>
-                    <span class="nav-link-text ms-1">Settings</span>
+                    <span class="nav-link-text">Settings</span>
+                    <div class="nav-indicator"></div>
                 </a>
             </li>
         </ul>
-        <div class="position-absolute bottom-0 p-5 text-white my-1 d-flex gap-2">
-            <div class="nav-link d-flex bg-secondary rounded-2 py-2 px-3">
-                <span id="user-info"></span>
-            </div>
-            </a>
-            <a class="nav-link d-flex bg-secondary rounded-2 py-2 px-3" href="/logout">
-                <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center"
-                >
-                <i class="bi bi-box-arrow-right"></i>
+        <div class="position-absolute bottom-0 p-4 w-100">
+            <div class="user-section">
+                <div class="user-info-card">
+                    <div class="user-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <div class="user-details">
+                        <span id="user-info" class="user-name">Loading...</span>
+                        <small class="user-role">Administrator</small>
+                    </div>
                 </div>
-                <span class="nav-link-text ms-1">Logout</span>
-            </a>
+                <a class="logout-btn" href="/logout">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
         </div>
     </div>
 </div>
 <!-- end ofcanvas navbar -->
 
 <style>
-    ul li:hover {
-        opacity: 0.5;
-        transition: all 0.5s;
+/* Modern Navbar Styles */
+.modern-navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.modern-menu-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 12px;
+    padding: 10px 12px;
+    transition: all 0.3s ease;
+}
+
+.modern-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.modern-brand {
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.modern-brand:hover {
+    color: #ffd700 !important;
+    transform: scale(1.05);
+}
+
+.logo-animate {
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
+.logo-animate:hover {
+    transform: rotate(360deg) scale(1.1);
+}
+
+.brand-text {
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+}
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.time-display {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 15px;
+    border-radius: 20px;
+    color: white;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.time-display i {
+    margin-right: 8px;
+    color: #ffd700;
+}
+
+/* Modern Sidebar Styles */
+.modern-sidebar {
+    background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+    border: none;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
+}
+
+.modern-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+}
+
+.gradient-text {
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    margin: 0;
+}
+
+.modern-close {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    padding: 8px;
+    transition: all 0.3s ease;
+}
+
+.modern-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+/* Navigation Items */
+.modern-nav-item {
+    margin: 8px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.modern-nav-link {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    color: #ecf0f1;
+    text-decoration: none;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modern-nav-link:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(10px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modern-nav-item.active .modern-nav-link {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 5px 25px rgba(102, 126, 234, 0.3);
+}
+
+.nav-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.dashboard-icon {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+}
+
+.staff-icon {
+    background: linear-gradient(135deg, #4834d4, #686de0);
+    color: white;
+}
+
+.periode-icon {
+    background: linear-gradient(135deg, #00d2d3, #54a0ff);
+    color: white;
+}
+
+.data-icon {
+    background: linear-gradient(135deg, #5f27cd, #a55eea);
+    color: white;
+}
+
+.settings-icon {
+    background: linear-gradient(135deg, #ff9ff3, #f368e0);
+    color: white;
+}
+
+.modern-nav-link:hover .nav-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.nav-link-text {
+    font-weight: 500;
+    flex: 1;
+}
+
+.nav-indicator {
+    width: 4px;
+    height: 20px;
+    background: #ffd700;
+    border-radius: 2px;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.modern-nav-item.active .nav-indicator {
+    opacity: 1;
+}
+
+/* User Section */
+.user-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.user-info-card {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.user-details {
+    flex: 1;
+}
+
+.user-name {
+    display: block;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.user-role {
+    color: #bdc3c7;
+    font-size: 0.8rem;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.logout-btn:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(231, 76, 60, 0.3);
+}
+
+.logout-btn i {
+    margin-right: 8px;
+    font-size: 1.1rem;
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.modern-nav-item.active .nav-icon {
+    animation: pulse 2s infinite;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .navbar-actions {
+        display: none;
     }
+    
+    .modern-brand {
+        font-size: 1rem;
+    }
+}
 </style>
 
 <script>
+// Update current time
+function updateTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+    const timeElement = document.getElementById('current-time');
+    if (timeElement) {
+        timeElement.textContent = timeString;
+    }
+}
+
+// Update time every second
+setInterval(updateTime, 1000);
+updateTime(); // Initial call
+
+// Fetch user info
 fetch('/users/current-user')
   .then(res => res.json())
   .then(data => {
-    document.getElementById('user-info').innerText = data.email; // atau data.name jika ada
+    const userInfoElement = document.getElementById('user-info');
+    if (userInfoElement) {
+        userInfoElement.textContent = data.email || data.name || 'User';
+    }
+  })
+  .catch(err => {
+    console.log('Error fetching user info:', err);
+    const userInfoElement = document.getElementById('user-info');
+    if (userInfoElement) {
+        userInfoElement.textContent = 'User';
+    }
   });
+
+// Add smooth scroll behavior
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click animation to nav items
+    const navLinks = document.querySelectorAll('.modern-nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Create ripple effect
+            const ripple = document.createElement('div');
+            ripple.style.position = 'absolute';
+            ripple.style.borderRadius = '50%';
+            ripple.style.background = 'rgba(255, 255, 255, 0.3)';
+            ripple.style.transform = 'scale(0)';
+            ripple.style.animation = 'ripple 0.6s linear';
+            ripple.style.left = '50%';
+            ripple.style.top = '50%';
+            ripple.style.width = '100px';
+            ripple.style.height = '100px';
+            ripple.style.marginLeft = '-50px';
+            ripple.style.marginTop = '-50px';
+            
+            this.style.position = 'relative';
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+});
+
+// Add ripple animation CSS
+const style = document.createElement('style');
+style.textContent = `
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+`;
+document.head.appendChild(style);
 </script>

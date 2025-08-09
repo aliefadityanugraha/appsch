@@ -1,6 +1,200 @@
 <div class="main-content p-4">
   <div class="container-fluid">
-    <div class="card shadow-sm p-5">
-      COOMING SOON
+    <div class="row">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i class="fas fa-cog me-2"></i>Settings</h4>
+          </div>
+          <div class="card-body">
+            <!-- Flash Messages -->
+            <% if (success && success.length > 0) { %>
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <%= success %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            <% } %>
+            <% if (errors && errors.length > 0) { %>
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <%= errors %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            <% } %>
+            <% if (messages && messages.length > 0) { %>
+              <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <%= messages %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            <% } %>
+
+            <div class="row">
+              <!-- Account Information -->
+              <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                  <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>Account Information</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="row mb-3">
+                      <div class="col-sm-4">
+                        <strong>User ID:</strong>
+                      </div>
+                      <div class="col-sm-8">
+                        <span class="text-muted"><%= user.id %></span>
+                      </div>
+                    </div>
+                    <div class="row mb-3">
+                      <div class="col-sm-4">
+                        <strong>Email:</strong>
+                      </div>
+                      <div class="col-sm-8">
+                        <span class="text-primary"><%= user.email %></span>
+                      </div>
+                    </div>
+                    <div class="row mb-3">
+                      <div class="col-sm-4">
+                        <strong>Role:</strong>
+                      </div>
+                      <div class="col-sm-8">
+                        <% if (user.userRole) { %>
+                         <span class="badge bg-info"><%= user.userRole.role %></span>
+                       <% } else { %>
+                         <span class="badge bg-secondary">No Role</span>
+                       <% } %>
+                      </div>
+                    </div>
+                    <div class="row mb-3">
+                      <div class="col-sm-4">
+                        <strong>Status:</strong>
+                      </div>
+                      <div class="col-sm-8">
+                        <% if (user.status === 'active') { %>
+                          <span class="badge bg-success">Active</span>
+                        <% } else { %>
+                          <span class="badge bg-warning">Inactive</span>
+                        <% } %>
+                      </div>
+                    </div>
+                    <div class="row mb-3">
+                      <div class="col-sm-4">
+                        <strong>Created:</strong>
+                      </div>
+                      <div class="col-sm-8">
+                        <span class="text-muted"><%= new Date(user.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-4">
+                        <strong>Last Updated:</strong>
+                      </div>
+                      <div class="col-sm-8">
+                        <span class="text-muted"><%= new Date(user.updatedAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Update Profile Form -->
+              <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                  <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Update Profile</h5>
+                  </div>
+                  <div class="card-body">
+                    <form action="/settings/update-profile" method="POST">
+                      <input type="hidden" name="_token" value="<%= csrfToken %>">
+                      
+                      <!-- Email Update -->
+                      <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" value="<%= user.email %>" required>
+                        <div class="form-text">Enter your new email address if you want to change it.</div>
+                      </div>
+
+                      <hr>
+                      <h6 class="text-muted mb-3">Change Password</h6>
+                      
+                      <!-- Current Password -->
+                      <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" placeholder="Enter current password">
+                        <div class="form-text">Required only if you want to change your password.</div>
+                      </div>
+
+                      <!-- New Password -->
+                      <div class="mb-3">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="Enter new password" minlength="6">
+                        <div class="form-text">Minimum 6 characters. Leave blank if you don't want to change password.</div>
+                      </div>
+
+                      <!-- Confirm Password -->
+                      <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password">
+                        <div class="form-text">Re-enter your new password to confirm.</div>
+                      </div>
+
+                      <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                          <i class="fas fa-save me-2"></i>Update Profile
+                        </button>
+                        <a href="/" class="btn btn-outline-secondary">
+                          <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- Password Validation Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const newPasswordInput = document.getElementById('newPassword');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const currentPasswordInput = document.getElementById('currentPassword');
+    const form = document.querySelector('form');
+
+    function validatePasswords() {
+        const newPassword = newPasswordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        const currentPassword = currentPasswordInput.value;
+
+        // Reset custom validity
+        confirmPasswordInput.setCustomValidity('');
+        currentPasswordInput.setCustomValidity('');
+
+        // If new password is provided, current password is required
+        if (newPassword && !currentPassword) {
+            currentPasswordInput.setCustomValidity('Current password is required when changing password');
+        }
+
+        // Check if passwords match
+        if (newPassword && confirmPassword && newPassword !== confirmPassword) {
+            confirmPasswordInput.setCustomValidity('Passwords do not match');
+        }
+    }
+
+    newPasswordInput.addEventListener('input', validatePasswords);
+    confirmPasswordInput.addEventListener('input', validatePasswords);
+    currentPasswordInput.addEventListener('input', validatePasswords);
+
+    form.addEventListener('submit', function(e) {
+        validatePasswords();
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+</script>

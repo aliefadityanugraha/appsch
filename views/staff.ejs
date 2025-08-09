@@ -1,5 +1,5 @@
 <div class="row p-1 p-md-4">
-    <div class="p-1 p-md-4 mt-2 mt-md-0 col-md-8 col-12 order-md-1 order-2">
+    <div class="p-1 p-md-4 mt-2 mt-md-0 col-md-8 col-12 order-md-1">
         <style>
             @media (max-width: 768px) {
                 #myTable {
@@ -70,6 +70,7 @@
                     <!-- form add records task -->
                     <div id="recordAlertPlaceholder"></div>
                     <form id="addRecordForm" action="" method="post">
+                        <input type="hidden" name="_token" value="<%= csrfToken %>">
                         <div class="d-xxl-flex gap-2 d-block">
                             <!-- filter select -->
                             <div class="input-group input-group-sm mb-3">
@@ -87,6 +88,13 @@
                                 <input type="date" id="start-date" class="form-control form-control-sm" name="date" value="<%= new Date().toISOString().slice(0,10) %>" required>
                             </div>
                         </div>
+                        <!-- Toggle Check All/Uncheck All button -->
+                        <div id="checkAllButtons" class="mb-3" style="display: none;">
+                            <button type="button" id="toggleAllBtn" class="btn btn-sm btn-outline-success" onclick="toggleAllTasks()">
+                                <i class="bi bi-check-square"></i> Check All
+                            </button>
+                        </div>
+                        
                         <ul id="taskList" class="list-group">
                             <!-- tasks will be populated by javascript -->
                         </ul>
@@ -122,9 +130,10 @@
             </div>
         </div>
     </div>
-    <div class="p-1 p-md-4 mt-2 mt-md-0 col-md-4 col-12 order-md-2 order-1">
+    <div class="p-1 p-md-4 mt-2 mt-md-0 col-md-4 col-12 order-md-2">
         <h3>Tambah Karyawan</h3>
         <form id="form-karyawan" action="/addStaff" method="post">
+            <input type="hidden" name="_token" value="<%= csrfToken %>">
             <div class="p-2">
                 <label for="name" class="form-label">Nama:</label>
                 <input
@@ -362,9 +371,12 @@
             const checkedTaskInputs = Array.from(formElement.querySelectorAll('input[name="taskIds"]:checked'));
             const taskIds = checkedTaskInputs.map(input => input.value);
             const date = formElement.querySelector('input[name="date"]').value;
-            const response = await fetch(`/records/${currentRecordId}`, {
+            const response = await fetch(`/api/records/${currentRecordId}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': '<%= csrfToken %>'
+                },
                 body: JSON.stringify({ taskIds, date })
             });
             if (response.ok) {
@@ -379,16 +391,37 @@
         const submitButton = addRecordModal.querySelector('#addRecordSubmitButton');
         taskListDiv.innerHTML = '<div class="text-center my-3">Loading tasks...</div>';
         try {
+            console.log('=== DEBUG fetchAndRenderTasks ===');
+            console.log('StaffId:', staffId);
+            console.log('Date:', date);
+            
             const [tasksRes, recordsRes] = await Promise.all([
-                fetch(`/task/${staffId}`),
-                fetch(`/records/${staffId}?date=${date}`)
+                fetch(`/api/task/${staffId}`),
+                fetch(`/api/records/${staffId}?date=${date}`)
             ]);
+            
+            console.log('Tasks response status:', tasksRes.status);
+            console.log('Records response status:', recordsRes.status);
+            
             if (!tasksRes.ok || !recordsRes.ok) throw new Error('Failed to fetch data');
-            const tasks = await tasksRes.json();
+            
+            const tasksResponse = await tasksRes.json();
             const recordData = await recordsRes.json();
-            currentRecordId = recordData.recordId;
-            // recordData.tasks adalah array of task yang sudah terhubung ke record
-            const recordTaskIds = (recordData.tasks || []).map(t => t.id);
+            
+            console.log('Tasks response:', tasksResponse);
+            console.log('Record data response:', recordData);
+            
+            currentRecordId = recordData.data?.recordId;
+            console.log('Current record ID:', currentRecordId);
+            
+            // recordData.data.tasks adalah array of task yang sudah terhubung ke record
+            const recordTaskIds = (recordData.data?.tasks || []).map(t => t.id);
+            console.log('Record task IDs:', recordTaskIds);
+            
+            // Extract tasks data from API response
+            const tasks = tasksResponse.data || [];
+            console.log('All tasks:', tasks.map(t => ({id: t.id, description: t.description})));
+            
             renderTaskList(taskListDiv, tasks, recordTaskIds, submitButton);
         } catch (err) {
             handleTaskFetchError(taskListDiv, submitButton);
@@ -397,6 +430,8 @@
 
     function renderTaskList(taskListDiv, tasks, recordTaskIds, submitButton) {
         taskListDiv.innerHTML = '';
+        const checkAllButtons = document.getElementById('checkAllButtons');
+        
         if (tasks.length > 0) {
             tasks.forEach(task => {
                 const checked = recordTaskIds.includes(task.id) ? 'checked' : '';
@@ -427,10 +462,16 @@
             if(submitButton) {
                 submitButton.style.display = 'block';
             }
+            if(checkAllButtons) {
+                checkAllButtons.style.display = 'block';
+            }
         } else {
             taskListDiv.innerHTML = '<p>Tidak ada tugas untuk karyawan ini</p>';
             if(submitButton) {
                 submitButton.style.display = 'none';
+            }
+            if(checkAllButtons) {
+                checkAllButtons.style.display = 'none';
             }
         }
     }
@@ -509,15 +550,77 @@
                     } else {
                         item.classList.remove('checked-bg');
                     }
+                    // Update tampilan tombol toggle
+                    updateToggleButton();
                 });
             }
         });
+    }
+
+    // Fungsi untuk toggle all tasks
+    function toggleAllTasks() {
+        const taskCheckboxes = document.querySelectorAll('#taskList input[name="taskIds"]');
+        const toggleBtn = document.getElementById('toggleAllBtn');
+        const icon = toggleBtn.querySelector('i');
+        
+        // Cek apakah semua checkbox sudah dicentang
+        const allChecked = Array.from(taskCheckboxes).every(checkbox => checkbox.checked);
+        
+        if (allChecked) {
+            // Jika semua sudah dicentang, uncheck semua
+            taskCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    checkbox.checked = false;
+                    checkbox.dispatchEvent(new Event('change'));
+                }
+            });
+            // Update tombol ke mode "Check All"
+            toggleBtn.className = 'btn btn-sm btn-outline-success';
+            icon.className = 'bi bi-check-square';
+            toggleBtn.innerHTML = '<i class="bi bi-check-square"></i> Check All';
+        } else {
+            // Jika tidak semua dicentang, check semua
+            taskCheckboxes.forEach(checkbox => {
+                if (!checkbox.checked) {
+                    checkbox.checked = true;
+                    checkbox.dispatchEvent(new Event('change'));
+                }
+            });
+            // Update tombol ke mode "Uncheck All"
+            toggleBtn.className = 'btn btn-sm btn-outline-warning';
+            icon.className = 'bi bi-square';
+            toggleBtn.innerHTML = '<i class="bi bi-square"></i> Uncheck All';
+        }
+        updateCheckedBg();
+    }
+    
+    // Fungsi untuk update tampilan tombol berdasarkan keadaan checkbox
+    function updateToggleButton() {
+        const taskCheckboxes = document.querySelectorAll('#taskList input[name="taskIds"]');
+        const toggleBtn = document.getElementById('toggleAllBtn');
+        
+        if (taskCheckboxes.length === 0 || !toggleBtn) return;
+        
+        const allChecked = Array.from(taskCheckboxes).every(checkbox => checkbox.checked);
+        const someChecked = Array.from(taskCheckboxes).some(checkbox => checkbox.checked);
+        
+        if (allChecked) {
+            // Semua dicentang - tampilkan "Uncheck All"
+            toggleBtn.className = 'btn btn-sm btn-outline-warning';
+            toggleBtn.innerHTML = '<i class="bi bi-square"></i> Uncheck All';
+        } else {
+            // Tidak semua dicentang - tampilkan "Check All"
+            toggleBtn.className = 'btn btn-sm btn-outline-success';
+            toggleBtn.innerHTML = '<i class="bi bi-check-square"></i> Check All';
+        }
     }
 
     if (typeof renderTaskList === 'function') {
         const origRenderTaskList = renderTaskList;
         renderTaskList = function(...args) {
             origRenderTaskList.apply(this, args);
+            // Update tampilan tombol toggle setelah render
+            setTimeout(updateToggleButton, 100);
             setTimeout(updateCheckedBg, 0);
         }
     }

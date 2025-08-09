@@ -17,7 +17,13 @@ function renderDatabaseError(req, res, error) {
 module.exports = {
     error404: (req, res) => {
         res.status(404).render("error/404", {
-            layout: "layouts/auth-layouts",
+            layout: false,
+            title: "Page Not Found",
+            statusCode: 404,
+            message: "Halaman yang Anda cari tidak dapat ditemukan. Mungkin halaman telah dipindahkan, dihapus, atau URL yang Anda masukkan salah.",
+            req: req.path,
+            showDetails: process.env.NODE_ENV !== 'production',
+            details: null
         });
     },
     renderDatabaseError

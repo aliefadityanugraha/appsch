@@ -1,139 +1,131 @@
 "use strict";
 
-const Task = require('../models/Task');
-const Staff = require('../models/Staff');
+const TaskService = require('../services/TaskService');
+const StaffService = require('../services/StaffService');
+const ResponseFormatter = require('../utils/ResponseFormatter');
 const Periode = require('../models/Periode');
 const Records = require('../models/Records');
 const { knex } = require('../config/database');
 
-module.exports = {
-
-    task: async (req, res) => {
-        try {
-            const staffId = req.params.id;
-
-            const staff = await Staff.query().where('id', staffId);
-
-            const tasks = await Task.query()
-                .where('staffId', staffId)
-                .withGraphFetched('periode');
-
-            const periodeData = await Periode.query().orderBy('createdAt', 'asc');
-
-            res.status(200).render("task", {
-                layout: "layouts/main-layouts",
-                title: staff[0].name,
-                data: tasks,
-                staff,
-                id: req.params.id,
-                periodeData,
-                req: req.path,
-            });
-        } catch (error) {
-            console.error('Error fetching task:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    },
-
-    addTask: async (req, res) => {
-        try {
-            const { description, value, id, periode } = req.body;
-
-            await Task.query().insert({
-                description: description,
-                value: parseInt(value),
-                staffId: id,
-                periodeId: periode,
-            });
-            
-            res.status(200).redirect(`/addTask/${id}`);
-        } catch (error) {
-            console.error('Error adding task:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    },
-
-    updateTask: async (req, res) => {
-        try {
-            const { description, periode, value } = req.body;
-            const taskId = req.params.id;
-            
-            await Task.query()
-                .findById(taskId)
-                .patch({
-                    description,
-                    value: parseFloat(value),
-                    periodeId: periode,
-                });
-                
-            res.status(200).redirect(`/addTask/${req.body.id}`);
-        } catch (error) {
-            console.error('Error updating task:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    },
-
-    deleteTask: async (req, res) => {
-        try {
-            const taskId = req.params.id;
-            const staffId = req.params.staffId;
-
-            await Task.query().deleteById(taskId);
-            
-            res.status(200).redirect(`/addTask/${staffId}`);
-        } catch (error) {
-            console.error('Error deleting task:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    },
-
-    getTasksByStaffId: async (req, res) => {
-        try {
-            const staffId = req.params.id;
-            const date = req.query.date;
-            let query = Task.query().where('staffId', staffId);
-            
-            if (date) {
-                const start = new Date(date);
-                start.setHours(0, 0, 0, 0);
-                const end = new Date(date);
-                end.setHours(23, 59, 59, 999);
-                
-                query = query.whereBetween('createdAt', [start, end]);
-            }
-
-            const tasks = await query.select('id', 'description', 'value', 'periodeId');
-            
-            res.json(tasks);
-        } catch (error) {
-            console.error('Error getting tasks by staff ID:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    },
-
-    createRecord: async (req, res) => {
-        try {
-            const { value, staffId, taskIds } = req.body;
-            
-            const record = await Records.query().insert({
-                value,
-                staffId,
-            });
-
-            // For many-to-many relation, we need to handle the junction table manually
-            if (taskIds && taskIds.length > 0) {
-                const junctionData = taskIds.map(taskId => ({
-                    recordId: record.id,
-                    taskId: taskId
-                }));
-                
-                await knex('RecordTasks').insert(junctionData);
-            }
-
-            res.status(200).redirect(`/addTask/${staffId}`);
-        } catch (error) {
-            console.error('Error creating record:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
+class TaskController {
+    constructor() {
+        this.taskService = new TaskService();
+        this.staffService = new StaffService();
     }
+
+    task = ResponseFormatter.asyncHandler(async (req, res) => {
+        const staffId = req.params.id;
+
+        const [staff, tasks, periodeData] = await Promise.all([
+            this.staffService.getStaffById(staffId),
+            this.taskService.getTasksByStaffId(staffId),
+            Periode.query().orderBy('createdAt', 'asc')
+        ]);
+
+        return ResponseFormatter.renderView(req, res, "task", {
+            layout: "layouts/main-layouts",
+            title: staff.name,
+            data: tasks,
+            staff: [staff], // Keep array format for backward compatibility
+            id: req.params.id,
+            periodeData,
+            req: req.path,
+        });
+    })
+
+    addTask = ResponseFormatter.asyncHandler(async (req, res) => {
+        const { description, value, id, periode } = req.body;
+
+        const taskData = {
+            description: description,
+            value: parseInt(value),
+            staffId: id,
+            periodeId: periode,
+            status: 'pending'
+        };
+
+        await this.taskService.createTask(taskData);
+        
+        return ResponseFormatter.redirectWithFlash(req, res, `/addTask/${id}`, 'Task berhasil ditambahkan', 'success');
+    })
+
+    updateTask = ResponseFormatter.asyncHandler(async (req, res) => {
+        const { description, periode, value } = req.body;
+        const taskId = req.params.id;
+        
+        const updateData = {
+            description,
+            value: parseFloat(value),
+            periodeId: periode,
+        };
+        
+        await this.taskService.updateTask(taskId, updateData);
+            
+        return ResponseFormatter.redirectWithFlash(req, res, `/addTask/${req.body.id}`, 'Task berhasil diperbarui', 'success');
+    })
+
+    deleteTask = ResponseFormatter.asyncHandler(async (req, res) => {
+        const taskId = req.params.id;
+        const staffId = req.params.staffId;
+
+        await this.taskService.deleteTask(taskId);
+        
+        return ResponseFormatter.redirectWithFlash(req, res, `/addTask/${staffId}`, 'Task berhasil dihapus', 'success');
+    })
+
+    getTasksByStaffId = ResponseFormatter.asyncHandler(async (req, res) => {
+        const staffId = req.params.id;
+        const date = req.query.date;
+        
+        const options = {};
+        
+        if (date) {
+            const start = new Date(date);
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(date);
+            end.setHours(23, 59, 59, 999);
+            
+            options.dateFrom = start;
+            options.dateTo = end;
+        }
+
+        const tasks = await this.taskService.getTasksByStaffId(staffId, options);
+        
+        // Format response for API compatibility
+        const formattedTasks = tasks.map(task => ({
+            id: task.id,
+            description: task.description,
+            value: task.value,
+            periodeId: task.periodeId
+        }));
+        
+        return ResponseFormatter.sendSuccess(res, formattedTasks, 'Tasks retrieved successfully');
+    })
+
+    createRecord = ResponseFormatter.asyncHandler(async (req, res) => {
+        const { value, staffId, taskIds } = req.body;
+        
+        const record = await Records.query().insert({
+            value,
+            staffId,
+        });
+
+        // Many-to-many handled by Objection relations in repositories elsewhere
+
+        return ResponseFormatter.redirectWithFlash(req, res, `/addTask/${staffId}`, {
+            success: 'Record berhasil dibuat'
+        });
+    })
+}
+
+// Create and export instance
+const taskController = new TaskController();
+
+module.exports = {
+    task: taskController.task,
+    addTask: taskController.addTask,
+    updateTask: taskController.updateTask,
+    deleteTask: taskController.deleteTask,
+    getTasksByStaffId: taskController.getTasksByStaffId,
+    createRecord: taskController.createRecord
 };

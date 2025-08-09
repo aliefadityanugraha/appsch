@@ -1,9 +1,9 @@
+const BaseModel = require('./BaseModel');
 const { Model } = require('objection');
-const { v4: uuidv4 } = require('uuid');
 
-class Periode extends Model {
+class Periode extends BaseModel {
   static get tableName() {
-    return 'Periode';
+    return 'periode';
   }
 
   static get idColumn() {
@@ -15,50 +15,30 @@ class Periode extends Model {
       type: 'object',
       required: ['periode', 'nilai'],
       properties: {
-        id: { type: 'string', format: 'uuid' },
-        periode: { type: 'string', minLength: 1 },
-        nilai: { type: 'integer' },
-        createdAt: { type: 'string', format: 'date-time' },
-        updatedAt: { type: 'string', format: 'date-time' }
+        ...super.jsonSchema.properties,
+        periode: { type: 'string', minLength: 1, maxLength: 191 },
+        nilai: { type: 'integer', minimum: 0 }
       }
     };
   }
 
   static get relationMappings() {
     const Task = require('./Task');
+    const { Model } = require('objection');
 
     return {
-      task: {
+      tasks: {
         relation: Model.HasManyRelation,
         modelClass: Task,
         join: {
-          from: 'Periode.id',
-          to: 'Task.periodeId'
+          from: 'periode.id',
+          to: 'task.periodeId'
         }
       }
     };
   }
 
-  $beforeInsert() {
-    this.id = this.id || uuidv4();
-    if (this.createdAt && this.createdAt instanceof Date) {
-      this.createdAt = this.createdAt.toISOString().slice(0, 19).replace('T', ' ');
-    } else if (!this.createdAt) {
-      const now = new Date();
-      this.createdAt = now.toISOString().slice(0, 19).replace('T', ' ');
-    }
-    const now = new Date();
-    this.updatedAt = now.toISOString().slice(0, 19).replace('T', ' ');
-  }
 
-  $beforeUpdate() {
-    if (this.updatedAt && this.updatedAt instanceof Date) {
-      this.updatedAt = this.updatedAt.toISOString().slice(0, 19).replace('T', ' ');
-    } else {
-      const now = new Date();
-      this.updatedAt = now.toISOString().slice(0, 19).replace('T', ' ');
-    }
-  }
 }
 
 module.exports = Periode;

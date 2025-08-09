@@ -82,6 +82,7 @@
     <div class="p-1 p-md-4 mt-2 mt-md-0 col-md-4 col-12 order-md-2 order-1">
         <h3>Tambah Instrument</h3>
         <form action="/addPeriode" method="post">
+            <input type="hidden" name="_token" value="<%= csrfToken %>">
             <div class="P-2">
                 <label for="periode" class="form-label">Periode:</label>
                 <input

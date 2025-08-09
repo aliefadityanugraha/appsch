@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 
 class User extends BaseModel {
   static get tableName() {
-    return 'User';
+    return 'user';
   }
 
   static get idColumn() {
@@ -14,23 +14,33 @@ class User extends BaseModel {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['email', 'password'],
+      required: ['email'],
       properties: {
-        id: { type: 'string', format: 'uuid' },
+        ...super.jsonSchema.properties,
         email: { type: 'string', format: 'email' },
-        password: { type: 'string', minLength: 1 },
+        password: { type: ['string', 'null'], minLength: 1 },
         status: { type: 'boolean', default: true },
         role: { type: 'integer', default: 1 },
         refreshToken: { type: ['string', 'null'] },
-        createdAt: { type: 'string', format: 'date-time' },
-        updatedAt: { type: 'string', format: 'date-time' }
+        resetToken: { type: ['string', 'null'] },
+        resetTokenExpiry: { type: ['string', 'null'], format: 'date-time' },
+        mustResetPassword: { type: 'boolean', default: false }
       }
     };
   }
-
+  
   static get relationMappings() {
+    const Role = require('./Role');
+    
     return {
-      // Add relations here if needed
+      userRole: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Role,
+        join: {
+          from: 'user.role',
+          to: 'role.id'
+        }
+      }
     };
   }
 

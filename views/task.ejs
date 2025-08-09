@@ -80,6 +80,7 @@
         <% const nilai = data.reduce((acc, e) => acc + e.value, 0) %>
         <p>Presentase Nilai : <%= Math.round(nilai * 100 / 100) %>%</p>
         <form action="/addTask" method="post" class="mt-4">
+            <input type="hidden" name="_token" value="<%= csrfToken %>">
             <input type="hidden" id="id" name="id" value="<%= id %>" required/>
             <div class="mb-3">
                 <label for="description" class="form-label">Deskripsi Task:</label>
