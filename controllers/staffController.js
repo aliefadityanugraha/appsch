@@ -1,54 +1,73 @@
 "use strict";
 
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const StaffService = require('../services/StaffService');
+const Periode = require('../models/Periode');
+const ResponseFormatter = require('../utils/ResponseFormatter');
+const { ValidationError, NotFoundError } = require('../middleware/errorHandler');
 
-module.exports = {
-  staff: async (req, res) => {
-    const data = await prisma.staff.findMany({
-      // where: {
-      //   createdAt: {
-      //     gte: new Date('2024-06-21'), // Start of date range
-      //     lte: new Date('2024-06-31'), // End of date range
-      //   },
-      // },
-      include: {
-        task: true,
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
+class StaffController {
+    constructor() {
+        this.staffService = new StaffService();
+    }
+
+    staff = ResponseFormatter.asyncHandler(async (req, res) => {
+        const [data, listPeriode] = await Promise.all([
+            this.staffService.getAllStaff(),
+            Periode.query()
+        ]);
+        
+        ResponseFormatter.renderView(req, res, "staff", {
+            layout: "layouts/main-layouts",
+            title: "Data Staff",
+            data,
+            listPeriode
+        });
     });
-    res.render("staff", {
-      layout: "layouts/main-layouts",
-      title: "Data Staff",
-      data,
-      req: req.path,
+
+    addStaff = ResponseFormatter.asyncHandler(async (req, res) => {
+        const { name, jabatan, nip, tunjangan } = req.body;
+        
+        await this.staffService.createStaff({
+            name,
+            jabatan,
+            nip,
+            tunjangan
+        });
+        
+        ResponseFormatter.redirectWithFlash(req, res, '/staff', 'Data karyawan berhasil ditambahkan!', 'success');
     });
-  },
-  addStaff: async (req, res) => {
-    const { name, jabatan, nip } = req.body;
-    const data = await prisma.staff.create({
-      data: { name, jabatan, nip },
+
+    updateStaff = ResponseFormatter.asyncHandler(async (req, res) => {
+        const { id } = req.params;
+        const { name, jabatan, nip, tunjangan } = req.body;
+        
+        await this.staffService.updateStaff(id, {
+            name,
+            jabatan,
+            nip,
+            tunjangan
+        });
+        
+        ResponseFormatter.redirectWithFlash(req, res, '/staff', 'Data karyawan berhasil diupdate!', 'success');
     });
-    console.log(data);
-    res.redirect("/staff");
-  },
-  updateStaff: async (req, res) => {
-    const { id } = req.params;
-    const { name, jabatan, nip } = req.body;
-    const data = await prisma.staff.update({
-      where: { id },
-      data: { name, jabatan, nip, updatedAt: new Date() },
+
+    deleteStaff = ResponseFormatter.asyncHandler(async (req, res) => {
+        const { id } = req.params;
+        
+        await this.staffService.deleteStaff(id);
+        
+        ResponseFormatter.redirectWithFlash(req, res, '/staff', 'Data karyawan berhasil dihapus!', 'success');
     });
-    res.redirect("/staff");
-  },
-  deleteStaff: async (req, res) => {
-    const { id } = req.params;
-    const data = await prisma.staff.delete({
-      where: { id },
+
+    getStaffAPI = ResponseFormatter.asyncHandler(async (req, res) => {
+        const data = await this.staffService.getAllStaff();
+        
+        ResponseFormatter.sendSuccess(res, {
+            message: 'Staff data retrieved successfully',
+            data: data
+        });
     });
-    console.log(data);
-    res.redirect("/staff");
-  },
-};
+}
+
+// Export instance of the controller
+module.exports = new StaffController();

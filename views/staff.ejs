@@ -1,178 +1,629 @@
-<div class="container">
-  <%- include('./components/button-go-back.ejs') %>
-  <h1>Tambah Data Staff</h1>
-  
-  <form action="/addStaff" method="post" class="row g-3">
-    <div class="col-md-6">
-      <label for="name" class="form-label">Nama:</label>
-      <input
-        type="text"
-        class="form-control"
-        id="name"
-        name="name"
-        required
-        placeholder="Masukkan Nama"
-      />
-    </div>
-    <div class="col-md-6">
-      <label for="jabatan" class="form-label">Jabatan:</label>
-      <input
-        type="text"
-        class="form-control"
-        id="jabatan"
-        name="jabatan"
-        required
-        placeholder="Masukkan Jabatan"
-      />
-    </div>
-    <div class="col-md-6">
-      <label for="nip" class="form-label">NIP:</label>
-      <input
-        type="text"
-        class="form-control"
-        id="nip"
-        name="nip"
-        required
-        placeholder="Masukkan NIP"
-      />
-    </div>
-    <div class="col-12">
-      <button type="button" class="btn btn-secondary" onclick="clearForm()">
-        Clear
-      </button>
-      <script>
-        function clearForm() {
-          document.getElementById("name").value = "";
-          document.getElementById("jabatan").value = "";
-          document.getElementById("nip").value = "";
-          document.querySelector("form").action = "/addStaff/";
-        }
-      </script>
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
-  </form>
-</div>
+<div class="row p-1 p-md-4">
+    <div class="p-1 p-md-4 mt-2 mt-md-0 col-md-8 col-12 order-md-1">
+        <style>
+            @media (max-width: 768px) {
+                #myTable {
+                    font-size: 12px;
+                    width: 100%;
+                    display: block;
+                    overflow-x: auto;
+                    white-space: nowrap;
+                }
+            }
+        </style>
+        <div class="table-responsive">
+            <table id="myTable" class="table table-striped align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th>Nama</th>
+                    <th>Jabatan</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% let no = 1; %>
+                <% data.forEach(e => { %>
+                    <tr>
+                        <td><%= e.name %></td>
+                        <td><%= e.jabatan %></td>
+                        <td>
+                            <a
+                                    href="javascript:void(0)"
+                                    class="btn btn-sm btn-primary my-2 text-white"
+                                    onclick="edit('<%= e.id %>', '<%= e.name %>', '<%= e.jabatan %>', '<%= e.nip %>', '<%= e.tunjangan %>')"
+                            ><i class="bi bi-pencil-fill"></i
+                                ></a>
+                            <button type="button" class="btn btn-sm btn-danger my-2 text-white" data-bs-toggle="modal"
+                                data-bs-target="#deleteStaffModal"
+                                data-staff-id="<%= e.id %>"
+                                data-staff-name="<%= e.name %>">
+                                <i class="bi bi-trash3-fill"></i>
+                            </button>
+                            <a
+                                    href="/addTask/<%= e.id %>"
+                                    class="btn btn-sm btn-success my-2 text-white"
+                            ><i class="bi bi-file-earmark-plus"></i
+                                ></a>
 
-<div class="container mt-4">
-  <style>
-    @media (max-width: 768px) {
-      #myTable {
-        font-size: 12px;
-        width: 100%;
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-      }
-    }
-  </style>
-
-  <table id="myTable" class="table table-striped display responsive nowrap">
-    <thead>
-      <tr>
-        <th>No</th>
-        <th>Nama</th>
-        <th>Jabatan</th>
-        <th>NIP</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% let no = 1; %> <% data.forEach(e => { %>
-      <tr>
-        <td><%= no %></td>
-        <td><%= e.name %></td>
-        <td><%= e.jabatan %></td>
-        <td><%= e.nip %></td>
-        <td>
-          <a
-            href="javascript:void(0)"
-            class="btn btn-outline-primary"
-            onclick="edit('<%= e.id %>', '<%= e.name %>', '<%= e.jabatan %>', '<%= e.nip %>')"
-            ><i class="bi bi-pencil-fill"></i
-          ></a>
-          <a href="#" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<%= e.id %>">
-            <i class="bi bi-trash3-fill"></i>
-          </a>
-          <div class="modal fade" id="deleteModal<%= e.id %>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <!-- modal -->
+                            <button type="button" class="btn btn-sm btn-info my-2 text-white"
+                                    data-bs-toggle="offcanvas"
+                                    data-bs-target="#addRecordModal"
+                                    data-staff-id="<%= e.id %>"
+                                    data-staff-name="<%= e.name %>">
+                                <i class="bi bi-plus-circle"></i> Penilaian
+                            </button>
+                        </td>
+                    </tr>
+                    <% no++ %>
+                <% }) %>
+                </tbody>
+            </table>
+            <!-- modal -->
+            <div class="offcanvas offcanvas-end offcanvas-record" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="addRecordModal" aria-labelledby="addRecordModalLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="addRecordModalLabel"> Penilaian Karyawan
+                        <span class="fw-bold" id="staffName"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                  Are you sure you want to delete this staff?
+                <div class="offcanvas-body">
+                    <!-- form add records task -->
+                    <div id="recordAlertPlaceholder"></div>
+                    <form id="addRecordForm" action="" method="post">
+                        <input type="hidden" name="_token" value="<%= csrfToken %>">
+                        <div class="d-xxl-flex gap-2 d-block">
+                            <!-- filter select -->
+                            <div class="input-group input-group-sm mb-3">
+                                <label class="input-group-text" for="periodeFilter"><i class="bi bi-funnel-fill px-1"></i>Filter by Instrumen</label>
+                                <select id="periodeFilter" class="form-select form-select-sm" aria-label="Periode Task" onchange="filterTasks(this.value)" style="width: auto !important;">
+                                    <option selected value="semua">Tampilkan Semua</option>
+                                    <% listPeriode.forEach(periode => { %>
+                                        <option value="<%= periode.id %>"><%= periode.periode %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <!-- end filter select -->
+                            <div class="input-group input-group-sm mb-3">
+                                <span class="input-group-text"><i class="bi bi-calendar-date-fill px-1"></i> State Date</span>
+                                <input type="date" id="start-date" class="form-control form-control-sm" name="date" value="<%= new Date().toISOString().slice(0,10) %>" required>
+                            </div>
+                        </div>
+                        <!-- Toggle Check All/Uncheck All button -->
+                        <div id="checkAllButtons" class="mb-3" style="display: none;">
+                            <button type="button" id="toggleAllBtn" class="btn btn-sm btn-outline-success" onclick="toggleAllTasks()">
+                                <i class="bi bi-check-square"></i> Check All
+                            </button>
+                        </div>
+                        
+                        <ul id="taskList" class="list-group">
+                            <!-- tasks will be populated by javascript -->
+                        </ul>
+                        <button id="addRecordSubmitButton" class="btn btn-sm btn-info my-2 text-white" type="submit" style="display: none;">
+                            <i class="bi bi-plus-circle"></i> Update Penilaian
+                        </button>
+                    </form>
+                    <!-- end form add records task -->
                 </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                  <a href="/deleteStaff/<%= e.id %>" class="btn btn-danger">Delete</a>
-                </div>
-              </div>
             </div>
-          </div>
-          <a
-            href="/addTask/<%= e.id %>"
-            class="btn btn-outline-success"
-            ><i class="bi bi-file-earmark-plus"></i
-          ></a>
-  
-          <!-- modal -->
-          <button type="button" class="btn btn-info my-2 text-light" data-bs-toggle="modal" data-bs-target="#exampleModal<%= e.id %>">
-            <i class="bi bi-plus-circle"></i> Add Record
-          </button>
-          <div class="modal fade" id="exampleModal<%= e.id %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Add Record for <%= e.name %></h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <form action="/addRecordTask/<%= e.id %>" method="post">
-                    <% let noo = 1; %> <% e.task.forEach(ex => { %>
-                    <div class="form-check">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        id="tugasCheck<%= noo %>"
-                        name="value"
-                        value="<%- parseInt(ex.nilai) %>"
-                        onchange="if(this.checked){this.nextElementSibling.style.textDecoration='line-through';}else{this.nextElementSibling.style.textDecoration='none';}"
-                      />
-                      <label class="form-check-label" for="tugasCheck<%= noo %>"
-                        ><%= ex.deskripsi %></label
-                      >
+            <!-- modal delete staff (reusable) -->
+            <div class="modal fade" id="deleteStaffModal" tabindex="-1"
+                    aria-labelledby="deleteStaffModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteStaffModalLabel">Confirm Delete</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete staff <span
+                                    class="fst-italic fw-bold" id="deleteStaffName"></span>?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-sm btn-secondary text-white" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <a href="#" id="deleteStaffLink" class="btn btn-sm btn-danger text-white">Delete</a>
+                        </div>
                     </div>
-                    <% noo++ %> <% }) %> <% if (e.task.length > 0) { %>
-                    <button class="btn btn-info my-2 text-light" type="submit">
-                      <i class="bi bi-plus-circle"></i> Add Record</i>
-                    </button>
-                    <% } %>
-                  </form>
                 </div>
-              </div>
             </div>
-          </div>
-        </td>
-      </tr>
-      <% no++ %> <% }) %>
-    </tbody>
-  </table>
-  
-  <!-- edit javascript -->
-  <script>
-    function edit(id, name, jabatan, nip) {
-      document.getElementById("name").value = name;
-      document.getElementById("jabatan").value = jabatan;
-      document.getElementById("nip").value = nip;
-      document.querySelector("form").action = "/updateStaff/" + id;
-    }
-  </script>
+        </div>
+    </div>
+    <div class="p-1 p-md-4 mt-2 mt-md-0 col-md-4 col-12 order-md-2">
+        <h3>Tambah Karyawan</h3>
+        <form id="form-karyawan" action="/addStaff" method="post">
+            <input type="hidden" name="_token" value="<%= csrfToken %>">
+            <div class="p-2">
+                <label for="name" class="form-label">Nama:</label>
+                <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        id="name"
+                        name="name"
+                        required
+                        placeholder="Masukkan Nama"
+                />
+            </div>
+            <div class="p-2">
+                <label for="jabatan" class="form-label">Jabatan:</label>
+                <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        id="jabatan"
+                        name="jabatan"
+                        required
+                        placeholder="Masukkan Jabatan"
+                />
+            </div>
+            <div class="p-2">
+                <label for="nip" class="form-label">NIP:</label>
+                <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        id="nip"
+                        name="nip"
+                        required
+                        placeholder="Masukkan NIP"
+                />
+            </div>
+            <div class="p-2">
+                <label for="tunjangan" class="form-label">Tunjangan:</label>
+                <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        id="tunjangan"
+                        name="tunjangan"
+                        required
+                        placeholder="Masukkan Tunjangan"
+                />
+            </div>
+            <div class="py-2">
+                <button type="button" class="btn btn-sm btn-danger text-white" onclick="clearForm()"><i class="bi bi-x-circle px-1"></i>Clear</button>
+                <button type="submit" class="btn btn-sm btn-success text-white"><i class="bi bi-floppy px-1"></i> Simpan</button>
+            </div>
+        </form>
+        <script>
+            function clearForm() {
+                document.getElementById("name").value = "";
+                document.getElementById("jabatan").value = "";
+                document.getElementById("nip").value = "";
+                document.getElementById("tunjangan").value = "";
+                document.querySelector("form").action = "/addStaff/";
+            }
+        </script>
+    </div>
 </div>
+
+
 <script>
-  $(document).ready(function () {
-    $("#myTable").DataTable({
-      responsive: true
+    function edit(id, name, jabatan, nip, tunjangan) {
+        document.getElementById("name").value = name;
+        document.getElementById("jabatan").value = jabatan;
+        document.getElementById("nip").value = nip;
+        document.getElementById("tunjangan").value = tunjangan;
+        document.querySelector("#form-karyawan").action = "/updateStaff/" + id;
+    }
+</script>
+<script>
+    // Global variables untuk state management
+    let currentStaffId = null;
+    let currentRecordId = null;
+
+    $(document).ready(function () {
+        $("#myTable").DataTable({
+            responsive: true,
+            initComplete: function() {
+                console.log('DataTable initialization complete');
+                initializeOffcanvasSystem();
+            }
+        });
     });
-  });
+
+    // Fungsi untuk menginisialisasi sistem offcanvas
+    function initializeOffcanvasSystem() {
+        const addRecordModal = document.getElementById('addRecordModal');
+        if (!addRecordModal) return;
+
+        // Restore state offcanvas
+        restoreOffcanvasState(addRecordModal);
+
+        // Setup event listeners
+        setupOffcanvasEventListeners(addRecordModal);
+        setupDeleteModalListeners();
+    }
+
+    function restoreOffcanvasState(addRecordModal) {
+        console.log('=== DEBUG RESTORE STATE ===');
+        console.log('localStorage offcanvasOpen:', localStorage.getItem('offcanvasOpen'));
+        console.log('localStorage offcanvasStaffId:', localStorage.getItem('offcanvasStaffId'));
+        console.log('localStorage offcanvasDate:', localStorage.getItem('offcanvasDate'));
+        
+        if (localStorage.getItem('offcanvasOpen') === 'true') {
+            console.log('Condition met: offcanvasOpen is true');
+            const staffId = localStorage.getItem('offcanvasStaffId');
+            let date = localStorage.getItem('offcanvasDate');
+            console.log('StaffId from localStorage:', staffId);
+            console.log('Date from localStorage:', date);
+            
+            // Jika date null, gunakan tanggal hari ini
+            if (!date) {
+                date = new Date().toISOString().slice(0,10);
+                console.log('Date was null, using today:', date);
+            }
+            
+            if (staffId) {
+                console.log('StaffId exists, proceeding with restore...');
+                // Pastikan Bootstrap sudah ter-load dan DOM siap
+                setTimeout(() => {
+                    console.log('Inside setTimeout - checking state again...');
+                    // Cek lagi apakah state masih valid
+                    if (localStorage.getItem('offcanvasOpen') === 'true') {
+                        console.log('State still valid, looking for button...');
+                        const btn = document.querySelector(`button[data-staff-id='${staffId}'][data-bs-target='#addRecordModal']`);
+                        console.log('Button found:', btn);
+                        console.log('addRecordModal:', addRecordModal);
+                        
+                        if (btn && addRecordModal) {
+                            console.log('Both button and modal found, proceeding...');
+                            // Set tanggal sebelum buka offcanvas
+                            const dateInput = document.getElementById('start-date');
+                            if (dateInput) dateInput.value = date;
+                            
+                            // Pastikan offcanvas instance sudah ada
+                            const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(addRecordModal);
+                            console.log('Bootstrap offcanvas instance:', bsOffcanvas);
+                            console.log('Bootstrap available:', typeof bootstrap !== 'undefined');
+                            
+                            if (bsOffcanvas) {
+                                console.log('Showing offcanvas...');
+                                bsOffcanvas.show(btn);
+                            }
+                        } else {
+                            console.log("Button or modal not found, clearing state");
+                            clearOffcanvasState();
+                        }
+                    } else {
+                        console.log('State no longer valid, skipping restore');
+                    }
+                }, 200);
+            } else {
+                console.log('Missing staffId, skipping restore');
+            }
+        } else {
+            console.log('Condition not met: offcanvasOpen is not true');
+        }
+        console.log('=== END DEBUG RESTORE STATE ===');
+    }
+
+    function clearOffcanvasState() {
+        localStorage.setItem('offcanvasOpen', 'false');
+        localStorage.removeItem('offcanvasStaffId');
+        localStorage.removeItem('offcanvasDate');
+    }
+
+    function setupOffcanvasEventListeners(addRecordModal) {
+        addRecordModal.addEventListener('show.bs.offcanvas', function (event) {
+            handleOffcanvasShow(event, addRecordModal);
+        });
+
+        addRecordModal.addEventListener('hidden.bs.offcanvas', function () {
+            handleOffcanvasHidden();
+        });
+
+        document.getElementById('addRecordForm').onsubmit = async function(e) {
+            await handleRecordFormSubmit(e, this);
+        };
+
+        document.getElementById('addRecordForm').addEventListener('submit', function(e) {
+            if (!currentRecordId) {
+                // Hanya enable input yang dicentang
+                const allTaskInputs = Array.from(this.querySelectorAll('input[name="task"]'));
+                allTaskInputs.forEach(input => {
+                    if (!input.checked) input.disabled = true;
+                });
+            }
+        });
+    }
+
+    function handleOffcanvasShow(event, addRecordModal) {
+        const button = event.relatedTarget;
+        const staffId = button.getAttribute('data-staff-id');
+        const staffName = button.getAttribute('data-staff-name');
+        currentStaffId = staffId; // Update global variable
+
+        const modalTitle = addRecordModal.querySelector('#staffName');
+        const form = addRecordModal.querySelector('#addRecordForm');
+        const periodeFilter = addRecordModal.querySelector('#periodeFilter');
+        const dateInput = addRecordModal.querySelector('#start-date');
+
+        modalTitle.textContent = staffName;
+        form.action = '/addRecordTask/' + staffId;
+        if(periodeFilter) {
+            periodeFilter.value = 'Filter Periode Task';
+        }
+
+        fetchAndRenderTasks(staffId, dateInput.value);
+
+        dateInput.onchange = function() {
+            console.log('Tanggal berubah:', dateInput.value);
+            fetchAndRenderTasks(currentStaffId, dateInput.value);
+            localStorage.setItem('offcanvasDate', dateInput.value);
+        };
+
+        setTimeout(() => {
+            localStorage.setItem('offcanvasOpen', 'true');
+            localStorage.setItem('offcanvasStaffId', currentStaffId);
+            localStorage.setItem('offcanvasDate', dateInput.value);
+        }, 100);
+    }
+
+    function handleOffcanvasHidden() {
+        setTimeout(() => {
+            clearOffcanvasState();
+        }, 100);
+    }
+
+    async function handleRecordFormSubmit(e, formElement) {
+        if (currentRecordId) {
+            e.preventDefault();
+            // Ambil semua task yang tercentang
+            const checkedTaskInputs = Array.from(formElement.querySelectorAll('input[name="taskIds"]:checked'));
+            const taskIds = checkedTaskInputs.map(input => input.value);
+            const date = formElement.querySelector('input[name="date"]').value;
+            const response = await fetch(`/api/records/${currentRecordId}`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': '<%= csrfToken %>'
+                },
+                body: JSON.stringify({ taskIds, date })
+            });
+            if (response.ok) {
+                showRecordAlert('Record berhasil diupdate!', 'success');
+            }
+        }
+    }
+
+    async function fetchAndRenderTasks(staffId, date) {
+        const addRecordModal = document.getElementById('addRecordModal');
+        const taskListDiv = addRecordModal.querySelector('#taskList');
+        const submitButton = addRecordModal.querySelector('#addRecordSubmitButton');
+        taskListDiv.innerHTML = '<div class="text-center my-3">Loading tasks...</div>';
+        try {
+            console.log('=== DEBUG fetchAndRenderTasks ===');
+            console.log('StaffId:', staffId);
+            console.log('Date:', date);
+            
+            const [tasksRes, recordsRes] = await Promise.all([
+                fetch(`/api/task/${staffId}`),
+                fetch(`/api/records/${staffId}?date=${date}`)
+            ]);
+            
+            console.log('Tasks response status:', tasksRes.status);
+            console.log('Records response status:', recordsRes.status);
+            
+            if (!tasksRes.ok || !recordsRes.ok) throw new Error('Failed to fetch data');
+            
+            const tasksResponse = await tasksRes.json();
+            const recordData = await recordsRes.json();
+            
+            console.log('Tasks response:', tasksResponse);
+            console.log('Record data response:', recordData);
+            
+            currentRecordId = recordData.data?.recordId;
+            console.log('Current record ID:', currentRecordId);
+            
+            // recordData.data.tasks adalah array of task yang sudah terhubung ke record
+            const recordTaskIds = (recordData.data?.tasks || []).map(t => t.id);
+            console.log('Record task IDs:', recordTaskIds);
+            
+            // Extract tasks data from API response
+            const tasks = tasksResponse.data || [];
+            console.log('All tasks:', tasks.map(t => ({id: t.id, description: t.description})));
+            
+            renderTaskList(taskListDiv, tasks, recordTaskIds, submitButton);
+        } catch (err) {
+            handleTaskFetchError(taskListDiv, submitButton);
+        }
+    }
+
+    function renderTaskList(taskListDiv, tasks, recordTaskIds, submitButton) {
+        taskListDiv.innerHTML = '';
+        const checkAllButtons = document.getElementById('checkAllButtons');
+        
+        if (tasks.length > 0) {
+            tasks.forEach(task => {
+                const checked = recordTaskIds.includes(task.id) ? 'checked' : '';
+                const value = task.id;
+                const taskItem = document.createElement('div');
+                taskItem.className = 'form-check task-item';
+                taskItem.dataset.periode = task.periodeId;
+                taskItem.innerHTML = `
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="task-${task.id}"
+                                name="taskIds"
+                                value="${value}"
+                                ${checked}
+                            />
+                            <label class="form-check-label" for="task-${task.id}">
+                                ${task.description || ''}
+                            </label>
+                        </div>
+                        <span class="badge text-bg-danger text-white rounded-pill">${task.value || 0}</span>
+                    </li>
+                `;
+                taskListDiv.appendChild(taskItem);
+            });
+            if(submitButton) {
+                submitButton.style.display = 'block';
+            }
+            if(checkAllButtons) {
+                checkAllButtons.style.display = 'block';
+            }
+        } else {
+            taskListDiv.innerHTML = '<p>Tidak ada tugas untuk karyawan ini</p>';
+            if(submitButton) {
+                submitButton.style.display = 'none';
+            }
+            if(checkAllButtons) {
+                checkAllButtons.style.display = 'none';
+            }
+        }
+    }
+
+    function handleTaskFetchError(taskListDiv, submitButton) {
+        taskListDiv.innerHTML = '<div class="text-danger">Failed to load tasks.</div>';
+        if(submitButton) {
+            submitButton.style.display = 'none';
+        }
+    }
+
+    function setupDeleteModalListeners() {
+        const deleteStaffModal = document.getElementById('deleteStaffModal');
+        if(deleteStaffModal) {
+            deleteStaffModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const staffId = button.getAttribute('data-staff-id');
+                const staffName = button.getAttribute('data-staff-name');
+                const nameSpan = deleteStaffModal.querySelector('#deleteStaffName');
+                const deleteLink = deleteStaffModal.querySelector('#deleteStaffLink');
+                if(nameSpan) {
+                    nameSpan.textContent = staffName;
+                }
+                if(deleteLink) {
+                    deleteLink.href = '/deleteStaff/' + staffId;
+                }
+            });
+        }
+    }
+
+    function showRecordAlert(message, type) {
+        const alertPlaceholder = document.getElementById('recordAlertPlaceholder');
+        alertPlaceholder.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        setTimeout(() => {
+            const alert = alertPlaceholder.querySelector('.alert');
+            if (alert) {
+                alert.classList.remove('show');
+                alert.classList.add('hide');
+                setTimeout(() => { alertPlaceholder.innerHTML = ''; }, 500);
+            }
+        }, 2500);
+    }
+
+    function filterTasks(periode) {
+        const tasks = document.querySelectorAll('.task-item');
+        tasks.forEach(task => {
+            if (periode.toLowerCase() === 'semua') {
+                task.style.display = 'block';
+            } else {
+                if (task.dataset.periode.toLowerCase() === periode.toLowerCase()) {
+                    task.style.display = 'block';
+                } else {
+                    task.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    function updateCheckedBg() {
+        document.querySelectorAll('.list-group-item').forEach(function(item) {
+            var checkbox = item.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                if (checkbox.checked) {
+                    item.classList.add('checked-bg');
+                } else {
+                    item.classList.remove('checked-bg');
+                }
+                checkbox.addEventListener('change', function() {
+                    if (checkbox.checked) {
+                        item.classList.add('checked-bg');
+                    } else {
+                        item.classList.remove('checked-bg');
+                    }
+                    // Update tampilan tombol toggle
+                    updateToggleButton();
+                });
+            }
+        });
+    }
+
+    // Fungsi untuk toggle all tasks
+    function toggleAllTasks() {
+        const taskCheckboxes = document.querySelectorAll('#taskList input[name="taskIds"]');
+        const toggleBtn = document.getElementById('toggleAllBtn');
+        const icon = toggleBtn.querySelector('i');
+        
+        // Cek apakah semua checkbox sudah dicentang
+        const allChecked = Array.from(taskCheckboxes).every(checkbox => checkbox.checked);
+        
+        if (allChecked) {
+            // Jika semua sudah dicentang, uncheck semua
+            taskCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    checkbox.checked = false;
+                    checkbox.dispatchEvent(new Event('change'));
+                }
+            });
+            // Update tombol ke mode "Check All"
+            toggleBtn.className = 'btn btn-sm btn-outline-success';
+            icon.className = 'bi bi-check-square';
+            toggleBtn.innerHTML = '<i class="bi bi-check-square"></i> Check All';
+        } else {
+            // Jika tidak semua dicentang, check semua
+            taskCheckboxes.forEach(checkbox => {
+                if (!checkbox.checked) {
+                    checkbox.checked = true;
+                    checkbox.dispatchEvent(new Event('change'));
+                }
+            });
+            // Update tombol ke mode "Uncheck All"
+            toggleBtn.className = 'btn btn-sm btn-outline-warning';
+            icon.className = 'bi bi-square';
+            toggleBtn.innerHTML = '<i class="bi bi-square"></i> Uncheck All';
+        }
+        updateCheckedBg();
+    }
+    
+    // Fungsi untuk update tampilan tombol berdasarkan keadaan checkbox
+    function updateToggleButton() {
+        const taskCheckboxes = document.querySelectorAll('#taskList input[name="taskIds"]');
+        const toggleBtn = document.getElementById('toggleAllBtn');
+        
+        if (taskCheckboxes.length === 0 || !toggleBtn) return;
+        
+        const allChecked = Array.from(taskCheckboxes).every(checkbox => checkbox.checked);
+        const someChecked = Array.from(taskCheckboxes).some(checkbox => checkbox.checked);
+        
+        if (allChecked) {
+            // Semua dicentang - tampilkan "Uncheck All"
+            toggleBtn.className = 'btn btn-sm btn-outline-warning';
+            toggleBtn.innerHTML = '<i class="bi bi-square"></i> Uncheck All';
+        } else {
+            // Tidak semua dicentang - tampilkan "Check All"
+            toggleBtn.className = 'btn btn-sm btn-outline-success';
+            toggleBtn.innerHTML = '<i class="bi bi-check-square"></i> Check All';
+        }
+    }
+
+    if (typeof renderTaskList === 'function') {
+        const origRenderTaskList = renderTaskList;
+        renderTaskList = function(...args) {
+            origRenderTaskList.apply(this, args);
+            // Update tampilan tombol toggle setelah render
+            setTimeout(updateToggleButton, 100);
+            setTimeout(updateCheckedBg, 0);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', updateCheckedBg);
 </script>

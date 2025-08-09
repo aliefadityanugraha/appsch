@@ -1,0 +1,86 @@
+<section class="min-vh-100 d-flex align-items-center bg-light" style="background-image: url('/public/img/A7C04816.jpg'); background-position: top; background-size: cover;">
+<div class="container position-relative z-1">
+    <div class="row justify-content-center">
+    <div class="col-lg-5 text-center mx-auto mb-4">
+        <h1 class="text-white mb-2 mt-5">Welcome!</h1>
+        <p class="lead text-white">Use these awesome forms to login or create new account in your project for free.</p>
+    </div>
+    </div>
+    <div class="row justify-content-center">
+    <div class="col-xl-4 col-lg-5 col-md-7 mx-auto">
+        <div class="card shadow-sm border-0">
+        <div class="card-header text-center pt-4 bg-white border-0">
+            <h5>Register</h5>
+        </div>
+        <div class="card-body">
+            <% if (message && message.length > 0) { %>
+            <div class="alert alert-danger" role="alert">
+                <%= message %>
+            </div>
+            <% } %>
+            <form role="form" id="registerForm">
+                <input type="hidden" name="_token" id="csrfToken" value="<%= csrfToken %>">
+                <div class="mb-3">
+                    <input type="email" name="email" id="email" class="form-control form-control-sm" placeholder="Email" aria-label="Email" required>
+                </div>
+                <div class="mb-3">
+                    <input type="password" name="password" id="password" class="form-control form-control-sm" placeholder="Password" aria-label="Password" required>
+                </div>
+                <div class="mb-3">
+                    <input type="password" name="confirmPassword" id="confirmPassword" class="form-control form-control-sm" placeholder="Confirm Password" aria-label="Password" required>
+                </div>
+                <div class="form-check mb-3 text-start">
+                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" checked required>
+                    <label class="form-check-label" for="flexCheckDefault">
+                    I agree the <a href="/" class="text-primary fw-bold">Terms and Conditions</a>
+                    </label>
+                </div>
+                <div class="text-center">
+                    <button type="button" class="btn btn-sm btn-primary w-100 my-3" id="registerBtn">Sign up</button>
+                </div>
+                <p class="text-sm mt-3 mb-0 text-center">Already have an account? <a href="/auth/login" class="text-primary fw-bold">Sign in</a></p>
+            </form>
+        </div>
+        </div>
+    </div>
+    </div>
+</div>
+</section>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('registerBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const confirmPassword = document.getElementById('confirmPassword').value.trim();
+      if (!email || !password || !confirmPassword) {
+        alert('Please fill in all fields.');
+        return;
+      }
+      if (password !== confirmPassword) {
+        alert('Passwords do not match.');
+        return;
+      }
+      try {
+        const csrfToken = document.getElementById('csrfToken').value;
+        const response = await fetch('/auth/register', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken
+          },
+          body: JSON.stringify({ email, password }),
+        });
+        if (response.ok) {
+          alert('Registration successful!');
+          window.location.href = '/auth/login';
+        } else {
+          const data = await response.json();
+          alert(data.message || 'Registration failed.');
+        }
+      } catch (err) {
+        alert('An error occurred.');
+      }
+    });
+  });
+</script>

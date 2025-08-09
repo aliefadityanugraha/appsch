@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 - <%= title || 'Internal Server Error' %> | Appsch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+        
+        .error-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 60px 40px;
+            text-align: center;
+            max-width: 700px;
+            width: 90%;
+        }
+        
+        .error-code {
+            font-size: 120px;
+            font-weight: 900;
+            color: #ff6b6b;
+            line-height: 1;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .error-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 16px;
+        }
+        
+        .error-message {
+            font-size: 18px;
+            color: #718096;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .error-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+        
+        .btn-warning {
+            background: #ffd93d;
+            color: #744210;
+            border: 2px solid #f6cc02;
+        }
+        
+        .btn-warning:hover {
+            background: #ffed4e;
+            border-color: #eab308;
+        }
+        
+        .error-details {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #495057;
+            border-left: 4px solid #dc3545;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .error-details h4 {
+            margin-bottom: 10px;
+            color: #dc3545;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .error-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+        }
+        
+        .error-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            color: #856404;
+        }
+        
+        .error-info h5 {
+            margin-bottom: 8px;
+            color: #744210;
+        }
+        
+        .error-info ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .error-info li {
+            margin-bottom: 4px;
+        }
+        
+        @media (max-width: 768px) {
+            .error-container {
+                padding: 40px 20px;
+            }
+            
+            .error-code {
+                font-size: 80px;
+            }
+            
+            .error-title {
+                font-size: 24px;
+            }
+            
+            .error-message {
+                font-size: 16px;
+            }
+            
+            .error-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">
+            ⚠️
+        </div>
+        
+        <div class="error-code"><%= statusCode || 500 %></div>
+        
+        <h1 class="error-title"><%= title || 'Internal Server Error' %></h1>
+        
+        <p class="error-message">
+            <%= message || 'Terjadi kesalahan pada server. Tim teknis kami telah diberitahu dan sedang menangani masalah ini.' %>
+        </p>
+        
+        <div class="error-info">
+            <h5>Apa yang dapat Anda lakukan:</h5>
+            <ul>
+                <li>Tunggu beberapa menit dan coba lagi</li>
+                <li>Periksa koneksi internet Anda</li>
+                <li>Hubungi administrator jika masalah berlanjut</li>
+                <li>Kembali ke halaman sebelumnya</li>
+            </ul>
+        </div>
+        
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">🏠 Kembali ke Beranda</a>
+            <a href="javascript:location.reload()" class="btn btn-warning">🔄 Coba Lagi</a>
+            <a href="javascript:history.back()" class="btn btn-secondary">← Kembali</a>
+        </div>
+        
+        <% if (showDetails && details) { %>
+        <div class="error-details">
+            <h4>Detail Error (Development Mode):</h4>
+            <pre><%= details %></pre>
+        </div>
+        <% } %>
+    </div>
+    
+    <script>
+        // Auto reload after 60 seconds
+        let countdown = 60;
+        const countdownElement = document.createElement('div');
+        countdownElement.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 1000;
+        `;
+        document.body.appendChild(countdownElement);
+        
+        const timer = setInterval(() => {
+            countdown--;
+            countdownElement.textContent = `Auto reload dalam ${countdown} detik`;
+            
+            if (countdown <= 0) {
+                clearInterval(timer);
+                location.reload();
+            }
+        }, 1000);
+        
+        // Click to cancel auto reload
+        countdownElement.addEventListener('click', () => {
+            clearInterval(timer);
+            countdownElement.textContent = 'Auto reload dibatalkan';
+            setTimeout(() => {
+                countdownElement.remove();
+            }, 2000);
+        });
+        
+        // Track server errors for analytics
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'server_error', {
+                'error_code': '<%= statusCode || 500 %>',
+                'page_location': window.location.href,
+                'page_title': document.title
+            });
+        }
+        
+        // Report error to monitoring service
+        if (typeof fetch !== 'undefined') {
+            fetch('/api/health/error-report', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    type: 'client_error_page_view',
+                    statusCode: '<%= statusCode || 500 %>',
+                    url: window.location.href,
+                    userAgent: navigator.userAgent,
+                    timestamp: new Date().toISOString()
+                })
+            }).catch(() => {
+                // Ignore reporting errors
+            });
+        }
+    </script>
+</body>
+</html>

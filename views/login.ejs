@@ -1,0 +1,60 @@
+<section class="min-vh-100 d-flex align-items-center" style="background-image: url('/public/img/A7C04816.jpg'); background-size: cover;">
+    <div class="container">
+        <div class="row justify-content-center bg-white py-5 rounded-3">
+            <div class="col-xl-4 col-lg-5 col-md-7 px-4">
+                <div class=" pb-0 text-start border-0">
+                    <h4 class="fw-bold">Sign In</h4>
+                    <p class="mb-0">Enter your email and password to sign in</p>
+                </div>
+                <div>
+                    <% if (message.length > 0) { %>
+                    <div class="alert alert-danger" role="alert">
+                        <%= message %>
+                    </div>
+                    <% } %>
+                    <form role="form" action="/auth/login" method="POST">
+                        <input type="hidden" name="_token" value="<%= csrfToken %>">
+                    <div class="my-3">
+                        <input type="email" name="email" class="form-control form-control-sm" placeholder="Email" aria-label="Email" required>
+                    </div>
+                    <div class="my-3">
+                        <input type="password" name="password" class="form-control form-control-sm" placeholder="Password" aria-label="Password" required>
+                    </div>
+                    <div class="text-end mb-3">
+                        <a href="/auth/reset-password" class="text-primary text-sm">Lupa Password?</a>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-sm btn-primary w-100 mt-4 mb-0">Sign in</button>
+                    </div>
+                    </form>
+                </div>
+                <div class="text-center pt-0 px-lg-2 px-1 border-0 my-2">
+                    <p class="mb-4 text-sm mx-auto">
+                    Don't have an account?
+                    <a href="/auth/register" class="text-primary fw-bold">Sign up</a>
+                    </p>
+                </div>
+                
+            </div>
+            <div class="col-6 d-lg-flex d-none align-items-center justify-content-center">
+                <div class="position-relative bg-primary rounded-3 h-100 m-3 px-5 rounded-4 d-flex flex-column justify-content-center overflow-hidden w-100" style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signin-ill.jpg'); background-size: cover;">
+                    <span class="position-absolute top-0 start-0 w-100 h-100 bg-primary opacity-50 rounded-4"></span>
+                    <div class="position-relative z-1 text-white text-center">
+                        <h4 class="mt-5 fw-bold">"Attention is the new currency"</h4>
+                        <p>The more effortless the writing looks, the more effort the writer actually put into the process.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+        var options = {
+            damping: '0.5'
+        }
+        Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+</script>
