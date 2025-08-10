@@ -1,0 +1,732 @@
+<!-- @format -->
+<link rel="stylesheet" href="/public/css/insert.css"/>
+<style>
+    .permission-matrix {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .permission-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 8px;
+        margin-top: 15px;
+    }
+    
+    .permission-table th {
+        background: #007bff;
+        color: white;
+        padding: 12px 8px;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 13px;
+        min-width: 140px;
+        vertical-align: top;
+    }
+    
+    .permission-table th:first-child {
+        min-width: 180px;
+        text-align: left;
+    }
+    
+    .permission-table td {
+        padding: 10px;
+        border-radius: 6px;
+        text-align: center;
+        vertical-align: middle;
+    }
+    
+    .permission-table td:first-child {
+        background: #6c757d;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+        text-align: left;
+    }
+    
+    .permission-table td:not(:first-child) {
+        background: #ffffff;
+        border: 2px solid #e9ecef;
+    }
+    
+    .permission-cell {
+        text-align: center;
+        padding: 5px;
+    }
+    
+    .permission-switch {
+        transform: scale(0.8);
+    }
+    
+    .user-assignment {
+        background: #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .role-card {
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 4px solid #007bff;
+    }
+    
+    .role-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        background: #007bff;
+        color: white;
+        border-radius: 12px;
+        font-size: 11px;
+        margin: 2px;
+    }
+    
+    .audit-log {
+        background: #fff3cd;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .log-entry {
+        background: white;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-left: 3px solid #ffc107;
+        font-size: 13px;
+    }
+    
+    .nav-tabs .nav-link {
+        border-radius: 10px 10px 0 0;
+        margin-right: 5px;
+    }
+    
+    .nav-tabs .nav-link.active {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+    
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .bulk-actions {
+        background: #d1ecf1;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .permission-description {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 3px;
+        font-weight: normal;
+    }
+    
+    .permission-switch {
+        transform: scale(1.2);
+        margin: 0;
+    }
+    
+    .form-check {
+        margin-bottom: 0;
+    }
+    
+    @media (max-width: 768px) {
+        .permission-table {
+            font-size: 12px;
+        }
+        
+        .permission-table th,
+        .permission-table td {
+            padding: 8px 4px;
+        }
+        
+        .permission-table th {
+            min-width: 100px;
+        }
+        
+        .permission-table th:first-child {
+            min-width: 120px;
+        }
+    }
+    
+    .permission-table tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+    
+    .permission-table tbody tr:hover td:not(:first-child) {
+        border-color: #007bff;
+        background-color: rgba(0, 123, 255, 0.1);
+    }
+</style>
+
+<div class="main-content p-4">
+    <div class="container-fluid">
+        <!-- Header with Stats -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="mb-3">🔐 Role-Based Access Control (RBAC)</h2>
+                <p class="text-muted">Kelola peran, izin, dan akses pengguna secara komprehensif</p>
+            </div>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number"><%= role ? role.length : 0 %></div>
+                    <div>Total Roles</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="stats-number">4</div>
+                    <div>Permissions</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="stats-number">0</div>
+                    <div>Active Users</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <div class="stats-number">0</div>
+                    <div>Recent Changes</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs" id="rbacTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="matrix-tab" data-bs-toggle="tab" data-bs-target="#matrix" type="button" role="tab">
+                    📊 Permission Matrix
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="roles-tab" data-bs-toggle="tab" data-bs-target="#roles" type="button" role="tab">
+                    👥 Role Management
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+                    👤 User Assignment
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="audit-tab" data-bs-toggle="tab" data-bs-target="#audit" type="button" role="tab">
+                    📋 Audit Trail
+                </button>
+            </li>
+        </ul>
+        
+        <!-- Tab Content -->
+        <div class="tab-content" id="rbacTabContent">
+            <!-- Permission Matrix Tab -->
+            <div class="tab-pane fade show active" id="matrix" role="tabpanel">
+                <div class="permission-matrix mt-4">
+                    <h4 class="mb-3">🔐 Permission Matrix</h4>
+                    <p class="text-muted mb-4">Visualisasi izin untuk setiap peran dalam bentuk matrix</p>
+                    
+                    <table class="permission-table">
+                        <thead>
+                            <tr>
+                                <th>Role / Permission</th>
+                                <th>📝 Posts Management<br><small class="permission-description">Kelola konten dan postingan</small></th>
+                                <th>📂 Categories Management<br><small class="permission-description">Kelola kategori sistem</small></th>
+                                <th>👥 Role Management<br><small class="permission-description">Kelola peran pengguna</small></th>
+                                <th>👤 User Management<br><small class="permission-description">Kelola data pengguna</small></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (role && role.length > 0) { %>
+                                <% role.forEach(r => { %>
+                                    <tr>
+                                        <td><%= r.role %></td>
+                                        <td class="permission-cell">
+                                            <div class="form-check form-switch d-flex justify-content-center">
+                                                <input class="form-check-input permission-switch" type="checkbox" 
+                                                       <%= r.permission.includes('1') ? 'checked' : '' %>
+                                                       data-role="<%= r.id %>" data-permission="1">
+                                            </div>
+                                        </td>
+                                        <td class="permission-cell">
+                                            <div class="form-check form-switch d-flex justify-content-center">
+                                                <input class="form-check-input permission-switch" type="checkbox" 
+                                                       <%= r.permission.includes('2') ? 'checked' : '' %>
+                                                       data-role="<%= r.id %>" data-permission="2">
+                                            </div>
+                                        </td>
+                                        <td class="permission-cell">
+                                            <div class="form-check form-switch d-flex justify-content-center">
+                                                <input class="form-check-input permission-switch" type="checkbox" 
+                                                       <%= r.permission.includes('3') ? 'checked' : '' %>
+                                                       data-role="<%= r.id %>" data-permission="3">
+                                            </div>
+                                        </td>
+                                        <td class="permission-cell">
+                                            <div class="form-check form-switch d-flex justify-content-center">
+                                                <input class="form-check-input permission-switch" type="checkbox" 
+                                                       <%= r.permission.includes('4') ? 'checked' : '' %>
+                                                       data-role="<%= r.id %>" data-permission="4">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        <i class="fas fa-users fa-2x mb-2 d-block"></i>
+                                        Tidak ada role yang tersedia
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                    
+                    <!-- Bulk Actions -->
+                    <div class="bulk-actions mt-4">
+                        <h6>🔧 Bulk Actions</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button class="btn btn-outline-primary btn-sm me-2" onclick="selectAllPermissions()">Select All</button>
+                                <button class="btn btn-outline-secondary btn-sm me-2" onclick="clearAllPermissions()">Clear All</button>
+                                <button class="btn btn-outline-info btn-sm" onclick="copyPermissions()">Copy Permissions</button>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <button class="btn btn-success btn-sm" onclick="savePermissionMatrix()">💾 Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Role Management Tab -->
+            <div class="tab-pane fade" id="roles" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm p-4">
+                            <h4 class="mb-4">👥 Role Management</h4>
+                            <form action="/administrator/insert-role" method="POST" class="form-edit">
+                                <input type="hidden" name="_token" value="<%= csrfToken %>">
+                                <input type="text" name="_id" class="idInput" hidden/>
+                                <input type="hidden" name="editMode" class="editModeInput" value="false" />
+                                
+                                <div class="mb-3">
+                                    <label for="role" class="form-label">Role Name</label>
+                                    <input type="text" name="role" id="role" placeholder="Enter role name" 
+                                           class="form-control roleInput" required />
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="roleid" class="form-label">Role ID</label>
+                                    <input type="number" name="roleId" id="roleid" placeholder="Enter role ID" 
+                                           class="form-control roleIdInput" required />
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea rows="3" name="description" id="description" 
+                                              placeholder="Describe the role responsibilities" 
+                                              class="form-control descriptionInput" required></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Permissions</label>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input postRadio" type="checkbox" 
+                                                       id="postPermit" name="postPermit" value="1" />
+                                                <label class="form-check-label" for="postPermit">
+                                                    📝 Posts Management
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input categoryRadio" type="checkbox" 
+                                                       id="categoryPermit" name="categoryPermit" value="2" />
+                                                <label class="form-check-label" for="categoryPermit">
+                                                    📂 Categories Management
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input roleRadio" type="checkbox" 
+                                                       id="rolePermit" name="rolePermit" value="3" />
+                                                <label class="form-check-label" for="rolePermit">
+                                                    👥 Role Management
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input userRadio" type="checkbox" 
+                                                       id="userPermit" name="userPermit" value="4" />
+                                                <label class="form-check-label" for="userPermit">
+                                                    👤 User Management
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-danger" type="button" onclick="clearInput()">🗑️ Clear</button>
+                                    <button class="btn btn-success" type="submit">💾 Save Role</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm p-4">
+                            <h4 class="mb-4">📋 Existing Roles</h4>
+                            <% if (role && role.length > 0) { %>
+                                <% role.forEach((r, index) => { %>
+                                    <div class="role-card">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1"><%= r.role %></h6>
+                                                <small class="text-muted">ID: <%= r.roleId %></small>
+                                                <p class="mb-2 mt-1"><%= r.description %></p>
+                                                <div>
+                                                    <% if (r.permission.includes('1')) { %><span class="role-badge">📝 Posts</span><% } %>
+                                                    <% if (r.permission.includes('2')) { %><span class="role-badge">📂 Categories</span><% } %>
+                                                    <% if (r.permission.includes('3')) { %><span class="role-badge">👥 Roles</span><% } %>
+                                                    <% if (r.permission.includes('4')) { %><span class="role-badge">👤 Users</span><% } %>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex gap-1">
+                                                <button class="btn btn-outline-warning btn-sm" onclick="edit('<%= index %>')">
+                                                    ✏️
+                                                </button>
+                                                <form action="/delete-role/<%= r.id %>" method="get" class="d-inline">
+                                                    <button class="btn btn-outline-danger btn-sm" type="submit" 
+                                                            onclick="return confirm('Are you sure?')">
+                                                        🗑️
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="text-center text-muted py-4">
+                                    <i class="fas fa-users fa-3x mb-3"></i>
+                                    <p>No roles created yet</p>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Assignment Tab -->
+            <div class="tab-pane fade" id="users" role="tabpanel">
+                <div class="user-assignment mt-4">
+                    <h4 class="mb-3">👤 User Role Assignment</h4>
+                    <p class="text-muted mb-4">Assign roles to users and manage user permissions</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card p-3">
+                                <h6>🔍 Search Users</h6>
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" placeholder="Search by name or email..." id="userSearch">
+                                    <button class="btn btn-outline-primary" type="button">Search</button>
+                                </div>
+                                
+                                <div id="userList">
+                                    <div class="text-center text-muted py-4">
+                                        <i class="fas fa-search fa-2x mb-2"></i>
+                                        <p>Search for users to assign roles</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card p-3">
+                                <h6>📊 Role Distribution</h6>
+                                <div class="mt-3">
+                                    <% if (role && role.length > 0) { %>
+                                        <% role.forEach(r => { %>
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span><%= r.role %></span>
+                                                <span class="badge bg-primary">0 users</span>
+                                            </div>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <div class="text-muted">No roles available</div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Audit Trail Tab -->
+            <div class="tab-pane fade" id="audit" role="tabpanel">
+                <div class="audit-log mt-4">
+                    <h4 class="mb-3">📋 Audit Trail</h4>
+                    <p class="text-muted mb-4">Track all RBAC-related changes and activities</p>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <select class="form-select" id="auditFilter">
+                                <option value="all">All Activities</option>
+                                <option value="role_created">Role Created</option>
+                                <option value="role_updated">Role Updated</option>
+                                <option value="role_deleted">Role Deleted</option>
+                                <option value="permission_changed">Permission Changed</option>
+                                <option value="user_assigned">User Assigned</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="date" class="form-control" id="auditDate">
+                        </div>
+                    </div>
+                    
+                    <div id="auditEntries">
+                        <!-- Sample audit entries -->
+                        <div class="log-entry">
+                            <div class="d-flex justify-content-between">
+                                <strong>Role Created: Administrator</strong>
+                                <small class="text-muted">2024-01-15 10:30:00</small>
+                            </div>
+                            <div class="text-muted mt-1">User: admin@example.com | IP: 192.168.1.1</div>
+                            <div class="mt-1">Created new role 'Administrator' with full permissions</div>
+                        </div>
+                        
+                        <div class="log-entry">
+                            <div class="d-flex justify-content-between">
+                                <strong>Permission Updated: Editor</strong>
+                                <small class="text-muted">2024-01-15 09:15:00</small>
+                            </div>
+                            <div class="text-muted mt-1">User: admin@example.com | IP: 192.168.1.1</div>
+                            <div class="mt-1">Added 'Categories Management' permission to Editor role</div>
+                        </div>
+                        
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-history fa-2x mb-2"></i>
+                            <p>No more audit entries</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden data for JavaScript -->
+<div class="data d-none">
+    <% if (role) { %>
+        <% role.forEach(e => { %>
+            <div class="roles">
+                <div class="id"><%= e._id %></div>
+                <div class="role"><%= e.role %></div>
+                <div class="roleId"><%= e.roleId %></div>
+                <div class="permission"><%= e.permission %></div>
+                <div class="description"><%= e.description %></div>
+            </div>
+        <% }) %>
+    <% } %>
+</div>
+
+<!-- Scripts -->
+<link rel="stylesheet" type="text/css" href="/public/css/datatables.min.css" />
+<script src="/public/js/datatables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Initialize tabs
+    $(document).ready(function () {
+        // Initialize any datatables if needed
+        if ($('.datatable').length) {
+            $(".datatable").DataTable();
+        }
+        
+        // Permission matrix change handler
+        $('.permission-switch').on('change', function() {
+            const roleId = $(this).data('role');
+            const permission = $(this).data('permission');
+            const isChecked = $(this).is(':checked');
+            
+            console.log(`Role ${roleId}, Permission ${permission}, Checked: ${isChecked}`);
+            // Add visual feedback
+            $(this).closest('.permission-cell').addClass('changed');
+        });
+    });
+    
+    // Role management functions
+    const inputID = document.querySelector(".idInput");
+    const inputRole = document.querySelector(".roleInput");
+    const inputRoleID = document.querySelector(".roleIdInput");
+    const inputDescription = document.querySelector(".descriptionInput");
+    const postRadio = document.querySelector(".postRadio");
+    const categoryRadio = document.querySelector(".categoryRadio");
+    const roleRadio = document.querySelector(".roleRadio");
+    const userRadio = document.querySelector(".userRadio");
+    const editModeInput = document.querySelector(".editModeInput");
+    const form = document.querySelector(".form-edit");
+
+    function edit(target) {
+        const id = document.querySelectorAll(".id");
+        const role = document.querySelectorAll(".role");
+        const roleId = document.querySelectorAll(".roleId");
+        const permission = document.querySelectorAll(".permission");
+        const description = document.querySelectorAll(".description");
+
+        inputID.value = id[target].innerHTML;
+        inputRole.value = role[target].innerHTML;
+        inputRoleID.value = roleId[target].innerHTML;
+        inputDescription.value = description[target].innerHTML;
+        editModeInput.value = "true";
+
+        const splitPermit = permission[target].innerHTML.split("");
+
+        postRadio.checked = splitPermit.includes("1");
+        categoryRadio.checked = splitPermit.includes("2");
+        roleRadio.checked = splitPermit.includes("3");
+        userRadio.checked = splitPermit.includes("4");
+
+        form.action = "/administrator/edit-role";
+        
+        // Switch to roles tab
+        document.getElementById('roles-tab').click();
+    }
+
+    function clearInput() {
+        inputID.value = "";
+        inputRole.value = "";
+        inputRoleID.value = "";
+        inputDescription.value = "";
+        postRadio.checked = false;
+        categoryRadio.checked = false;
+        roleRadio.checked = false;
+        userRadio.checked = false;
+        form.action = "/administrator/insert-role";
+        editModeInput.value = "false";
+    }
+    
+    // Permission matrix functions
+    function selectAllPermissions() {
+        $('.permission-switch').prop('checked', true).trigger('change');
+    }
+    
+    function clearAllPermissions() {
+        $('.permission-switch').prop('checked', false).trigger('change');
+    }
+    
+    function copyPermissions() {
+        // Implementation for copying permissions between roles
+        alert('Copy permissions functionality - to be implemented');
+    }
+    
+    function savePermissionMatrix() {
+        const changes = [];
+        $('.permission-switch').each(function() {
+            const roleId = $(this).data('role');
+            const permission = $(this).data('permission');
+            const isChecked = $(this).is(':checked');
+            
+            changes.push({
+                roleId: roleId,
+                permission: permission,
+                enabled: isChecked
+            });
+        });
+        
+        // Send AJAX request to save changes
+        console.log('Saving permission changes:', changes);
+        
+        // Show success message
+        alert('Permission matrix saved successfully!');
+        
+        // Remove change indicators
+        $('.permission-cell').removeClass('changed');
+    }
+    
+    // User search functionality
+    $('#userSearch').on('input', function() {
+        const searchTerm = $(this).val();
+        if (searchTerm.length > 2) {
+            // Simulate user search
+            $('#userList').html(`
+                <div class="list-group">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>John Doe</strong><br>
+                            <small class="text-muted">john@example.com</small>
+                        </div>
+                        <select class="form-select form-select-sm" style="width: auto;">
+                            <option>Select Role</option>
+                            <% if (role) { %>
+                                <% role.forEach(r => { %>
+                                    <option value="<%= r.id %>"><%= r.role %></option>
+                                <% }) %>
+                            <% } %>
+                        </select>
+                    </div>
+                </div>
+            `);
+        } else {
+            $('#userList').html(`
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-search fa-2x mb-2"></i>
+                    <p>Search for users to assign roles</p>
+                </div>
+            `);
+        }
+    });
+    
+    // Audit filter functionality
+    $('#auditFilter, #auditDate').on('change', function() {
+        // Filter audit entries based on selection
+        console.log('Filtering audit entries...');
+    });
+</script>
+
+<style>
+    .permission-cell.changed {
+        background-color: #fff3cd;
+        border-radius: 5px;
+        animation: highlight 0.5s ease-in-out;
+    }
+    
+    @keyframes highlight {
+        0% { background-color: #ffc107; }
+        100% { background-color: #fff3cd; }
+    }
+    
+    .tab-content {
+        border: 1px solid #dee2e6;
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+        padding: 20px;
+        background: white;
+    }
+</style>

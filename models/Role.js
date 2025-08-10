@@ -18,6 +18,7 @@ class Role extends BaseModel {
       properties: {
         ...super.jsonSchema.properties,
         role: { type: 'string', minLength: 1 },
+        roleId: { type: 'integer' },
         permission: { type: 'string' },
         description: { type: 'string', minLength: 1 }
       }

@@ -18,6 +18,7 @@ const checkPasswordReset = require("../middleware/checkPasswordReset");
 const {isRole} = require("../middleware/roleMidleware");
 const {refreshToken} = require("../controllers/authController");
 const {roles, insertRole, editRole, deleteRole} = require("../controllers/roleController");
+const rbacController = require("../controllers/rbacController");
 
 /* main route */
 router.get("/", authenticateToken, checkPasswordReset, mainController.dashboard);
@@ -47,6 +48,15 @@ router.get("/roles", authenticateToken, checkPasswordReset, isRole(3), roles);
 router.post("/administrator/insert-role", authenticateToken, isRole(3), insertRole);
 router.post("/administrator/edit-role", authenticateToken, isRole(3), editRole);
 router.get("/delete-role/:id", authenticateToken, isRole(3), deleteRole);
+
+/* RBAC Control routes */
+router.get("/rbac-control", authenticateToken, checkPasswordReset, isRole(3), rbacController.dashboard);
+router.post("/rbac-control/update-permissions", authenticateToken, isRole(3), rbacController.updatePermissionMatrix);
+router.get("/rbac-control/search-users", authenticateToken, isRole(3), rbacController.searchUsers);
+router.post("/rbac-control/assign-role", authenticateToken, isRole(3), rbacController.assignRole);
+router.get("/rbac-control/role-stats", authenticateToken, isRole(3), rbacController.getRoleStats);
+router.get("/rbac-control/audit-trail", authenticateToken, isRole(3), rbacController.getAuditTrail);
+router.post("/rbac-control/bulk-operations", authenticateToken, isRole(3), rbacController.bulkRoleOperations);
 
 /* staff management routes - require user management permission (4) */
 router.get("/staff", authenticateToken, checkPasswordReset, isRole(4), staffController.staff);
@@ -88,6 +98,67 @@ router.get('/users/current-user', authenticateToken, async (req, res) => {
 });
 
 router.get('/dashboard', mainController.dashboard);
+
+/* Test email endpoint - hanya untuk development */
+if (process.env.NODE_ENV === 'development') {
+    router.get('/test-email', async (req, res) => {
+        try {
+            const EmailService = require('../services/EmailService');
+            const isConnected = await EmailService.testConnection();
+            
+            res.json({ 
+                success: isConnected, 
+                message: isConnected ? '✅ Email connection successful' : '❌ Email connection failed',
+                timestamp: new Date().toISOString(),
+                config: {
+                    host: process.env.SMTP_HOST || 'Not configured',
+                    port: process.env.SMTP_PORT || 'Not configured',
+                    user: process.env.SMTP_USER ? '***configured***' : 'Not configured'
+                }
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: '❌ Error testing email connection',
+                error: error.message
+            });
+        }
+    });
+
+    router.get('/test-send-email', async (req, res) => {
+        try {
+            const { email } = req.query;
+            if (!email) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Parameter email diperlukan. Contoh: /test-send-email?email=test@example.com'
+                });
+            }
+
+            const EmailService = require('../services/EmailService');
+            const crypto = require('crypto');
+            const testToken = crypto.randomBytes(32).toString('hex');
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            
+            const result = await EmailService.sendPasswordResetEmail(email, testToken, baseUrl);
+            
+            res.json({
+                success: result.success,
+                message: result.success ? '✅ Test email berhasil dikirim' : '❌ Gagal mengirim test email',
+                email: email,
+                messageId: result.messageId || null,
+                error: result.error || null,
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: '❌ Error sending test email',
+                error: error.message
+            });
+        }
+    });
+}
 
 router.use(errorController.error404);
 

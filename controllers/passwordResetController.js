@@ -4,6 +4,7 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const jsonWebToken = require('jsonwebtoken');
+const EmailService = require('../services/EmailService');
 
 module.exports = {
     // Tampilkan halaman reset password
@@ -55,11 +56,19 @@ module.exports = {
                     updatedAt: new Date().toISOString().slice(0, 19).replace('T', ' ')
                 });
 
-            // TODO: Implementasi pengiriman email
-            console.log(`Reset token untuk ${email}: ${resetToken}`);
-            console.log(`Reset URL: ${req.protocol}://${req.get('host')}/auth/reset-password?token=${resetToken}`);
-
-            req.flash('message', 'Link reset password telah dikirim ke email Anda');
+            // Kirim email reset password
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            const emailResult = await EmailService.sendPasswordResetEmail(email, resetToken, baseUrl);
+            
+            if (emailResult.success) {
+                console.log(`✅ Email reset password berhasil dikirim ke ${email}`);
+                req.flash('message', 'Link reset password telah dikirim ke email Anda. Silakan cek inbox atau folder spam.');
+            } else {
+                console.error(`❌ Gagal mengirim email ke ${email}:`, emailResult.error);
+                // Tetap beri pesan sukses untuk keamanan, tapi log error
+                req.flash('message', 'Jika email terdaftar, link reset password akan dikirim');
+            }
+            
             res.redirect('/auth/reset-password');
 
         } catch (error) {

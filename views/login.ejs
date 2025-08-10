@@ -1,47 +1,60 @@
-<section class="min-vh-100 d-flex align-items-center" style="background-image: url('/public/img/A7C04816.jpg'); background-size: cover;">
-    <div class="container">
-        <div class="row justify-content-center bg-white py-5 rounded-3">
-            <div class="col-xl-4 col-lg-5 col-md-7 px-4">
-                <div class=" pb-0 text-start border-0">
-                    <h4 class="fw-bold">Sign In</h4>
-                    <p class="mb-0">Enter your email and password to sign in</p>
-                </div>
-                <div>
-                    <% if (message.length > 0) { %>
-                    <div class="alert alert-danger" role="alert">
-                        <%= message %>
+<section class="modern-login-section">
+    <div class="login-background"></div>
+    <div class="container-fluid h-100">
+        <div class="row h-100 align-items-center justify-content-center">
+            <div class="col-xl-4 col-lg-5 col-md-6 col-sm-8">
+                <div class="modern-login-card">
+                    <div class="login-header">
+                        <div class="logo-container">
+                            <img src="/public/img/logo-smata.png" alt="Logo" class="login-logo">
+                        </div>
+                        <h2 class="login-title">Selamat Datang</h2>
+                        <p class="login-subtitle">TUKIN SMATAJAYA - Sistem Penilaian Tunjangan Kinerja</p>
                     </div>
-                    <% } %>
-                    <form role="form" action="/auth/login" method="POST">
-                        <input type="hidden" name="_token" value="<%= csrfToken %>">
-                    <div class="my-3">
-                        <input type="email" name="email" class="form-control form-control-sm" placeholder="Email" aria-label="Email" required>
-                    </div>
-                    <div class="my-3">
-                        <input type="password" name="password" class="form-control form-control-sm" placeholder="Password" aria-label="Password" required>
-                    </div>
-                    <div class="text-end mb-3">
-                        <a href="/auth/reset-password" class="text-primary text-sm">Lupa Password?</a>
-                    </div>
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-sm btn-primary w-100 mt-4 mb-0">Sign in</button>
-                    </div>
-                    </form>
-                </div>
-                <div class="text-center pt-0 px-lg-2 px-1 border-0 my-2">
-                    <p class="mb-4 text-sm mx-auto">
-                    Don't have an account?
-                    <a href="/auth/register" class="text-primary fw-bold">Sign up</a>
-                    </p>
-                </div>
-                
-            </div>
-            <div class="col-6 d-lg-flex d-none align-items-center justify-content-center">
-                <div class="position-relative bg-primary rounded-3 h-100 m-3 px-5 rounded-4 d-flex flex-column justify-content-center overflow-hidden w-100" style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signin-ill.jpg'); background-size: cover;">
-                    <span class="position-absolute top-0 start-0 w-100 h-100 bg-primary opacity-50 rounded-4"></span>
-                    <div class="position-relative z-1 text-white text-center">
-                        <h4 class="mt-5 fw-bold">"Attention is the new currency"</h4>
-                        <p>The more effortless the writing looks, the more effort the writer actually put into the process.</p>
+                    
+                    <div class="login-form-container">
+                        <% if (message.length > 0) { %>
+                        <div class="modern-alert">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span><%= message %></span>
+                        </div>
+                        <% } %>
+                        
+                        <form role="form" action="/auth/login" method="POST" class="modern-form">
+                            <input type="hidden" name="_token" value="<%= csrfToken %>">
+                            
+                            <div class="form-group">
+                                <div class="input-container">
+                                    <i class="bi bi-envelope-fill input-icon"></i>
+                                    <input type="email" name="email" class="modern-input" placeholder="Masukkan email Anda" aria-label="Email" required>
+                                    <label class="floating-label">Email</label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="input-container">
+                                    <i class="bi bi-lock-fill input-icon"></i>
+                                    <input type="password" name="password" class="modern-input" placeholder="Masukkan password Anda" aria-label="Password" required>
+                                    <label class="floating-label">Password</label>
+                                </div>
+                            </div>
+                            
+                            <div class="forgot-password">
+                                <a href="/auth/reset-password" class="forgot-link">
+                                    <i class="bi bi-question-circle"></i>
+                                    Lupa Password?
+                                </a>
+                            </div>
+                            
+                            <button type="submit" class="modern-login-btn">
+                                <span class="btn-text">Masuk</span>
+                                <i class="bi bi-arrow-right btn-icon"></i>
+                            </button>
+                        </form>
+                        
+                        <div class="register-link">
+                            <p>Belum punya akun? <a href="/auth/register" class="register-btn">Daftar Sekarang</a></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -49,12 +62,350 @@
     </div>
 </section>
 
-<script>
-    var win = navigator.platform.indexOf('Win') > -1;
-    if (win && document.querySelector('#sidenav-scrollbar')) {
-        var options = {
-            damping: '0.5'
-        }
-        Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+<style>
+/* Modern Login Styles */
+.modern-login-section {
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.login-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: -1;
+}
+
+.login-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('/public/img/A7C04816.jpg') center/cover;
+    opacity: 0.1;
+    z-index: -1;
+}
+
+.modern-login-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: slideUp 0.8s ease-out;
+    max-width: 450px;
+    width: 100%;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
     }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo-container {
+    margin-bottom: 20px;
+}
+
+.login-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.login-title {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+}
+
+.login-subtitle {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+.modern-alert {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.input-container {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #667eea;
+    font-size: 1.1rem;
+    z-index: 2;
+}
+
+.modern-input {
+    width: 100%;
+    padding: 15px 15px 15px 45px;
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+}
+
+.modern-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
+}
+
+.floating-label {
+    position: absolute;
+    left: 45px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 1rem;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0 5px;
+}
+
+.modern-input:focus + .floating-label,
+.modern-input:not(:placeholder-shown) + .floating-label {
+    top: 0;
+    left: 40px;
+    font-size: 0.8rem;
+    color: #667eea;
+    font-weight: 600;
+}
+
+.forgot-password {
+    text-align: right;
+    margin-bottom: 25px;
+}
+
+.forgot-link {
+    color: #667eea;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+}
+
+.forgot-link:hover {
+    color: #764ba2;
+    transform: translateX(-3px);
+}
+
+.modern-login-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 15px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.modern-login-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.modern-login-btn:hover::before {
+    left: 100%;
+}
+
+.modern-login-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+}
+
+.btn-icon {
+    transition: transform 0.3s ease;
+}
+
+.modern-login-btn:hover .btn-icon {
+    transform: translateX(5px);
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+.register-link p {
+    color: #6c757d;
+    margin: 0;
+}
+
+.register-btn {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.register-btn:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .modern-login-card {
+        margin: 20px;
+        padding: 30px 25px;
+    }
+    
+    .login-title {
+        font-size: 1.5rem;
+    }
+    
+    .login-subtitle {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .modern-login-card {
+        margin: 15px;
+        padding: 25px 20px;
+    }
+    
+    .login-logo {
+        width: 60px;
+        height: 60px;
+    }
+}
+</style>
+
+<script>
+// Add ripple effect to login button
+document.addEventListener('DOMContentLoaded', function() {
+    const loginBtn = document.querySelector('.modern-login-btn');
+    
+    loginBtn.addEventListener('click', function(e) {
+        const ripple = document.createElement('span');
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.classList.add('ripple');
+        
+        this.appendChild(ripple);
+        
+        setTimeout(() => {
+            ripple.remove();
+        }, 600);
+    });
+    
+    // Add floating label functionality
+    const inputs = document.querySelectorAll('.modern-input');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+            if (!this.value) {
+                this.parentElement.classList.remove('focused');
+            }
+        });
+    });
+});
 </script>
+
+<style>
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+</style>

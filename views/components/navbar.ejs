@@ -75,6 +75,15 @@
                     <div class="nav-indicator"></div>
                 </a>
             </li>
+            <li class="modern-nav-item <%= req === '/rbac-control' ? 'active' : '' %>">
+                <a class="nav-link modern-nav-link" href="/rbac-control">
+                    <div class="nav-icon rbac-icon">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <span class="nav-link-text">RBAC Control</span>
+                    <div class="nav-indicator"></div>
+                </a>
+            </li>
         </ul>
         <div class="position-absolute bottom-0 p-4 w-100">
             <div class="user-section">
@@ -472,4 +481,36 @@ style.textContent = `
 }
 `;
 document.head.appendChild(style);
+
+// Fix offcanvas backdrop click issue
+document.addEventListener('DOMContentLoaded', function() {
+    const offcanvasElement = document.getElementById('offcanvasExample');
+    if (offcanvasElement) {
+        // Ensure backdrop is enabled and clickable
+        offcanvasElement.setAttribute('data-bs-backdrop', 'true');
+        offcanvasElement.setAttribute('data-bs-keyboard', 'true');
+        
+        // Add custom backdrop click handler as fallback
+        document.addEventListener('click', function(event) {
+            const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
+            if (offcanvas && offcanvasElement.classList.contains('show')) {
+                // Check if click is outside offcanvas
+                if (!offcanvasElement.contains(event.target) && 
+                    !event.target.closest('[data-bs-toggle="offcanvas"]')) {
+                    offcanvas.hide();
+                }
+            }
+        });
+        
+        // Handle backdrop clicks specifically
+        offcanvasElement.addEventListener('click', function(event) {
+            if (event.target === this) {
+                const offcanvas = bootstrap.Offcanvas.getInstance(this);
+                if (offcanvas) {
+                    offcanvas.hide();
+                }
+            }
+        });
+    }
+});
 </script>
