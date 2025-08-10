@@ -4,11 +4,6 @@ const RecordsService = require('../services/RecordsService');
 const TaskService = require('../services/TaskService');
 const ResponseFormatter = require('../utils/ResponseFormatter');
 
-class RecordsController {
-    constructor() {
-        this.recordsService = new RecordsService();
-        this.taskService = new TaskService();
-    }
 
     records = ResponseFormatter.asyncHandler(async (req, res) => {
         // Calculate current month date range
