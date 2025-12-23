@@ -36,7 +36,7 @@ class Logger {
     }
 
     /**
-     * Write log to file
+     * Write log to file (Asynchronous for performance)
      */
     writeToFile(level, formattedMessage) {
         if (!this.enableFile) return;
@@ -45,12 +45,16 @@ class Logger {
         const logFile = path.join(logsDir, `${date}.log`);
         const errorLogFile = path.join(logsDir, `${date}-error.log`);
 
-        // Write to general log
-        fs.appendFileSync(logFile, formattedMessage + '\n');
+        // Write to general log asynchronously
+        fs.appendFile(logFile, formattedMessage + '\n', (err) => {
+            if (err) console.error('Failed to write to general log:', err);
+        });
 
-        // Write errors to separate error log
+        // Write errors to separate error log asynchronously
         if (level === 'error' || level === 'fatal') {
-            fs.appendFileSync(errorLogFile, formattedMessage + '\n');
+            fs.appendFile(errorLogFile, formattedMessage + '\n', (err) => {
+                if (err) console.error('Failed to write to error log:', err);
+            });
         }
     }
 
@@ -188,4 +192,6 @@ class Logger {
 // Create singleton instance
 const logger = new Logger();
 
+// Export class and instance for backward compatibility
 module.exports = logger;
+module.exports.Logger = Logger;

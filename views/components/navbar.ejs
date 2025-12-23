@@ -1,82 +1,75 @@
-<nav class="navbar p-3 modern-navbar">
-    <div class="container-fluid">
-        <div class="d-flex align-items-center">
-            <button class="btn modern-menu-btn" aria-label="menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
-                <i class="bi bi-list"></i>
-            </button>
-            <a class="navbar-brand px-4 text-white modern-brand" href="/">
-                <img src="/public/img/logo-smata.png" alt="Logo" width="35" height="35" class="d-inline-block align-text-top logo-animate">
-                <span class="brand-text">TUKIN SMATAJAYA</span>
-            </a>
-        </div>
-        <div class="navbar-actions">
-            <div class="time-display">
-                <i class="bi bi-clock"></i>
-                <span id="current-time"></span>
-            </div>
+<!-- Inline script to prevent sidebar flash - runs immediately -->
+<script>
+(function() {
+    // Apply saved state immediately before render
+    if (localStorage.getItem('sidebarMinimized') === 'true') {
+        document.documentElement.classList.add('sidebar-minimized-early');
+    }
+})();
+</script>
+
+<!-- Fixed Sidebar -->
+<div class="fixed-sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <img src="/public/img/logo-smata.png" alt="Logo" class="logo-img">
+            <span class="logo-text">TUKIN SMATAJAYA</span>
         </div>
     </div>
-</nav>
-
-<!-- ofcanvas navbar -->
-
-<div class="offcanvas offcanvas-start modern-sidebar" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-    <div class="offcanvas-header modern-header">
-        <h5 class="offcanvas-title gradient-text" id="addRecordModalLabel">
-            <i class="bi bi-grid-3x3-gap-fill me-2"></i>
-            TUKIN SMATAJAYA
-        </h5>
-        <button type="button" class="btn-close modern-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="position-relative h-100">
-        <ul class="navbar-nav p-4">
-            <li class="modern-nav-item <%= req === '/' ? 'active' : '' %>">
-                <a class="nav-link modern-nav-link" href="/">
-                    <div class="nav-icon dashboard-icon">
+    
+    <div class="sidebar-content">
+        <ul class="sidebar-nav">
+            <li class="sidebar-item <%= req === '/' ? 'active' : '' %>">
+                <a class="sidebar-link" href="/">
+                    <div class="nav-icon">
                         <i class="bi bi-speedometer2"></i>
                     </div>
-                    <span class="nav-link-text">Dashboard</span>
-                    <div class="nav-indicator"></div>
+                    <span class="nav-text">Dashboard</span>
                 </a>
             </li>
-            <li class="modern-nav-item <%= req === '/staff' ? 'active' : '' %>">
-                <a class="nav-link modern-nav-link" href="/staff">
-                    <div class="nav-icon staff-icon">
+            <li class="sidebar-item <%= req === '/staff' ? 'active' : '' %>">
+                <a class="sidebar-link" href="/staff">
+                    <div class="nav-icon">
                         <i class="bi bi-people-fill"></i>
                     </div>
-                    <span class="nav-link-text">Karyawan & Penilaian</span>
-                    <div class="nav-indicator"></div>
+                    <span class="nav-text">Karyawan & Penilaian</span>
                 </a>
             </li>
-            <li class="modern-nav-item <%= req === '/periode' ? 'active' : '' %>">
-                <a class="nav-link modern-nav-link" href="/periode">
-                    <div class="nav-icon periode-icon">
+            <li class="sidebar-item <%= req === '/periode' ? 'active' : '' %>">
+                <a class="sidebar-link" href="/periode">
+                    <div class="nav-icon">
                         <i class="bi bi-calendar-event"></i>
                     </div>
-                    <span class="nav-link-text">Kategori Instrumen</span>
-                    <div class="nav-indicator"></div>
+                    <span class="nav-text">Kategori Instrumen</span>
                 </a>
             </li>
-            <li class="modern-nav-item <%= req === '/data' ? 'active' : '' %>">
-                <a class="nav-link modern-nav-link" href="/data">
-                    <div class="nav-icon data-icon">
+            <li class="sidebar-item <%= req === '/data' ? 'active' : '' %>">
+                <a class="sidebar-link" href="/data">
+                    <div class="nav-icon">
                         <i class="bi bi-bar-chart-fill"></i>
                     </div>
-                    <span class="nav-link-text">Laporan</span>
-                    <div class="nav-indicator"></div>
+                    <span class="nav-text">Laporan</span>
                 </a>
             </li>
-            <li class="modern-nav-item <%= req === '/settings' ? 'active' : '' %>">
-                <a class="nav-link modern-nav-link" href="/settings">
-                    <div class="nav-icon settings-icon">
+            <li class="sidebar-item <%= req === '/settings' ? 'active' : '' %>">
+                <a class="sidebar-link" href="/settings">
+                    <div class="nav-icon">
                         <i class="bi bi-gear-fill"></i>
                     </div>
-                    <span class="nav-link-text">Settings</span>
-                    <div class="nav-indicator"></div>
+                    <span class="nav-text">Settings</span>
+                </a>
+            </li>
+            <li class="sidebar-item <%= req === '/rbac-control' ? 'active' : '' %>">
+                <a class="sidebar-link" href="/rbac-control">
+                    <div class="nav-icon">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <span class="nav-text">RBAC Control</span>
                 </a>
             </li>
         </ul>
-        <div class="position-absolute bottom-0 p-4 w-100">
+        
+        <div class="sidebar-footer">
             <div class="user-section">
                 <div class="user-info-card">
                     <div class="user-avatar">
@@ -89,387 +82,622 @@
                 </div>
                 <a class="logout-btn" href="/logout">
                     <i class="bi bi-box-arrow-right"></i>
-                    <span>Logout</span>
+                    <span class="logout-text">Logout</span>
                 </a>
             </div>
         </div>
     </div>
 </div>
-<!-- end ofcanvas navbar -->
+
+<!-- Top Navbar -->
+<nav class="top-navbar">
+    <div class="navbar-content">
+        <div class="navbar-left">
+            <button class="sidebar-toggle-btn" id="sidebarToggle">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <button class="mobile-toggle-btn" id="mobileToggle">
+                <i class="bi bi-list"></i>
+            </button>
+            <h5 class="page-title mb-0">
+                <% 
+                    const pageTitles = {
+                        '/': 'Dashboard',
+                        '/staff': 'Karyawan & Penilaian',
+                        '/periode': 'Kategori Instrumen',
+                        '/data': 'Laporan',
+                        '/settings': 'Settings',
+                        '/rbac-control': 'RBAC Control'
+                    };
+                    const currentTitle = pageTitles[req] || 'Dashboard';
+                %>
+                <%= currentTitle %>
+            </h5>
+        </div>
+        <div class="navbar-right">
+            <div class="time-display">
+                <i class="bi bi-clock"></i>
+                <span id="current-time-nav"></span>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Overlay for mobile -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <style>
-/* Modern Navbar Styles */
-.modern-navbar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+/* ========================================
+   Clean White Modern Sidebar & Navbar
+   ======================================== */
+
+/* Early state - applied before DOMContentLoaded to prevent flash */
+html.sidebar-minimized-early .fixed-sidebar {
+    width: 72px;
+}
+
+html.sidebar-minimized-early .fixed-sidebar .logo-text,
+html.sidebar-minimized-early .fixed-sidebar .nav-text,
+html.sidebar-minimized-early .fixed-sidebar .user-details,
+html.sidebar-minimized-early .fixed-sidebar .logout-text {
+    opacity: 0;
+    width: 0;
+}
+
+html.sidebar-minimized-early .fixed-sidebar .nav-icon,
+html.sidebar-minimized-early .fixed-sidebar .user-avatar,
+html.sidebar-minimized-early .fixed-sidebar .logout-btn i {
+    margin-right: 0;
+}
+
+html.sidebar-minimized-early .fixed-sidebar .sidebar-link,
+html.sidebar-minimized-early .fixed-sidebar .user-info-card {
+    justify-content: center;
+}
+
+html.sidebar-minimized-early .top-navbar {
+    left: 72px;
+}
+
+html.sidebar-minimized-early .sidebar-toggle-btn i {
+    transform: rotate(180deg);
+}
+
+/* Fixed Sidebar - Clean White */
+.fixed-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 260px;
+    background: #ffffff;
+    border-right: 1px solid #e2e8f0;
     transition: all 0.3s ease;
-}
-
-.modern-menu-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    border-radius: 12px;
-    padding: 10px 12px;
-    transition: all 0.3s ease;
-}
-
-.modern-menu-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    color: white;
-}
-
-.modern-brand {
-    font-weight: 700;
-    font-size: 1.2rem;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.modern-brand:hover {
-    color: #ffd700 !important;
-    transform: scale(1.05);
-}
-
-.logo-animate {
-    transition: all 0.3s ease;
-    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-}
-
-.logo-animate:hover {
-    transform: rotate(360deg) scale(1.1);
-}
-
-.brand-text {
-    background: linear-gradient(45deg, #ffd700, #ffed4e);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: 800;
-}
-
-.navbar-actions {
+    z-index: 1000;
     display: flex;
-    align-items: center;
-    gap: 15px;
+    flex-direction: column;
 }
 
-.time-display {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 8px 15px;
-    border-radius: 20px;
-    color: white;
-    font-size: 0.9rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
+.fixed-sidebar.minimized {
+    width: 72px;
 }
 
-.time-display i {
-    margin-right: 8px;
-    color: #ffd700;
-}
-
-/* Modern Sidebar Styles */
-.modern-sidebar {
-    background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
-    border: none;
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
-}
-
-.modern-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 20px;
-}
-
-.gradient-text {
-    background: linear-gradient(45deg, #ffd700, #ffed4e);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: 700;
-    margin: 0;
-}
-
-.modern-close {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    padding: 8px;
-    transition: all 0.3s ease;
-}
-
-.modern-close:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: rotate(90deg);
-}
-
-/* Navigation Items */
-.modern-nav-item {
-    margin: 8px 0;
-    position: relative;
-    overflow: hidden;
-}
-
-.modern-nav-link {
-    display: flex;
-    align-items: center;
-    padding: 15px 20px;
-    color: #ecf0f1;
-    text-decoration: none;
-    border-radius: 15px;
-    transition: all 0.3s ease;
-    position: relative;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.modern-nav-link:hover {
-    color: white;
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateX(10px);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-}
-
-.modern-nav-item.active .modern-nav-link {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    box-shadow: 0 5px 25px rgba(102, 126, 234, 0.3);
-}
-
-.nav-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
+/* Sidebar Header */
+.sidebar-header {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 15px;
-    font-size: 1.2rem;
-    transition: all 0.3s ease;
+    padding: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    min-height: 64px;
+    background: #ffffff;
 }
 
-.dashboard-icon {
-    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-    color: white;
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    justify-content: center;
 }
 
-.staff-icon {
-    background: linear-gradient(135deg, #4834d4, #686de0);
-    color: white;
+.logo-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    flex-shrink: 0;
 }
 
-.periode-icon {
-    background: linear-gradient(135deg, #00d2d3, #54a0ff);
-    color: white;
+.logo-text {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #1e293b;
+    white-space: nowrap;
+    letter-spacing: -0.025em;
+    transition: opacity 0.3s ease;
+    padding-left: 5px;
 }
 
-.data-icon {
-    background: linear-gradient(135deg, #5f27cd, #a55eea);
-    color: white;
+.fixed-sidebar.minimized .logo-text {
+    opacity: 0;
+    width: 0;
 }
 
-.settings-icon {
-    background: linear-gradient(135deg, #ff9ff3, #f368e0);
-    color: white;
+/* Sidebar Content */
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px 0;
+    display: flex;
+    flex-direction: column;
 }
 
-.modern-nav-link:hover .nav-icon {
-    transform: scale(1.1) rotate(5deg);
+.sidebar-content::-webkit-scrollbar {
+    width: 4px;
 }
 
-.nav-link-text {
-    font-weight: 500;
+.sidebar-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 100px;
+}
+
+.sidebar-nav {
+    list-style: none;
+    padding: 0 12px;
+    margin: 0;
     flex: 1;
 }
 
-.nav-indicator {
-    width: 4px;
+.sidebar-item {
+    margin: 4px 0;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    color: #64748b;
+    text-decoration: none !important;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.sidebar-link:hover {
+    background: #f1f5f9;
+    color: #3b82f6 !important;
+}
+
+.sidebar-item.active .sidebar-link {
+    background: #eff6ff;
+    color: #3b82f6 !important;
+}
+
+.sidebar-item.active .sidebar-link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 24px;
+    width: 3px;
+    background: #3b82f6;
+    border-radius: 0 3px 3px 0;
+}
+
+.nav-icon {
+    width: 20px;
     height: 20px;
-    background: #ffd700;
-    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-right: 12px;
+    transition: all 0.2s ease;
+}
+
+.sidebar-item.active .nav-icon {
+    color: #3b82f6;
+}
+
+.nav-text {
+    font-weight: 500;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity 0.3s ease;
+    flex: 1;
+}
+
+.fixed-sidebar.minimized .nav-text {
     opacity: 0;
-    transition: all 0.3s ease;
+    width: 0;
 }
 
-.modern-nav-item.active .nav-indicator {
-    opacity: 1;
+.fixed-sidebar.minimized .nav-icon {
+    margin-right: 0;
 }
 
-/* User Section */
-.user-section {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
+.fixed-sidebar.minimized .sidebar-link {
+    justify-content: center;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+    padding: 12px;
+    border-top: 1px solid #e2e8f0;
 }
 
 .user-info-card {
     display: flex;
     align-items: center;
-    margin-bottom: 15px;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 10px;
+    padding: 5px;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.fixed-sidebar.minimized .user-info-card {
+    justify-content: center;
+    padding: 8px;
 }
 
 .user-avatar {
-    width: 45px;
-    height: 45px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: #eff6ff;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 12px;
-    font-size: 1.5rem;
-    color: white;
+    font-size: 1rem;
+    color: #3b82f6;
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+
+.fixed-sidebar.minimized .user-avatar {
+    margin-right: 0;
 }
 
 .user-details {
     flex: 1;
+    overflow: hidden;
+    transition: opacity 0.3s ease;
+    min-width: 0;
+}
+
+.fixed-sidebar.minimized .user-details {
+    opacity: 0;
+    width: 0;
 }
 
 .user-name {
     display: block;
-    color: white;
+    color: #1e293b;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .user-role {
-    color: #bdc3c7;
-    font-size: 0.8rem;
+    color: #94a3b8;
+    font-size: 0.7rem;
 }
 
 .logout-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 12px;
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-    color: white;
-    text-decoration: none;
-    border-radius: 12px;
-    transition: all 0.3s ease;
+    padding: 8px 12px;
+    background: #fef2f2;
+    color: #ef4444 !important;
+    text-decoration: none !important;
+    border-radius: 8px;
+    transition: all 0.2s ease;
     font-weight: 500;
+    font-size: 0.8rem;
 }
 
 .logout-btn:hover {
-    background: linear-gradient(135deg, #c0392b, #a93226);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(231, 76, 60, 0.3);
+    background: #fee2e2;
+    color: #dc2626 !important;
 }
 
 .logout-btn i {
+    font-size: 1rem;
+    flex-shrink: 0;
     margin-right: 8px;
-    font-size: 1.1rem;
 }
 
-/* Animations */
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+.logout-text {
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
 }
 
-.modern-nav-item.active .nav-icon {
-    animation: pulse 2s infinite;
+.fixed-sidebar.minimized .logout-text {
+    opacity: 0;
+    width: 0;
+}
+
+.fixed-sidebar.minimized .logout-btn i {
+    margin-right: 0;
+}
+
+/* Top Navbar - Clean White */
+.top-navbar {
+    position: fixed;
+    top: 0;
+    left: 260px;
+    right: 0;
+    height: 64px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    z-index: 999;
+    transition: left 0.3s ease;
+}
+
+.fixed-sidebar.minimized ~ .top-navbar {
+    left: 72px;
+}
+
+.navbar-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding: 0 24px;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.sidebar-toggle-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+}
+
+.sidebar-toggle-btn:hover {
+    background: #e2e8f0;
+    color: #3b82f6;
+}
+
+.sidebar-toggle-btn i {
+    transition: transform 0.3s ease;
+}
+
+body.sidebar-minimized .sidebar-toggle-btn i {
+    transform: rotate(180deg);
+}
+
+.mobile-toggle-btn {
+    display: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.25rem;
+}
+
+.mobile-toggle-btn:hover {
+    background: #e2e8f0;
+}
+
+.page-title {
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.time-display {
+    background: #f8fafc;
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: #64748b;
+    font-size: 0.875rem;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.time-display i {
+    color: #3b82f6;
+}
+
+/* Sidebar Overlay for Mobile */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.sidebar-overlay.active {
+    display: block;
+    opacity: 1;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .navbar-actions {
+    .fixed-sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .fixed-sidebar.mobile-open {
+        transform: translateX(0);
+    }
+    
+    .top-navbar {
+        left: 0;
+    }
+    
+    .mobile-toggle-btn {
+        display: flex;
+    }
+    
+    .sidebar-toggle-btn {
         display: none;
     }
     
-    .modern-brand {
-        font-size: 1rem;
+    .time-display {
+        display: none;
     }
 }
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.sidebar-item {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+.sidebar-item:nth-child(1) { animation-delay: 0.05s; }
+.sidebar-item:nth-child(2) { animation-delay: 0.1s; }
+.sidebar-item:nth-child(3) { animation-delay: 0.15s; }
+.sidebar-item:nth-child(4) { animation-delay: 0.2s; }
+.sidebar-item:nth-child(5) { animation-delay: 0.25s; }
+.sidebar-item:nth-child(6) { animation-delay: 0.3s; }
 </style>
 
 <script>
-// Update current time
-function updateTime() {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString('id-ID', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-    });
-    const timeElement = document.getElementById('current-time');
-    if (timeElement) {
-        timeElement.textContent = timeString;
-    }
-}
-
-// Update time every second
-setInterval(updateTime, 1000);
-updateTime(); // Initial call
-
-// Fetch user info
-fetch('/users/current-user')
-  .then(res => res.json())
-  .then(data => {
-    const userInfoElement = document.getElementById('user-info');
-    if (userInfoElement) {
-        userInfoElement.textContent = data.email || data.name || 'User';
-    }
-  })
-  .catch(err => {
-    console.log('Error fetching user info:', err);
-    const userInfoElement = document.getElementById('user-info');
-    if (userInfoElement) {
-        userInfoElement.textContent = 'User';
-    }
-  });
-
-// Add smooth scroll behavior
+// Sidebar Toggle Functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Add click animation to nav items
-    const navLinks = document.querySelectorAll('.modern-nav-link');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            // Create ripple effect
-            const ripple = document.createElement('div');
-            ripple.style.position = 'absolute';
-            ripple.style.borderRadius = '50%';
-            ripple.style.background = 'rgba(255, 255, 255, 0.3)';
-            ripple.style.transform = 'scale(0)';
-            ripple.style.animation = 'ripple 0.6s linear';
-            ripple.style.left = '50%';
-            ripple.style.top = '50%';
-            ripple.style.width = '100px';
-            ripple.style.height = '100px';
-            ripple.style.marginLeft = '-50px';
-            ripple.style.marginTop = '-50px';
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const mobileToggle = document.getElementById('mobileToggle');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    
+    // Sync state from early class to proper classes
+    const savedState = localStorage.getItem('sidebarMinimized');
+    if (savedState === 'true') {
+        sidebar.classList.add('minimized');
+        document.body.classList.add('sidebar-minimized');
+    }
+    // Remove early class after proper classes are applied
+    document.documentElement.classList.remove('sidebar-minimized-early');
+    
+    // Desktop toggle
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('minimized');
+            document.body.classList.toggle('sidebar-minimized');
             
-            this.style.position = 'relative';
-            this.appendChild(ripple);
-            
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
+            // Save state to localStorage
+            const isMinimized = sidebar.classList.contains('minimized');
+            localStorage.setItem('sidebarMinimized', isMinimized);
+        });
+    }
+    
+    // Mobile toggle
+    if (mobileToggle) {
+        mobileToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('mobile-open');
+            sidebarOverlay.classList.toggle('active');
+        });
+    }
+    
+    // Close sidebar when clicking overlay
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', function() {
+            sidebar.classList.remove('mobile-open');
+            sidebarOverlay.classList.remove('active');
+        });
+    }
+    
+    // Update time in navbar
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('id-ID', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        const timeElement = document.getElementById('current-time-nav');
+        if (timeElement) {
+            timeElement.textContent = timeString;
+        }
+    }
+    
+    updateTime();
+    setInterval(updateTime, 1000);
+    
+    // Fetch user info
+    fetch('/users/current-user')
+        .then(res => res.json())
+        .then(data => {
+            const userInfoElement = document.getElementById('user-info');
+            if (userInfoElement) {
+                userInfoElement.textContent = data.email || data.name || 'User';
+            }
+        })
+        .catch(err => {
+            console.log('Error fetching user info:', err);
+            const userInfoElement = document.getElementById('user-info');
+            if (userInfoElement) {
+                userInfoElement.textContent = 'User';
+            }
+        });
+    
+    // Close mobile sidebar when clicking a link
+    const sidebarLinks = document.querySelectorAll('.sidebar-link');
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('mobile-open');
+                sidebarOverlay.classList.remove('active');
+            }
         });
     });
 });
-
-// Add ripple animation CSS
-const style = document.createElement('style');
-style.textContent = `
-@keyframes ripple {
-    to {
-        transform: scale(4);
-        opacity: 0;
-    }
-}
-`;
-document.head.appendChild(style);
 </script>

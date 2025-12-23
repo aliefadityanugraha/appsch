@@ -53,7 +53,7 @@ class RecordsRepository extends BaseRepository {
             .withGraphFetched('[staff, tasks(selectBasicFields)]')
             .modifiers({
                 selectBasicFields(builder) {
-                    builder.select('id', 'description', 'value', 'staffId', 'periodeId');
+                    builder.select('id', 'description', 'value', 'staffId', 'periodeid');
                 }
             });
 
@@ -186,33 +186,34 @@ class RecordsRepository extends BaseRepository {
      */
     async createWithTasks(recordData, taskIds = []) {
         const trx = await this.model.startTransaction();
-        
+
         try {
-            // Check for duplicate record on the same date for the same staff
+            // Robust duplicate check using local date parts to avoid UTC shifts
             const targetDate = recordData.createdAt ? new Date(recordData.createdAt) : new Date();
-            const startOfDay = new Date(targetDate);
-            startOfDay.setHours(0, 0, 0, 0);
-            const endOfDay = new Date(targetDate);
-            endOfDay.setHours(23, 59, 59, 999);
-            
+
+            // Generate local YYYY-MM-DD strings for comparison
+            const yr = targetDate.getFullYear();
+            const mt = String(targetDate.getMonth() + 1).padStart(2, '0');
+            const dy = String(targetDate.getDate()).padStart(2, '0');
+
+            const startOfDay = `${yr}-${mt}-${dy} 00:00:00`;
+            const endOfDay = `${yr}-${mt}-${dy} 23:59:59`;
+
             const existingRecord = await this.model.query(trx)
                 .where('staffId', recordData.staffId)
-                .whereBetween('createdAt', [
-                    startOfDay.toISOString().slice(0, 19).replace('T', ' '),
-                    endOfDay.toISOString().slice(0, 19).replace('T', ' ')
-                ])
+                .whereBetween('createdAt', [startOfDay, endOfDay])
                 .first();
-            
+
             if (existingRecord) {
                 throw new ValidationError(
                     `Record untuk staff ini sudah ada pada tanggal ${targetDate.toLocaleDateString('id-ID')}. Hanya boleh ada satu record per staff per hari.`,
                     [{ field: 'staffId', message: 'Duplicate record for this date' }]
                 );
             }
-            
+
             // Create record
             const record = await this.model.query(trx).insert(recordData);
-            
+
             // Associate with tasks if provided
             if (taskIds && taskIds.length > 0) {
                 // Use individual relate calls for MySQL compatibility
@@ -220,9 +221,9 @@ class RecordsRepository extends BaseRepository {
                     await record.$relatedQuery('tasks', trx).relate(taskId);
                 }
             }
-            
+
             await trx.commit();
-            
+
             // Return record with relations
             return await this.model.query()
                 .findById(record.id)
@@ -242,26 +243,29 @@ class RecordsRepository extends BaseRepository {
      */
     async updateWithTasks(id, updateData, taskIds = null) {
         const trx = await this.model.startTransaction();
-        
+
         try {
             // Update record
             await this.model.query(trx).findById(id).patch(updateData);
-            
+
             // Update task associations if provided
             if (taskIds !== null) {
                 const record = await this.model.query(trx).findById(id);
-                
+
                 // Unrelate all existing tasks
                 await record.$relatedQuery('tasks', trx).unrelate();
-                
+
                 // Relate new tasks
                 if (taskIds.length > 0) {
-                    await record.$relatedQuery('tasks', trx).relate(taskIds);
+                    // Use individual relate calls for MySQL compatibility (avoid batch insert error)
+                    for (const taskId of taskIds) {
+                        await record.$relatedQuery('tasks', trx).relate(taskId);
+                    }
                 }
             }
-            
+
             await trx.commit();
-            
+
             // Return updated record with relations
             return await this.model.query()
                 .findById(id)

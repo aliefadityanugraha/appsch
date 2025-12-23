@@ -1,0 +1,251 @@
+/* RBAC Control - Clean White Modern Theme */
+
+/* Stats Card - Clean Style */
+.stats-card {
+    background: var(--white, #ffffff);
+    border: 1px solid var(--gray-200, #e2e8f0);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    transition: all 0.2s ease;
+}
+
+.stats-card:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    transform: translateY(-2px);
+}
+
+.stats-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary, #3b82f6);
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.stats-label {
+    font-size: 0.8rem;
+    color: var(--gray-500, #64748b);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+/* Stats Card Variants */
+.stats-card.stats-roles .stats-number { color: #3b82f6; }
+.stats-card.stats-users .stats-number { color: #8b5cf6; }
+.stats-card.stats-active .stats-number { color: #22c55e; }
+.stats-card.stats-changes .stats-number { color: #f59e0b; }
+
+/* Permission Checkboxes - Clean */
+.permission-checkboxes {
+    background: var(--gray-50, #f8fafc);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--gray-200, #e2e8f0);
+}
+
+.permission-checkboxes .form-check {
+    padding: 0.5rem 0;
+    padding-left: 1.75rem;
+}
+
+.permission-checkboxes .form-check-label {
+    font-size: 0.875rem;
+    color: var(--gray-700, #334155);
+}
+
+.permission-checkboxes .form-check-input:checked {
+    background-color: var(--primary, #3b82f6);
+    border-color: var(--primary, #3b82f6);
+}
+
+/* Role Card */
+.role-card {
+    background: var(--white, #ffffff);
+    border: 1px solid var(--gray-200, #e2e8f0);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+
+.role-card:hover {
+    border-color: var(--primary, #3b82f6);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.role-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.role-name {
+    font-weight: 600;
+    color: var(--gray-800, #1e293b);
+    font-size: 1rem;
+}
+
+.role-badge {
+    background: var(--primary-lightest, #dbeafe);
+    color: var(--primary-dark, #2563eb);
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* User List - Clean */
+#userList {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#userList .user-item {
+    padding: 0.875rem;
+    border-bottom: 1px solid var(--gray-100, #f1f5f9);
+    transition: background 0.2s ease;
+}
+
+#userList .user-item:hover {
+    background: var(--gray-50, #f8fafc);
+}
+
+#userList .user-item:last-child {
+    border-bottom: none;
+}
+
+.user-email {
+    font-weight: 500;
+    color: var(--gray-800, #1e293b);
+}
+
+.user-role {
+    font-size: 0.8rem;
+    color: var(--gray-500, #64748b);
+}
+
+/* Search Input */
+.search-input {
+    background: var(--white, #ffffff);
+    border: 1px solid var(--gray-300, #cbd5e1);
+    border-radius: 8px;
+    padding: 0.625rem 1rem;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.search-input:focus {
+    border-color: var(--primary, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    outline: none;
+}
+
+/* Permission Matrix */
+.permission-matrix {
+    background: var(--white, #ffffff);
+    border: 1px solid var(--gray-200, #e2e8f0);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.permission-matrix-header {
+    background: var(--gray-50, #f8fafc);
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--gray-200, #e2e8f0);
+    font-weight: 600;
+    color: var(--gray-800, #1e293b);
+}
+
+.permission-matrix-body {
+    padding: 1.25rem;
+}
+
+/* Action Buttons */
+.action-btn {
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.action-btn-edit {
+    background: var(--info-light, #e0f2fe);
+    color: #0369a1;
+    border: none;
+}
+
+.action-btn-edit:hover {
+    background: #0ea5e9;
+    color: white;
+}
+
+.action-btn-delete {
+    background: var(--danger-light, #fee2e2);
+    color: #991b1b;
+    border: none;
+}
+
+.action-btn-delete:hover {
+    background: #ef4444;
+    color: white;
+}
+
+/* Audit Trail */
+.audit-item {
+    padding: 0.875rem;
+    border-left: 3px solid var(--gray-200, #e2e8f0);
+    margin-bottom: 0.75rem;
+    background: var(--gray-50, #f8fafc);
+    border-radius: 0 8px 8px 0;
+}
+
+.audit-item.audit-create { border-left-color: #22c55e; }
+.audit-item.audit-update { border-left-color: #3b82f6; }
+.audit-item.audit-delete { border-left-color: #ef4444; }
+
+.audit-time {
+    font-size: 0.75rem;
+    color: var(--gray-400, #94a3b8);
+}
+
+.audit-action {
+    font-weight: 500;
+    color: var(--gray-800, #1e293b);
+}
+
+.audit-details {
+    font-size: 0.875rem;
+    color: var(--gray-600, #475569);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .stats-card {
+        margin-bottom: 0.75rem;
+        padding: 1.25rem;
+    }
+    
+    .stats-number {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-card {
+        padding: 1rem;
+    }
+    
+    .stats-number {
+        font-size: 1.25rem;
+    }
+    
+    .permission-checkboxes {
+        padding: 0.75rem;
+    }
+}

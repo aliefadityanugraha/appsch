@@ -39,7 +39,7 @@ class ValidationService {
         if (!id) {
             throw new ValidationError(`${fieldName} is required`, [{ field: fieldName.toLowerCase().replace(' ', ''), message: `${fieldName} is required` }]);
         }
-        
+
         if (!uuidValidate(id)) {
             throw new ValidationError(`Invalid ${fieldName} format`, [{ field: fieldName.toLowerCase().replace(' ', ''), message: `Invalid ${fieldName} format` }]);
         }
@@ -47,7 +47,7 @@ class ValidationService {
 
     static validateStaffData(data, requireAll = true) {
         const errors = [];
-        
+
         // Required fields validation
         if (requireAll || data.name !== undefined) {
             if (!data.name || String(data.name).trim().length === 0) {
@@ -58,7 +58,7 @@ class ValidationService {
                 errors.push({ field: 'name', message: 'Name must not exceed 100 characters' });
             }
         }
-        
+
         if (requireAll || data.jabatan !== undefined) {
             if (!data.jabatan || String(data.jabatan).trim().length === 0) {
                 errors.push({ field: 'jabatan', message: 'Jabatan is required' });
@@ -66,7 +66,7 @@ class ValidationService {
                 errors.push({ field: 'jabatan', message: 'Jabatan must be at least 2 characters' });
             }
         }
-        
+
         if (requireAll || data.nip !== undefined) {
             if (!data.nip || String(data.nip).trim().length === 0) {
                 errors.push({ field: 'nip', message: 'NIP is required' });
@@ -76,13 +76,13 @@ class ValidationService {
                 errors.push({ field: 'nip', message: 'NIP must be between 8 and 20 digits' });
             }
         }
-        
+
         if (requireAll || data.tunjangan !== undefined) {
             if (!data.tunjangan || String(data.tunjangan).trim().length === 0) {
                 errors.push({ field: 'tunjangan', message: 'Tunjangan is required' });
             }
         }
-        
+
         if (errors.length > 0) {
             throw new ValidationError('Validation failed', errors);
         }
@@ -90,7 +90,7 @@ class ValidationService {
 
     static validateTaskData(data, requireAll = true) {
         const errors = [];
-        
+
         if (requireAll || data.description !== undefined) {
             if (!data.description || data.description.trim().length === 0) {
                 errors.push({ field: 'description', message: 'Description is required' });
@@ -98,7 +98,7 @@ class ValidationService {
                 errors.push({ field: 'description', message: 'Description must be at least 5 characters' });
             }
         }
-        
+
         if (requireAll || data.value !== undefined) {
             if (data.value === undefined || data.value === null) {
                 errors.push({ field: 'value', message: 'Value is required' });
@@ -106,7 +106,7 @@ class ValidationService {
                 errors.push({ field: 'value', message: 'Value must be a number between 0 and 100' });
             }
         }
-        
+
         if (requireAll || data.staffId !== undefined) {
             if (!data.staffId) {
                 errors.push({ field: 'staffId', message: 'Staff ID is required' });
@@ -114,15 +114,15 @@ class ValidationService {
                 ValidationService.validateUUID(data.staffId, 'Staff ID');
             }
         }
-        
-        if (requireAll || data.periodeId !== undefined) {
-            if (!data.periodeId) {
-                errors.push({ field: 'periodeId', message: 'Periode ID is required' });
+
+        if (requireAll || data.periodeid !== undefined) {
+            if (!data.periodeid) {
+                errors.push({ field: 'periodeid', message: 'Periode ID is required' });
             } else {
-                ValidationService.validateUUID(data.periodeId, 'Periode ID');
+                ValidationService.validateUUID(data.periodeid, 'Periode ID');
             }
         }
-        
+
         if (errors.length > 0) {
             throw new ValidationError('Validation failed', errors);
         }
@@ -130,7 +130,7 @@ class ValidationService {
 
     static validateRecordData(data, requireAll = true) {
         const errors = [];
-        
+
         if (requireAll || data.value !== undefined) {
             if (data.value === undefined || data.value === null) {
                 errors.push({ field: 'value', message: 'Value is required' });
@@ -138,7 +138,7 @@ class ValidationService {
                 errors.push({ field: 'value', message: 'Value must be a positive number' });
             }
         }
-        
+
         if (requireAll || data.staffId !== undefined) {
             if (!data.staffId) {
                 errors.push({ field: 'staffId', message: 'Staff ID is required' });
@@ -146,10 +146,10 @@ class ValidationService {
                 ValidationService.validateUUID(data.staffId, 'Staff ID');
             }
         }
-        
+
         // Note: taskId validation is removed because records are associated with multiple tasks
         // Task IDs are validated separately in the service layer
-        
+
         if (errors.length > 0) {
             throw new ValidationError('Validation failed', errors);
         }
@@ -157,7 +157,7 @@ class ValidationService {
 
     static validatePeriodeData(data, requireAll = true) {
         const errors = [];
-        
+
         if (requireAll || data.periode !== undefined) {
             if (!data.periode || data.periode.trim().length === 0) {
                 errors.push({ field: 'periode', message: 'Periode is required' });
@@ -165,7 +165,7 @@ class ValidationService {
                 errors.push({ field: 'periode', message: 'Periode must be at least 3 characters' });
             }
         }
-        
+
         if (requireAll || data.nilai !== undefined) {
             if (data.nilai === undefined || data.nilai === null) {
                 errors.push({ field: 'nilai', message: 'Nilai is required' });
@@ -173,7 +173,7 @@ class ValidationService {
                 errors.push({ field: 'nilai', message: 'Nilai must be a positive number' });
             }
         }
-        
+
         if (errors.length > 0) {
             throw new ValidationError('Validation failed', errors);
         }
@@ -181,7 +181,7 @@ class ValidationService {
 
     static validateUserData(data, requireAll = true) {
         const errors = [];
-        
+
         if (requireAll || data.email !== undefined) {
             if (!data.email || data.email.trim().length === 0) {
                 errors.push({ field: 'email', message: 'Email is required' });
@@ -189,7 +189,7 @@ class ValidationService {
                 errors.push({ field: 'email', message: 'Invalid email format' });
             }
         }
-        
+
         if (requireAll || data.password !== undefined) {
             if (!data.password || data.password.length === 0) {
                 errors.push({ field: 'password', message: 'Password is required' });
@@ -199,7 +199,7 @@ class ValidationService {
                 errors.push({ field: 'password', message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number' });
             }
         }
-        
+
         if (errors.length > 0) {
             throw new ValidationError('Validation failed', errors);
         }
@@ -209,7 +209,7 @@ class ValidationService {
         if (!date) {
             throw new ValidationError(`${fieldName} is required`);
         }
-        
+
         const dateObj = new Date(date);
         if (isNaN(dateObj.getTime())) {
             throw new ValidationError(`Invalid ${fieldName} format`);
@@ -234,14 +234,14 @@ class ValidationService {
         if (!startDate || !endDate) {
             throw new ValidationError('Start date and end date are required');
         }
-        
+
         const start = new Date(startDate);
         const end = new Date(endDate);
-        
+
         if (isNaN(start.getTime()) || isNaN(end.getTime())) {
             throw new ValidationError('Invalid date format');
         }
-        
+
         if (start > end) {
             throw new ValidationError('Start date must be before end date');
         }
@@ -251,7 +251,7 @@ class ValidationService {
         if (page && (isNaN(page) || page < 1)) {
             throw new ValidationError('Page must be a positive number');
         }
-        
+
         if (limit && (isNaN(limit) || limit < 1 || limit > 100)) {
             throw new ValidationError('Limit must be a number between 1 and 100');
         }
