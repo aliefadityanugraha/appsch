@@ -3,8 +3,6 @@
 const Role = require('../models/Role');
 const User = require('../models/User');
 const logger = require('../config/logger');
-const { ValidationError, NotFoundError } = require('../middleware/errorHandler');
-const { validationResult } = require('express-validator');
 
 class RBACController {
     /**
@@ -13,23 +11,43 @@ class RBACController {
     static async dashboard(req, res) {
         try {
             const roles = await Role.query().orderBy('createdAt', 'desc');
-            const users = await User.query().withGraphFetched('userRole');
             
-            // Calculate statistics
+            // Convert permission to string for view compatibility
+            const rolesWithStringPermission = roles.map(r => ({
+                ...r,
+                permission: String(r.permission)
+            }));
+            
+            const users = await User.query();
+            
+            // Count users per role
+            const roleCounts = {};
+            for (const role of roles) {
+                const count = await User.query().where('role', role.roleId).resultSize();
+                roleCounts[role.id] = count;
+            }
+            
             const stats = {
                 totalRoles: roles.length,
                 totalUsers: users.length,
-                activeUsers: users.filter(u => u.isActive).length,
-                recentChanges: 0 // This would come from audit log
+                activeUsers: users.filter(u => u.status).length,
+                recentChanges: 0
             };
             
             res.render('rbac-control', {
                 title: 'RBAC Control Dashboard',
-                role: roles,
+                role: rolesWithStringPermission,
                 users: users,
                 stats: stats,
+                roleCounts: roleCounts,
                 layout: 'layouts/main-layouts',
-                req: req.path
+                req: req.path,
+                csrfToken: res.locals.csrfToken || req.session.csrfToken || '',
+                messages: {
+                    success: req.flash('success'),
+                    error: req.flash('error'),
+                    warning: req.flash('warning')
+                }
             });
         } catch (error) {
             logger.error('Error loading RBAC dashboard', {
@@ -50,63 +68,52 @@ class RBACController {
      */
     static async updatePermissionMatrix(req, res) {
         try {
-            const { changes } = req.body;
+            const { roleId, permissions } = req.body;
             
-            if (!Array.isArray(changes)) {
-                throw new ValidationError('Invalid changes format');
+            if (!roleId) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Role ID is required'
+                });
             }
             
-            // Group changes by role
-            const roleChanges = {};
-            changes.forEach(change => {
-                if (!roleChanges[change.roleId]) {
-                    roleChanges[change.roleId] = [];
-                }
-                roleChanges[change.roleId].push(change);
+            const role = await Role.query().findById(roleId);
+            if (!role) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Role not found'
+                });
+            }
+            
+            // Build permission string from array
+            const newPermissions = Array.isArray(permissions) 
+                ? permissions.sort().join('') 
+                : String(permissions);
+            
+            const oldPermissions = role.permission;
+            
+            await Role.query()
+                .findById(roleId)
+                .patch({ permission: newPermissions });
+            
+            logger.info('Permission matrix updated', {
+                roleId: roleId,
+                roleName: role.role,
+                oldPermissions: oldPermissions,
+                newPermissions: newPermissions,
+                userId: req.user?.userId,
+                ip: req.ip
             });
-            
-            // Update each role's permissions
-            for (const [roleId, rolePermissions] of Object.entries(roleChanges)) {
-                const role = await Role.query().findById(roleId);
-                if (!role) {
-                    throw new NotFoundError(`Role with ID ${roleId} not found`);
-                }
-                
-                // Build new permission string
-                let newPermissions = '';
-                rolePermissions.forEach(perm => {
-                    if (perm.enabled && !newPermissions.includes(perm.permission)) {
-                        newPermissions += perm.permission;
-                    }
-                });
-                
-                // Update role
-                await Role.query()
-                    .findById(roleId)
-                    .patch({ permission: newPermissions });
-                
-                // Log the change
-                logger.info('Permission matrix updated', {
-                    roleId: roleId,
-                    roleName: role.role,
-                    oldPermissions: role.permission,
-                    newPermissions: newPermissions,
-                    userId: req.user?.userId,
-                    ip: req.ip
-                });
-            }
             
             res.json({
                 success: true,
-                message: 'Permission matrix updated successfully'
+                message: 'Permission updated successfully'
             });
             
         } catch (error) {
             logger.error('Error updating permission matrix', {
                 error: error.message,
-                stack: error.stack,
-                userId: req.user?.userId,
-                body: req.body
+                userId: req.user?.userId
             });
             
             res.status(500).json({
@@ -131,27 +138,32 @@ class RBACController {
                 });
             }
             
+            // Use LIKE for MySQL compatibility
             const users = await User.query()
-                .withGraphFetched('role')
                 .where(builder => {
                     builder
-                        .where('name', 'ilike', `%${query}%`)
-                        .orWhere('email', 'ilike', `%${query}%`);
+                        .where('email', 'like', `%${query}%`);
                 })
-                .limit(limit);
+                .limit(parseInt(limit));
+            
+            // Get role info for each user
+            const usersWithRoles = await Promise.all(users.map(async (user) => {
+                const role = await Role.query().where('roleId', user.role).first();
+                return {
+                    id: user.id,
+                    email: user.email,
+                    currentRole: role ? {
+                        id: role.id,
+                        roleId: role.roleId,
+                        name: role.role
+                    } : null,
+                    isActive: user.status
+                };
+            }));
             
             res.json({
                 success: true,
-                users: users.map(user => ({
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    currentRole: user.role ? {
-                        id: user.role.id,
-                        name: user.role.role
-                    } : null,
-                    isActive: user.isActive
-                }))
+                users: usersWithRoles
             });
             
         } catch (error) {
@@ -175,38 +187,43 @@ class RBACController {
         try {
             const { userId, roleId } = req.body;
             
-            // Validate input
             if (!userId || !roleId) {
-                throw new ValidationError('User ID and Role ID are required');
+                return res.status(400).json({
+                    success: false,
+                    message: 'User ID and Role ID are required'
+                });
             }
             
             // Check if user exists
             const user = await User.query().findById(userId);
             if (!user) {
-                throw new NotFoundError('User not found');
+                return res.status(404).json({
+                    success: false,
+                    message: 'User not found'
+                });
             }
             
-            // Check if role exists
+            // Check if role exists (roleId is the UUID)
             const role = await Role.query().findById(roleId);
             if (!role) {
-                throw new NotFoundError('Role not found');
+                return res.status(404).json({
+                    success: false,
+                    message: 'Role not found'
+                });
             }
             
-            // Update user role
-            const oldRole = await User.query()
-                .findById(userId)
-                .withGraphFetched('role');
+            const oldRoleId = user.role;
+            const oldRole = await Role.query().where('roleId', oldRoleId).first();
             
+            // Update user role with roleId (integer), not UUID
             await User.query()
                 .findById(userId)
-                .patch({ role: roleId });
+                .patch({ role: role.roleId });
             
-            // Log the change
             logger.info('User role assigned', {
                 userId: userId,
-                userName: user.name,
                 userEmail: user.email,
-                oldRole: oldRole.role?.role || 'None',
+                oldRole: oldRole?.role || 'None',
                 newRole: role.role,
                 assignedBy: req.user?.userId,
                 ip: req.ip
@@ -214,7 +231,7 @@ class RBACController {
             
             res.json({
                 success: true,
-                message: `Role '${role.role}' assigned to user '${user.name}' successfully`
+                message: `Role '${role.role}' assigned to user '${user.email}' successfully`
             });
             
         } catch (error) {
@@ -242,14 +259,16 @@ class RBACController {
             
             for (const role of roles) {
                 const userCount = await User.query()
-                    .where('role', role.id)
+                    .where('role', role.roleId)
                     .resultSize();
                 
+                const permStr = String(role.permission);
                 distribution.push({
                     roleId: role.id,
+                    roleNumId: role.roleId,
                     roleName: role.role,
                     userCount: userCount,
-                    permissions: role.permission.split('').map(p => parseInt(p))
+                    permissions: permStr.split('').map(p => parseInt(p))
                 });
             }
             
@@ -276,64 +295,34 @@ class RBACController {
      */
     static async getAuditTrail(req, res) {
         try {
-            const { filter, date, limit = 50 } = req.query;
+            const { filter, limit = 50 } = req.query;
             
-            // This is a placeholder - in a real implementation,
-            // you would have an audit_logs table
+            // Placeholder - implement with actual audit_logs table
             const auditEntries = [
                 {
                     id: 1,
                     action: 'role_created',
-                    description: 'Created new role: Administrator',
-                    userId: 'admin@example.com',
-                    ip: '192.168.1.1',
+                    description: 'System initialized with default roles',
+                    userId: 'system',
+                    ip: '127.0.0.1',
                     timestamp: new Date().toISOString(),
-                    details: {
-                        roleName: 'Administrator',
-                        permissions: '1234'
-                    }
-                },
-                {
-                    id: 2,
-                    action: 'permission_updated',
-                    description: 'Updated permissions for Editor role',
-                    userId: 'admin@example.com',
-                    ip: '192.168.1.1',
-                    timestamp: new Date(Date.now() - 3600000).toISOString(),
-                    details: {
-                        roleName: 'Editor',
-                        oldPermissions: '12',
-                        newPermissions: '123'
-                    }
+                    details: { roleName: 'Administrator', permissions: '1234' }
                 }
             ];
             
-            // Apply filters
             let filteredEntries = auditEntries;
-            
             if (filter && filter !== 'all') {
-                filteredEntries = filteredEntries.filter(entry => 
-                    entry.action === filter
-                );
-            }
-            
-            if (date) {
-                const filterDate = new Date(date);
-                filteredEntries = filteredEntries.filter(entry => {
-                    const entryDate = new Date(entry.timestamp);
-                    return entryDate.toDateString() === filterDate.toDateString();
-                });
+                filteredEntries = filteredEntries.filter(entry => entry.action === filter);
             }
             
             res.json({
                 success: true,
-                entries: filteredEntries.slice(0, limit)
+                entries: filteredEntries.slice(0, parseInt(limit))
             });
             
         } catch (error) {
             logger.error('Error getting audit trail', {
                 error: error.message,
-                query: req.query,
                 userId: req.user?.userId
             });
             
@@ -349,10 +338,26 @@ class RBACController {
      */
     static async bulkRoleOperations(req, res) {
         try {
-            const { operation, roleIds, targetRoleId } = req.body;
+            const { operation, roleIds } = req.body;
+            
+            if (!operation || !roleIds || !Array.isArray(roleIds)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid request parameters'
+                });
+            }
             
             switch (operation) {
                 case 'delete_multiple':
+                    // Don't allow deleting all roles
+                    const remainingRoles = await Role.query().whereNotIn('id', roleIds).resultSize();
+                    if (remainingRoles === 0) {
+                        return res.status(400).json({
+                            success: false,
+                            message: 'Cannot delete all roles'
+                        });
+                    }
+                    
                     await Role.query().delete().whereIn('id', roleIds);
                     logger.info('Bulk role deletion', {
                         deletedRoles: roleIds,
@@ -361,9 +366,19 @@ class RBACController {
                     break;
                     
                 case 'copy_permissions':
+                    if (roleIds.length < 2) {
+                        return res.status(400).json({
+                            success: false,
+                            message: 'Need at least 2 roles for copy operation'
+                        });
+                    }
+                    
                     const sourceRole = await Role.query().findById(roleIds[0]);
                     if (!sourceRole) {
-                        throw new NotFoundError('Source role not found');
+                        return res.status(404).json({
+                            success: false,
+                            message: 'Source role not found'
+                        });
                     }
                     
                     await Role.query()
@@ -379,7 +394,10 @@ class RBACController {
                     break;
                     
                 default:
-                    throw new ValidationError('Invalid bulk operation');
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Invalid bulk operation'
+                    });
             }
             
             res.json({

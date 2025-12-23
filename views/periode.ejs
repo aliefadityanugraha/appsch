@@ -14,69 +14,49 @@
         <div class="table-responsive">
             <table id="myTable" class="table table-striped align-middle">
                 <thead class="table-light">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Periode</th>
-                    <th scope="col">Nilai</th>
-                    <th scope="col">Actions</th>
-                </tr>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Periode</th>
+                        <th scope="col">Nilai</th>
+                        <th scope="col">Actions</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <% let no = 1; %>
-                <% data.forEach(e => { %>
-                    <tr>
-                        <th scope="row"><%= no %></th>
-                        <td><%= e.periode %></td>
-                        <td><%= e.nilai %></td>
-                        <td>
-                            <script>
-                                function editPeriode(id, periode, nilai) {
-                                    document.getElementById("periode").value = periode;
-                                    document.getElementById("nilai").value = nilai;
-                                    document.querySelector("form").action = "/updatePeriode/" + id;
-                                }
-                            </script>
-                            <a
-                                    href="javascript:void(0)"
-                                    class="btn btn-sm btn-primary"
-                                    onclick="editPeriode('<%= e.id %>', '<%= e.periode %>', '<%= e.nilai %>')"
-                            ><i class="bi bi-pencil-fill"></i
-                                ></a>
-                            <a
-                                    href="#"
-                                    class="btn btn-sm btn-danger text-white"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#deletePeriodeModal"
-                                    data-periode-id="<%= e.id %>"
-                                    data-periode-name="<%= e.periode %>"
-                            >
-                                <i class="bi bi-trash3-fill"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    <% no++; %>
-                <% }); %>
+                    <% let no=1; %>
+                        <% data.forEach(e=> { %>
+                            <tr>
+                                <th scope="row">
+                                    <%= no %>
+                                </th>
+                                <td>
+                                    <%= e.periode %>
+                                </td>
+                                <td>
+                                    <%= e.nilai %>
+                                </td>
+                                <td>
+                                    <script>
+                                        function editPeriode(id, periode, nilai) {
+                                            document.getElementById("periode").value = periode;
+                                            document.getElementById("nilai").value = nilai;
+                                            document.querySelector("form").action = "/updatePeriode/" + id;
+                                        }
+                                    </script>
+                                    <a href="javascript:void(0)" class="btn btn-sm btn-primary"
+                                        onclick="editPeriode('<%= e.id %>', '<%= e.periode %>', '<%= e.nilai %>')"><i
+                                            class="bi bi-pencil-fill"></i></a>
+                                    <a href="#" class="btn btn-sm btn-danger text-white" data-bs-toggle="modal"
+                                        data-bs-target="#deletePeriodeModal" data-periode-id="<%= e.id %>"
+                                        data-periode-name="<%= e.periode %>">
+                                        <i class="bi bi-trash3-fill"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <% no++; %>
+                                <% }); %>
                 </tbody>
             </table>
 
-            <!-- Reusable Delete Modal -->
-            <div class="modal fade" id="deletePeriodeModal" tabindex="-1" aria-labelledby="deletePeriodeModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="deletePeriodeModalLabel">Confirm Delete</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            Are you sure you want to delete this periode: <strong id="deletePeriodeName"></strong>?
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <a id="deletePeriodeLink" href="#" class="btn btn-danger">Delete</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
     <div class="p-1 p-md-4 mt-2 mt-md-0 col-md-4 col-12 order-md-2 order-1">
@@ -85,27 +65,17 @@
             <input type="hidden" name="_token" value="<%= csrfToken %>">
             <div class="P-2">
                 <label for="periode" class="form-label">Periode:</label>
-                <input
-                        type="text"
-                        class="form-control form-control-sm"
-                        id="periode"
-                        name="periode"
-                        required
-                />
+                <input type="text" class="form-control form-control-sm" id="periode" name="periode" required />
             </div>
             <div class="P-2">
                 <label for="nilai" class="form-label">Nilai:</label>
-                <input
-                        type="number"
-                        class="form-control form-control-sm"
-                        id="nilai"
-                        name="nilai"
-                        required
-                />
+                <input type="number" class="form-control form-control-sm" id="nilai" name="nilai" required />
             </div>
             <div class="py-2">
-                <button type="button" class="btn btn-sm btn-danger text-white" onclick="clearForm()"><i class="bi bi-x-circle px-1"></i>Clear</button>
-                <button type="submit" class="btn btn-sm btn-success text-white"><i class="bi bi-floppy px-1"></i> Simpan</button>
+                <button type="button" class="btn btn-sm btn-danger text-white" onclick="clearForm()"><i
+                        class="bi bi-x-circle px-1"></i>Clear</button>
+                <button type="submit" class="btn btn-sm btn-success text-white"><i class="bi bi-floppy px-1"></i>
+                    Simpan</button>
             </div>
         </form>
         <script>
@@ -140,3 +110,24 @@
         });
     });
 </script>
+
+<!-- Reusable Delete Modal -->
+<div class="modal fade" id="deletePeriodeModal" tabindex="-1" aria-labelledby="deletePeriodeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletePeriodeModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this periode: <strong id="deletePeriodeName"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-secondary text-white"
+                    data-bs-dismiss="modal">Cancel</button>
+                <a id="deletePeriodeLink" href="#" class="btn btn-sm btn-danger text-white">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>

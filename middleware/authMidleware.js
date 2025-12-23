@@ -1,61 +1,94 @@
-/** @format */
-
 "use strict";
 
 const jwt = require("jsonwebtoken");
 
-module.exports = {
-    isLogin: (req, res, next) => {
-        console.log('🔐 isLogin middleware called...');
-        console.log('📝 Request path:', req.path);
-        console.log('🍪 Session token:', req.session.token ? 'Exists' : 'Not found');
-        
-        const {token} = req.session;
+/**
+ * Authentication Middleware Class
+ * Handles user authentication and token verification
+ */
+class AuthMiddleware {
+    constructor() {
+        this.secretKey = process.env.ACCESS_SECRET_KEY;
+    }
 
-        if (token) {
-            console.log('✅ User already logged in, redirecting to /');
-            return res.redirect("/");
-        }
+    /**
+     * Check if user is already logged in
+     * Redirects to home if user has valid session
+     * @returns {Function} Express middleware function
+     */
+    isLogin() {
+        return (req, res, next) => {
+            const { token } = req.session;
+            if (token) {
+                return res.redirect("/");
+            }
+            next();
+        };
+    }
 
-        console.log('✅ User not logged in, proceeding...');
-        next();
-    },
+    /**
+     * Authenticate user token from session
+     * Redirects to login if no token or invalid token
+     * @returns {Function} Express middleware function
+     */
+    authenticateToken() {
+        return (req, res, next) => {
+            const { token } = req.session;
 
-    authenticateToken: (req, res, next) => {
-        console.log('🔐 authenticateToken middleware called...');
-        console.log('📝 Request path:', req.path);
-        console.log('🍪 Session exists:', req.session ? 'Yes' : 'No');
-        console.log('🍪 Session token:', req.session.token ? 'Exists' : 'Not found');
-        console.log('🔑 ACCESS_SECRET_KEY exists:', process.env.ACCESS_SECRET_KEY ? 'Yes' : 'No');
-
-        const {token} = req.session;
-
-        if (!token) {
-            console.log("❌ Session token not found");
-            console.log("🔄 Redirecting to login");
-            return res.status(401).redirect("/auth/login");
-        }
-
-        console.log('🎫 Verifying JWT token...');
-        jwt.verify(token, process.env.ACCESS_SECRET_KEY, (err, user) => {
-            if (err) {
-                console.error("❌ Invalid or expired token:", err.message);
-                console.error("   Error name:", err.name);
-                console.error("   Error expiredAt:", err.expiredAt);
-
-                if (req.path === "/auth/refresh-token") {
-                    console.log("🔄 Refresh token path, returning forbidden");
-                    return res.status(403).json({message: "Forbidden"});
-                }
-
-                console.log("🔄 Redirecting to refresh token");
-                return res.redirect("/auth/refresh-token");
+            if (!token) {
+                return res.status(401).redirect("/auth/login");
             }
 
-            console.log('✅ Token verified successfully');
-            console.log('👤 User data:', { userId: user.userId, email: user.email });
-            req.user = user;
-            next();
-        });
+            jwt.verify(token, this.secretKey, (err, user) => {
+                if (err) {
+                    if (req.path === "/auth/refresh-token") {
+                        return res.status(403).json({ message: "Forbidden" });
+                    }
+                    return res.redirect("/auth/refresh-token");
+                }
+
+                req.user = user;
+                next();
+            });
+        };
     }
+
+    /**
+     * Verify token and return user data (for API routes)
+     * @returns {Function} Express middleware function
+     */
+    verifyToken() {
+        return (req, res, next) => {
+            const { token } = req.session;
+
+            if (!token) {
+                return res.status(401).json({ 
+                    success: false, 
+                    message: "No authentication token provided" 
+                });
+            }
+
+            try {
+                const decoded = jwt.verify(token, this.secretKey);
+                req.user = decoded;
+                next();
+            } catch (err) {
+                return res.status(403).json({ 
+                    success: false, 
+                    message: "Invalid or expired token" 
+                });
+            }
+        };
+    }
+}
+
+// Create singleton instance
+const authMiddleware = new AuthMiddleware();
+
+// Export class and convenience methods for backward compatibility
+module.exports = {
+    AuthMiddleware,
+    isLogin: authMiddleware.isLogin(),
+    authenticateToken: authMiddleware.authenticateToken(),
+    verifyToken: authMiddleware.verifyToken()
 };

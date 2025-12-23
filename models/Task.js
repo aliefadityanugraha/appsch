@@ -12,11 +12,11 @@ class Task extends BaseModel {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['staffId', 'periodeId', 'description', 'value'],
+      required: ['staffId', 'periodeid', 'description', 'value'],
       properties: {
         ...super.jsonSchema.properties,
         staffId: { type: 'string', format: 'uuid' },
-        periodeId: { type: 'string', format: 'uuid' },
+        periodeid: { type: 'string', format: 'uuid' },
         description: { type: 'string', minLength: 1, maxLength: 191 },
         value: { type: 'integer', minimum: 0 }
       }
@@ -42,7 +42,7 @@ class Task extends BaseModel {
         relation: Model.BelongsToOneRelation,
         modelClass: Periode,
         join: {
-          from: 'task.periodeId',
+          from: 'task.periodeid',
           to: 'periode.id'
         }
       },

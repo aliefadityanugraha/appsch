@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 
 require("dotenv").config();
+const compression = require("compression");
 const path = require("path");
 const methodOverride = require("method-override");
 const expressLayouts = require("express-ejs-layouts");
@@ -18,16 +19,16 @@ const { checkObjectionConnection } = require("./config/database");
 const { renderDatabaseError } = require("./controllers/errorController");
 
 // Import middleware
-const { 
-    requestLogger, 
-    securityHeaders, 
-    performanceMonitor 
+const {
+    requestLogger,
+    securityHeaders,
+    performanceMonitor
 } = require("./middleware/requestLogger");
-const { 
-    errorHandler, 
-    notFoundHandler, 
-    handleUnhandledRejection, 
-    handleUncaughtException 
+const {
+    errorHandler,
+    notFoundHandler,
+    handleUnhandledRejection,
+    handleUncaughtException
 } = require("./middleware/errorHandler");
 const { csrfProtection } = require("./middleware/csrfMiddleware");
 
@@ -41,7 +42,8 @@ const apiRoute = require("./routes/api");
 // Trust proxy for accurate IP addresses
 app.set('trust proxy', 1);
 
-// Security and logging middleware
+// Basic middleware
+app.use(compression());
 app.use(requestLogger);
 app.use(securityHeaders);
 app.use(performanceMonitor);
@@ -53,7 +55,8 @@ app.use(flash());
 app.use(flashConfig.flash);
 
 app.set("view engine", "ejs");
-app.set('view cache', false); // Disable view caching for development
+// Enable view cache in production
+app.set('view cache', process.env.NODE_ENV === 'production');
 app.use(expressLayouts);
 app.set('layout', 'layouts/main-layouts');
 app.use(express.json({ limit: '10mb' }));
@@ -62,25 +65,27 @@ app.use(methodOverride("_method"));
 
 // CSRF Protection (after body parsing)
 app.use(csrfProtection);
-app.use("/public", express.static(path.join(__dirname, "public")));
 
-// Database connection check middleware
-app.use(async (req, res, next) => {
-    // Skip database check for static files
-    if (req.path.startsWith('/public/')) {
-        return next();
-    }
-    
-    try {
-        const dbCheck = await checkObjectionConnection();
-        if (!dbCheck.success) {
-            return renderDatabaseError(req, res, dbCheck.error);
+// Static files with caching
+app.use("/public", express.static(path.join(__dirname, "public"), {
+    maxAge: process.env.NODE_ENV === 'production' ? '1y' : 0,
+    etag: true,
+    lastModified: true,
+    immutable: process.env.NODE_ENV === 'production',
+    setHeaders: (res, filePath) => {
+        // Cache CSS, JS, images for 1 year in production
+        if (filePath.match(/\.(css|js|jpg|jpeg|png|gif|svg|woff|woff2|ttf|eot)$/)) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
         }
-        next();
-    } catch (error) {
-        return renderDatabaseError(req, res, error.message);
+        // HTML files should not be cached
+        if (filePath.endsWith('.html') || filePath.endsWith('.ejs')) {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        }
     }
-});
+}));
+
+// Database connection check moved to index.js startup for performance
+// Redundant middleware removed
 
 // Routes
 app.use("/api", apiRoute);

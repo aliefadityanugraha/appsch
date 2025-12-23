@@ -1,109 +1,182 @@
-/** @format */
-
 "use strict";
 
 const jwt = require("jsonwebtoken");
 const Role = require('../models/Role');
 const User = require('../models/User');
 
-const isRole = (perm) => {
-  return async (req, res, next) => {
-    try {
-      const session = req.session;
-      
-      if (!session || !session.token) {
-        console.log('❌ No session or token found');
-        return res.status(401).redirect('/auth/login');
-      }
-
-      // Verify JWT token using correct secret key
-      const token = jwt.verify(session.token, process.env.ACCESS_SECRET_KEY);
-      
-      if (!token || !token.userId) {
-        console.log('❌ Invalid token structure');
-        return res.status(401).redirect('/auth/login');
-      }
-
-      // Get user with role information
-      const user = await User.query().findById(token.userId);
-      
-      if (!user) {
-        console.log('❌ User not found');
-        return res.status(401).redirect('/auth/login');
-      }
-
-      // Get role information using Objection.js
-      // Since user.role is an integer but Role.id is UUID, we need to map them
-      // Create a mapping for integer role IDs to role names
-      // Based on database data: role 1 = Administrator, role 2 = Manager, role 3 = User
-      const roleMapping = {
-        1: 'Administrator',
-        2: 'Manager', 
-        3: 'User'
-      };
-      
-      const roleName = roleMapping[user.role];
-      if (!roleName) {
-        console.log('❌ Invalid role ID:', user.role);
-        return res.status(403).json({ error: 'Invalid role' });
-      }
-      
-      const findRole = await Role.query().where('role', roleName);
-      
-      if (findRole.length === 0) {
-        console.log('❌ Role not found for user:', user.email);
-        return res.status(403).json({ error: 'Role not found' });
-      }
-
-      const userRole = findRole[0];
-      const userPermissions = userRole.permission;
-      
-      // Check if permission is an array or object
-      let hasPermission = false;
-      
-      console.log('🔍 Checking permission:', perm, 'against user permissions:', userPermissions);
-      
-      if (Array.isArray(userPermissions)) {
-        hasPermission = userPermissions.includes(perm.toString());
-      } else if (typeof userPermissions === 'object' && userPermissions.arrayPermission) {
-        hasPermission = userPermissions.arrayPermission.includes(perm.toString());
-      } else if (typeof userPermissions === 'string') {
-        // Handle string permissions like "1234"
-        hasPermission = userPermissions.includes(perm.toString());
-      }
-      
-      console.log('🔍 Permission check result:', hasPermission);
-
-      if (hasPermission) {
-        console.log('✅ Permission granted for:', perm);
-        req.user = {
-          ...req.user,
-          role: user.role,
-          permissions: userPermissions
+/**
+ * Role Middleware Class
+ * Handles role-based access control
+ */
+class RoleMiddleware {
+    constructor() {
+        this.secretKey = process.env.ACCESS_SECRET_KEY;
+        this.roleMapping = {
+            1: 'Administrator',
+            2: 'Manager',
+            3: 'User'
         };
-        next();
-      } else {
-        console.log('❌ Permission denied for:', perm);
-        return res.status(403).render('error', {
-          layout: 'layouts/main-layouts',
-          title: 'Access Denied',
-          message: 'You do not have permission to access this resource',
-          statusCode: 403,
-          req: req.path
-        });
-      }
-    } catch (error) {
-      console.error('❌ Role middleware error:', error);
-      
-      if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-        return res.status(401).redirect('/auth/login');
-      }
-      
-      return res.status(500).json({ error: 'Internal server error' });
     }
-  };
-};
 
+    /**
+     * Verify session token and get user
+     * @param {Object} req - Express request object
+     * @returns {Object|null} Decoded token or null
+     */
+    verifyToken(req) {
+        const session = req.session;
+
+        if (!session || !session.token) {
+            return null;
+        }
+
+        try {
+            const token = jwt.verify(session.token, this.secretKey);
+            if (!token || !token.userId) {
+                return null;
+            }
+            return token;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    /**
+     * Get user role from database
+     * @param {number} roleId - User's role ID
+     * @returns {Object|null} Role object or null
+     */
+    async getUserRole(roleId) {
+        // Try to find by roleId first
+        let findRole = await Role.query().where('roleId', roleId);
+
+        // Fallback to role name if roleId not found
+        if (findRole.length === 0) {
+            const roleName = this.roleMapping[roleId];
+            if (roleName) {
+                const fallbackRole = await Role.query().where('role', roleName).first();
+                if (fallbackRole) {
+                    findRole = [fallbackRole];
+                }
+            }
+        }
+
+        return findRole.length > 0 ? findRole[0] : null;
+    }
+
+    /**
+     * Check if user has required permission
+     * @param {string} userPermissions - User's permissions
+     * @param {string} requiredPerm - Required permission
+     * @returns {boolean} Whether user has permission
+     */
+    hasPermission(userPermissions, requiredPerm) {
+        const permStr = String(userPermissions);
+        const requiredPermStr = String(requiredPerm);
+        return permStr.includes(requiredPermStr);
+    }
+
+    /**
+     * Middleware to check if user has required role/permission
+     * @param {string} perm - Required permission
+     * @returns {Function} Express middleware function
+     */
+    isRole(perm) {
+        return async (req, res, next) => {
+            try {
+                const token = this.verifyToken(req);
+
+                if (!token) {
+                    return res.status(401).redirect('/auth/login');
+                }
+
+                const user = await User.query().findById(token.userId);
+
+                if (!user) {
+                    return res.status(401).redirect('/auth/login');
+                }
+
+                const userRole = await this.getUserRole(user.role);
+
+                if (!userRole) {
+                    return res.status(403).json({ error: 'Role not found' });
+                }
+
+                const userPermissions = userRole.permission;
+
+                if (this.hasPermission(userPermissions, perm)) {
+                    req.user = {
+                        ...req.user,
+                        role: user.role,
+                        permissions: userPermissions
+                    };
+                    next();
+                } else {
+                    return res.status(403).render('error', {
+                        layout: 'layouts/main-layouts',
+                        title: 'Access Denied',
+                        message: 'You do not have permission to access this resource',
+                        statusCode: 403,
+                        req: req.path
+                    });
+                }
+            } catch (error) {
+                if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+                    return res.status(401).redirect('/auth/login');
+                }
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+        };
+    }
+
+    /**
+     * Middleware to require specific role level
+     * @param {number} roleLevel - Required role level
+     * @returns {Function} Express middleware function
+     */
+    requireRoleLevel(roleLevel) {
+        return async (req, res, next) => {
+            try {
+                const token = this.verifyToken(req);
+
+                if (!token) {
+                    return res.status(401).redirect('/auth/login');
+                }
+
+                const user = await User.query().findById(token.userId);
+
+                if (!user) {
+                    return res.status(401).redirect('/auth/login');
+                }
+
+                if (user.role > roleLevel) {
+                    return res.status(403).render('error', {
+                        layout: 'layouts/main-layouts',
+                        title: 'Access Denied',
+                        message: 'Insufficient role level',
+                        statusCode: 403,
+                        req: req.path
+                    });
+                }
+
+                req.user = { ...req.user, role: user.role };
+                next();
+            } catch (error) {
+                if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+                    return res.status(401).redirect('/auth/login');
+                }
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+        };
+    }
+}
+
+// Create singleton instance
+const roleMiddleware = new RoleMiddleware();
+
+// Export class and convenience method for backward compatibility
 module.exports = {
-  isRole,
+    RoleMiddleware,
+    isRole: (perm) => roleMiddleware.isRole(perm),
+    requireRoleLevel: (level) => roleMiddleware.requireRoleLevel(level)
 };

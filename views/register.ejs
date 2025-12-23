@@ -1,562 +1,338 @@
-<section class="modern-register-section">
-    <div class="register-background"></div>
-    <div class="modern-register-card">
-        <div class="register-header">
-            <div class="logo-container">
-                <img src="/public/img/logo-smata.png" alt="Logo" class="register-logo">
-            </div>
-            <h2 class="register-title">Create Account</h2>
-            <p class="register-subtitle">Join us and start your journey</p>
+<section class="auth-section">
+    <div class="auth-card">
+        <div class="auth-header">
+            <img src="/public/img/logo-smata.png" alt="Logo" class="auth-logo">
+            <h2>Buat Akun Baru</h2>
+            <p>Daftar untuk mengakses sistem</p>
         </div>
         
         <% if (message && message.length > 0) { %>
-        <div class="modern-alert">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            <%= message %>
+        <div class="auth-alert">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span><%= message %></span>
         </div>
         <% } %>
         
-        <form class="modern-form" id="registerForm">
+        <form class="auth-form" id="registerForm">
             <input type="hidden" name="_token" id="csrfToken" value="<%= csrfToken %>">
             
             <div class="form-group">
-                <div class="input-container">
-                    <i class="bi bi-envelope input-icon"></i>
-                    <input type="email" name="email" id="email" class="modern-input" placeholder=" " required>
-                    <label class="floating-label">Email Address</label>
+                <label>Email</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-envelope"></i>
+                    <input type="email" name="email" id="email" placeholder="Masukkan email Anda" required>
                 </div>
             </div>
             
             <div class="form-group">
-                <div class="input-container">
-                    <i class="bi bi-lock input-icon"></i>
-                    <input type="password" name="password" id="password" class="modern-input" placeholder=" " required>
-                    <label class="floating-label">Password</label>
+                <label>Password</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-lock"></i>
+                    <input type="password" name="password" id="password" placeholder="Masukkan password" required>
                 </div>
             </div>
             
             <div class="form-group">
-                <div class="input-container">
-                    <i class="bi bi-shield-lock input-icon"></i>
-                    <input type="password" name="confirmPassword" id="confirmPassword" class="modern-input" placeholder=" " required>
-                    <label class="floating-label">Confirm Password</label>
+                <label>Konfirmasi Password</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-shield-lock"></i>
+                    <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Konfirmasi password" required>
                 </div>
             </div>
             
             <div class="form-group">
-                <div class="modern-checkbox">
-                    <input type="checkbox" id="flexCheckDefault" class="checkbox-input" checked required>
-                    <label for="flexCheckDefault" class="checkbox-label">
-                        <span class="checkbox-custom"></span>
-                        I agree to the <a href="/" class="terms-link">Terms and Conditions</a>
-                    </label>
-                </div>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="agreeTerms" required>
+                    <span>Saya setuju dengan <a href="/">Syarat & Ketentuan</a></span>
+                </label>
             </div>
             
-            <button type="button" class="modern-register-btn" id="registerBtn">
-                <span class="btn-text">Create Account</span>
-                <i class="bi bi-arrow-right btn-icon"></i>
+            <button type="button" class="auth-btn" id="registerBtn">
+                <span>Daftar</span>
+                <i class="bi bi-arrow-right"></i>
             </button>
         </form>
         
-        <div class="login-link">
-            <p>Already have an account? <a href="/auth/login" class="login-btn">Sign in</a></p>
+        <div class="auth-footer">
+            <p>Sudah punya akun? <a href="/auth/login">Masuk</a></p>
         </div>
     </div>
 </section>
 
 <style>
-/* Modern Register Styles */
-.modern-register-section {
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.auth-section {
     min-height: 100vh;
-    position: relative;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    background: #f8fafc;
+    padding: 20px;
 }
 
-.register-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    z-index: -1;
-}
-
-.register-background::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('/public/img/A7C04816.jpg') center/cover;
-    opacity: 0.1;
-    z-index: -1;
-}
-
-.modern-register-card {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 25px;
+.auth-card {
+    background: #ffffff;
+    border-radius: 16px;
     padding: 40px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    animation: slideUp 0.8s ease-out;
-    max-width: 480px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    border: 1px solid #e2e8f0;
     width: 100%;
+    max-width: 400px;
 }
 
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.register-header {
+.auth-header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 32px;
 }
 
-.logo-container {
+.auth-logo {
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
     margin-bottom: 20px;
 }
 
-.register-logo {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    animation: logoFloat 3s ease-in-out infinite;
-}
-
-@keyframes logoFloat {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-}
-
-.register-title {
-    font-size: 2rem;
+.auth-header h2 {
+    font-size: 1.5rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 10px;
+    color: #1e293b;
+    margin-bottom: 8px;
 }
 
-.register-subtitle {
-    color: #6c757d;
-    font-size: 0.9rem;
-    margin-bottom: 0;
+.auth-header p {
+    color: #64748b;
+    font-size: 0.875rem;
 }
 
-.modern-alert {
-    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-    color: white;
-    padding: 15px 20px;
-    border-radius: 15px;
-    margin-bottom: 25px;
+.auth-alert {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
     display: flex;
     align-items: center;
     gap: 10px;
-    animation: shake 0.5s ease-in-out;
+    font-size: 0.875rem;
 }
 
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+.auth-alert.success {
+    background: #dcfce7;
+    color: #166534;
 }
 
 .form-group {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
-.input-container {
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 0.875rem;
+}
+
+.input-wrapper {
     position: relative;
 }
 
-.input-icon {
+.input-wrapper i {
     position: absolute;
-    left: 15px;
+    left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: #667eea;
-    font-size: 1.1rem;
-    z-index: 2;
+    color: #94a3b8;
 }
 
-.modern-input {
+.input-wrapper input {
     width: 100%;
-    padding: 15px 15px 15px 45px;
-    border: 2px solid #e9ecef;
-    border-radius: 15px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
+    padding: 12px 12px 12px 42px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background: #ffffff;
+    color: #1e293b;
 }
 
-.modern-input:focus {
+.input-wrapper input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    transform: translateY(-2px);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.floating-label {
-    position: absolute;
-    left: 45px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6c757d;
-    font-size: 1rem;
-    pointer-events: none;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 0 5px;
-}
-
-.modern-input:focus + .floating-label,
-.modern-input:not(:placeholder-shown) + .floating-label {
-    top: 0;
-    left: 40px;
-    font-size: 0.8rem;
-    color: #667eea;
-    font-weight: 600;
-}
-
-.modern-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.checkbox-input {
-    display: none;
-}
-
-.checkbox-custom {
-    width: 20px;
-    height: 20px;
-    border: 2px solid #e9ecef;
-    border-radius: 6px;
-    position: relative;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.9);
-    cursor: pointer;
-}
-
-.checkbox-input:checked + .checkbox-label .checkbox-custom {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-color: #667eea;
-}
-
-.checkbox-input:checked + .checkbox-label .checkbox-custom::after {
-    content: '✓';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
+.input-wrapper input::placeholder {
+    color: #94a3b8;
 }
 
 .checkbox-label {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     cursor: pointer;
-    font-size: 0.9rem;
-    color: #6c757d;
-    margin: 0;
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 400 !important;
 }
 
-.terms-link {
-    color: #667eea;
+.checkbox-label input {
+    width: 18px;
+    height: 18px;
+    accent-color: #3b82f6;
+}
+
+.checkbox-label a {
+    color: #3b82f6;
     text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
 }
 
-.terms-link:hover {
-    color: #764ba2;
+.checkbox-label a:hover {
     text-decoration: underline;
 }
 
-.modern-register-btn {
+.auth-btn {
     width: 100%;
-    padding: 15px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    padding: 12px 24px;
+    background: #3b82f6;
     border: none;
-    border-radius: 15px;
+    border-radius: 8px;
     color: white;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 25px;
+    gap: 8px;
 }
 
-.modern-register-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
+.auth-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
-.modern-register-btn:hover::before {
-    left: 100%;
+.auth-btn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
 }
 
-.modern-register-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
-}
-
-.btn-icon {
-    transition: transform 0.3s ease;
-}
-
-.modern-register-btn:hover .btn-icon {
-    transform: translateX(5px);
-}
-
-.login-link {
+.auth-footer {
     text-align: center;
-    padding-top: 20px;
-    border-top: 1px solid #e9ecef;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
 }
 
-.login-link p {
-    color: #6c757d;
-    margin: 0;
+.auth-footer p {
+    color: #64748b;
+    font-size: 0.875rem;
 }
 
-.login-btn {
-    color: #667eea;
+.auth-footer a {
+    color: #3b82f6;
     text-decoration: none;
     font-weight: 600;
-    transition: all 0.3s ease;
 }
 
-.login-btn:hover {
-    color: #764ba2;
+.auth-footer a:hover {
+    color: #2563eb;
     text-decoration: underline;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .modern-register-card {
-        margin: 20px;
-        padding: 30px 25px;
-    }
-    
-    .register-title {
-        font-size: 1.5rem;
-    }
-    
-    .register-subtitle {
-        font-size: 0.8rem;
-    }
-}
-
 @media (max-width: 480px) {
-    .modern-register-card {
-        margin: 15px;
-        padding: 25px 20px;
+    .auth-card {
+        padding: 24px;
     }
     
-    .register-logo {
-        width: 60px;
-        height: 60px;
+    .auth-logo {
+        width: 56px;
+        height: 56px;
+    }
+    
+    .auth-header h2 {
+        font-size: 1.25rem;
     }
 }
 </style>
 
 <script>
-// Add ripple effect and interactive functionality
 document.addEventListener('DOMContentLoaded', function() {
-    const registerBtn = document.querySelector('.modern-register-btn');
+    const registerBtn = document.getElementById('registerBtn');
     
-    // Add ripple effect to register button
-    registerBtn.addEventListener('click', function(e) {
-        const ripple = document.createElement('span');
-        const rect = this.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const x = e.clientX - rect.left - size / 2;
-        const y = e.clientY - rect.top - size / 2;
+    registerBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const confirmPassword = document.getElementById('confirmPassword').value.trim();
         
-        ripple.style.width = ripple.style.height = size + 'px';
-        ripple.style.left = x + 'px';
-        ripple.style.top = y + 'px';
-        ripple.classList.add('ripple');
+        if (!email || !password || !confirmPassword) {
+            showAlert('Mohon isi semua field.', 'error');
+            return;
+        }
         
-        this.appendChild(ripple);
+        if (password !== confirmPassword) {
+            showAlert('Password tidak sama.', 'error');
+            return;
+        }
         
-        setTimeout(() => {
-            ripple.remove();
-        }, 600);
-    });
-    
-    // Add floating label functionality
-    const inputs = document.querySelectorAll('.modern-input');
-    inputs.forEach(input => {
-        input.addEventListener('focus', function() {
-            this.parentElement.classList.add('focused');
-        });
+        registerBtn.innerHTML = '<span>Mendaftar...</span>';
+        registerBtn.disabled = true;
         
-        input.addEventListener('blur', function() {
-            if (!this.value) {
-                this.parentElement.classList.remove('focused');
+        try {
+            const csrfToken = document.getElementById('csrfToken').value;
+            const response = await fetch('/auth/register', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken
+                },
+                body: JSON.stringify({ email, password }),
+            });
+            
+            if (response.ok) {
+                showAlert('Registrasi berhasil! Mengalihkan ke login...', 'success');
+                setTimeout(() => window.location.href = '/auth/login', 2000);
+            } else {
+                const data = await response.json();
+                showAlert(data.message || 'Registrasi gagal.', 'error');
             }
-        });
-    });
-    
-    // Register form submission
-    document.getElementById('registerBtn').addEventListener('click', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const confirmPassword = document.getElementById('confirmPassword').value.trim();
-      
-      if (!email || !password || !confirmPassword) {
-        showAlert('Please fill in all fields.', 'error');
-        return;
-      }
-      
-      if (password !== confirmPassword) {
-        showAlert('Passwords do not match.', 'error');
-        return;
-      }
-      
-      // Show loading state
-      registerBtn.innerHTML = '<span class="btn-text">Creating Account...</span><i class="bi bi-arrow-clockwise btn-icon" style="animation: spin 1s linear infinite;"></i>';
-      registerBtn.disabled = true;
-      
-      try {
-        const csrfToken = document.getElementById('csrfToken').value;
-        const response = await fetch('/auth/register', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': csrfToken
-          },
-          body: JSON.stringify({ email, password }),
-        });
-        
-        if (response.ok) {
-          showAlert('Registration successful! Redirecting to login...', 'success');
-          setTimeout(() => {
-            window.location.href = '/auth/login';
-          }, 2000);
-        } else {
-          const data = await response.json();
-          showAlert(data.message || 'Registration failed.', 'error');
+        } catch (err) {
+            showAlert('Terjadi kesalahan. Silakan coba lagi.', 'error');
+        } finally {
+            registerBtn.innerHTML = '<span>Daftar</span><i class="bi bi-arrow-right"></i>';
+            registerBtn.disabled = false;
         }
-      } catch (err) {
-        showAlert('An error occurred. Please try again.', 'error');
-      } finally {
-        // Reset button state
-        registerBtn.innerHTML = '<span class="btn-text">Create Account</span><i class="bi bi-arrow-right btn-icon"></i>';
-        registerBtn.disabled = false;
-      }
     });
     
-    // Custom alert function
     function showAlert(message, type) {
-        const existingAlert = document.querySelector('.custom-alert');
-        if (existingAlert) {
-            existingAlert.remove();
-        }
+        const existing = document.querySelector('.auth-alert');
+        if (existing) existing.remove();
         
         const alert = document.createElement('div');
-        alert.className = `custom-alert alert-${type}`;
-        alert.innerHTML = `
-            <i class="bi bi-${type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill'}"></i>
-            ${message}
-        `;
+        alert.className = 'auth-alert' + (type === 'success' ? ' success' : '');
+        alert.innerHTML = '<i class="bi bi-' + (type === 'success' ? 'check-circle-fill' : 'exclamation-circle-fill') + '"></i><span>' + message + '</span>';
         
-        const form = document.querySelector('.modern-form');
+        const form = document.querySelector('.auth-form');
         form.insertBefore(alert, form.firstChild);
         
-        setTimeout(() => {
-            alert.remove();
-        }, 5000);
+        setTimeout(() => alert.remove(), 5000);
     }
 });
 </script>
-
-<style>
-.ripple {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.6);
-    transform: scale(0);
-    animation: ripple-animation 0.6s linear;
-    pointer-events: none;
-}
-
-@keyframes ripple-animation {
-    to {
-        transform: scale(4);
-        opacity: 0;
-    }
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.custom-alert {
-    padding: 15px 20px;
-    border-radius: 15px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    animation: slideDown 0.3s ease-out;
-}
-
-.alert-success {
-    background: linear-gradient(135deg, #28a745, #20c997);
-    color: white;
-}
-
-.alert-error {
-    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-    color: white;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-</style>

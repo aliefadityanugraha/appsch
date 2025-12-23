@@ -15,8 +15,12 @@ class TaskRepository extends BaseRepository {
      * @returns {Promise<Array>} Tasks with relations
      */
     async findWithRelations(options = {}) {
-        const query = this.model.query()
-            .withGraphFetched('[staff, periode]');
+        const query = this.model.query();
+        
+        // Only fetch relations if explicitly requested
+        if (options.includeRelations !== false) {
+            query.withGraphFetched('[staff, periode]');
+        }
 
         if (options.where) {
             query.where(options.where);
@@ -52,8 +56,10 @@ class TaskRepository extends BaseRepository {
             .where('staffId', staffId)
             .withGraphFetched('[staff, periode]');
 
-        if (options.periodeId) {
-            query.where('periodeId', options.periodeId);
+        if (options.periodeid) {
+            query.where('periodeid', options.periodeid);
+        } else if (options.periodeId) {
+            query.where('periodeid', options.periodeId);
         }
 
         if (options.status) {
@@ -75,13 +81,13 @@ class TaskRepository extends BaseRepository {
      * @param {Object} options - Additional options
      * @returns {Promise<Array>} Tasks for the periode
      */
-    async findByPeriodeId(periodeId, options = {}) {
-        if (!periodeId) {
+    async findByPeriodeId(periodeid, options = {}) {
+        if (!periodeid) {
             throw new ValidationError('Periode ID is required');
         }
 
         const query = this.model.query()
-            .where('periodeId', periodeId)
+            .where('periodeid', periodeid)
             .withGraphFetched('[staff, periode]');
 
         if (options.staffId) {
@@ -120,9 +126,7 @@ class TaskRepository extends BaseRepository {
             query.where('staffId', options.staffId);
         }
 
-        if (options.periodeId) {
-            query.where('periodeId', options.periodeId);
-        }
+        query.where('periodeid', options.periodeid);
 
         if (options.orderBy) {
             query.orderBy(options.orderBy.column, options.orderBy.direction || 'asc');
@@ -154,8 +158,10 @@ class TaskRepository extends BaseRepository {
             query.where('staffId', options.staffId);
         }
 
-        if (options.periodeId) {
-            query.where('periodeId', options.periodeId);
+        if (options.periodeid) {
+            query.where('periodeid', options.periodeid);
+        } else if (options.periodeId) {
+            query.where('periodeid', options.periodeId);
         }
 
         if (options.status) {
@@ -187,8 +193,8 @@ class TaskRepository extends BaseRepository {
             baseQuery.where('staffId', filters.staffId);
         }
 
-        if (filters.periodeId) {
-            baseQuery.where('periodeId', filters.periodeId);
+        if (filters.periodeid) {
+            baseQuery.where('periodeid', filters.periodeid);
         }
 
         if (filters.dateFrom) {
@@ -240,8 +246,8 @@ class TaskRepository extends BaseRepository {
             query.where('staffId', staffId);
         }
 
-        if (periodeId) {
-            query.where('periodeId', periodeId);
+        if (periodeid) {
+            query.where('periodeid', periodeid);
         }
 
         if (status) {
@@ -399,13 +405,13 @@ class TaskRepository extends BaseRepository {
      * @param {string} periodeId - Periode ID
      * @returns {Promise<number>} Number of deleted tasks
      */
-    async deleteByPeriodeId(periodeId) {
-        if (!periodeId) {
+    async deleteByPeriodeId(periodeid) {
+        if (!periodeid) {
             throw new ValidationError('Periode ID is required');
         }
 
         return await this.model.query()
-            .where('periodeId', periodeId)
+            .where('periodeid', periodeid)
             .delete();
     }
 }

@@ -1,120 +1,314 @@
 <main class="main-content">
-    <div class="container-fluid py-4">
+    <link rel="stylesheet" href="/public/css/dashboard.css">
+    <div class="container-fluid py-0">
         <%
             function getGreeting() {
-                const now = new Date();
-                const hour = now.getHours();
-                if (hour >= 5 && hour < 12) {
-                    return "Good Morning";
-                } else if (hour >= 12 && hour < 17) {
-                    return "Good Afternoon";
-                } else if (hour >= 17 && hour < 21) {
-                    return "Good Evening";
-                } else {
-                    return "Good Night";
-                }
+                const hour = new Date().getHours();
+                if (hour >= 5 && hour < 12) return "Selamat Pagi";
+                if (hour >= 12 && hour < 17) return "Selamat Siang";
+                if (hour >= 17 && hour < 21) return "Selamat Sore";
+                return "Selamat Malam";
+            }
+            
+            function timeAgo(date) {
+                const diff = Date.now() - new Date(date).getTime();
+                const mins = Math.floor(diff / 60000);
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+                if (mins < 60) return mins + ' menit yang lalu';
+                if (hours < 24) return hours + ' jam yang lalu';
+                return days + ' hari yang lalu';
             }
         %>
-        <div class="mb-4">
-            <h2 class="fw-bold" id="greeting-text">
-                <%= getGreeting() %>, welcome to SMATAJAYA Dashboard!
-            </h2>
-            <div class="text-muted" id="current-user-info"></div>
+        
+        <!-- Header Section -->
+        <div class="dashboard-header mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2 class="fw-bold mb-2 greeting-text">
+                        <i class="bi bi-sun-fill text-warning me-2"></i>
+                        <%= getGreeting() %>, <span id="user-name-greeting">...</span>!
+                    </h2>
+                    <p class="text-muted mb-0" id="current-user-info">
+                        <i class="bi bi-person-circle me-2"></i>Loading...
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="dashboard-date"><i class="bi bi-calendar3 me-2"></i><span id="current-date"></span></div>
+                    <div class="dashboard-time mt-2"><i class="bi bi-clock me-2"></i><span id="current-time"></span></div>
+                </div>
+            </div>
         </div>
-        <script>
-            fetch('/users/current-user')
-              .then(res => res.json())
-              .then(data => {
-                if (data.email) {
-                  document.getElementById('current-user-info').innerText = "Logged in as: " + data.email;
-                }
-              });
-        </script>
-        <div class="row g-4">
+
+        <!-- Statistics Cards -->
+        <div class="row g-4 mb-4">
             <div class="col-xl-3 col-sm-6">
-                <div class="card shadow-sm rounded-3">
-                    <div class="card-body p-3">
-                        <div class="row align-items-center">
-                            <div class="col-12">
-                                <div class="numbers">
-                                    <p class="text-uppercase fw-bold text-secondary small mb-1">Today's Money</p>
-                                    <h5 class="fw-bold mb-1"><%= totalMoney %></h5>
-                                    <p class="mb-0">
-                                        <span class="text-success fw-bold small">+55%</span>
-                                        <span class="text-muted small">since yesterday</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                <div class="stat-card card-money">
+                    <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+                    <div class="stat-content">
+                        <p class="stat-label">Total Pendapatan</p>
+                        <h3 class="stat-value" data-target="<%= typeof totalMoney !== 'undefined' ? totalMoney : 0 %>">0</h3>
+                        <div class="stat-trend"><i class="bi bi-graph-up-arrow"></i><span>Total dari records</span></div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-3 col-sm-6">
-                <div class="card shadow-sm rounded-3">
-                    <div class="card-body p-3">
-                        <div class="row align-items-center">
-                            <div class="col-12">
-                                <div class="numbers">
-                                    <p class="text-uppercase fw-bold text-secondary small mb-1">Users</p>
-                                    <h5 class="fw-bold mb-1"><%= totalUsers %></h5>
-                                    <p class="mb-0">
-                                        <span class="text-success fw-bold small">+3%</span>
-                                        <span class="text-muted small">since last week</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                <div class="stat-card card-staff">
+                    <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+                    <div class="stat-content">
+                        <p class="stat-label">Total Karyawan</p>
+                        <h3 class="stat-value" data-target="<%= typeof totalStaff !== 'undefined' ? totalStaff : 0 %>">0</h3>
+                        <div class="stat-trend"><i class="bi bi-person-badge"></i><span>Karyawan terdaftar</span></div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-3 col-sm-6">
-                <div class="card shadow-sm rounded-3">
-                    <div class="card-body p-3">
-                        <div class="row align-items-center">
-                            <div class="col-12">
-                                <div class="numbers">
-                                    <p class="text-uppercase fw-bold text-secondary small mb-1">Karyawan</p>
-                                    <h5 class="fw-bold mb-1"><%= newClients %></h5>
-                                    <p class="mb-0">
-                                        <span class="text-danger fw-bold small">-2%</span>
-                                        <span class="text-muted small">since last quarter</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                <div class="stat-card card-new">
+                    <div class="stat-icon"><i class="bi bi-person-plus-fill"></i></div>
+                    <div class="stat-content">
+                        <p class="stat-label">Karyawan Baru</p>
+                        <h3 class="stat-value" data-target="<%= typeof newStaff !== 'undefined' ? newStaff : 0 %>">0</h3>
+                        <div class="stat-trend"><i class="bi bi-calendar-month"></i><span>Bulan ini</span></div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-3 col-sm-6">
-                <div class="card shadow-sm rounded-3">
-                    <div class="card-body p-3">
-                        <div class="row align-items-center">
-                            <div class="col-12">
-                                <div class="numbers">
-                                    <p class="text-uppercase fw-bold text-secondary small mb-1">Task</p>
-                                    <h5 class="fw-bold mb-1"><%= totalSales %></h5>
-                                    <p class="mb-0">
-                                        <span class="text-success fw-bold small">+5%</span>
-                                        <span class="text-muted small">than last month</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                <div class="stat-card card-tasks">
+                    <div class="stat-icon"><i class="bi bi-list-check"></i></div>
+                    <div class="stat-content">
+                        <p class="stat-label">Total Task</p>
+                        <h3 class="stat-value" data-target="<%= typeof totalTasks !== 'undefined' ? totalTasks : 0 %>">0</h3>
+                        <div class="stat-trend"><i class="bi bi-check2-all"></i><span>Semua task</span></div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row mt-4 g-4">
+
+        <!-- Charts and Quick Actions Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-7">
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h5 class="mb-1"><i class="bi bi-graph-up me-2"></i>Grafik Pendapatan</h5>
+                        <p class="text-muted small mb-0">Tren pendapatan bulanan</p>
+                    </div>
+                    <div class="card-body">
+                        <div id="chart-container" style="height:300px">
+                            <div class="d-flex align-items-center justify-content-center h-100">
+                                <div class="loading-spinner"></div>
+                                <span class="ms-2 text-muted">Memuat grafik...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="col-lg-5">
-                <div class="card overflow-hidden h-100 p-5 ">
-                    <h5 class="fw-bold mb-4">Aksi Cepat</h5>
-                    <div class="d-grid gap-3">
-                        <a href="/staff" class="btn btn-primary"><i class="bi bi-people-fill text-lg px-2"></i> Tambah Karyawan</a>
-                        <a href="/periode" class="btn btn-primary text-white"><i class="bi bi-calendar-day-fill text-lg px-2"></i>Tambah Instrumen</a>
-                        <a href="/data" class="btn btn-primary text-white"><i class="bi bi-download text-lg px-2"></i> Export Data</a>
+                <div class="card quick-actions-card h-100">
+                    <div class="card-header"><h5 class="mb-0"><i class="bi bi-lightning-charge-fill me-2"></i>Aksi Cepat</h5></div>
+                    <div class="card-body">
+                        <div class="quick-action-grid">
+                            <a href="/staff" class="quick-action-item">
+                                <div class="quick-action-icon bg-primary"><i class="bi bi-person-plus-fill"></i></div>
+                                <div class="quick-action-text"><h6>Tambah Karyawan</h6><p>Daftarkan karyawan baru</p></div>
+                            </a>
+                            <a href="/periode" class="quick-action-item">
+                                <div class="quick-action-icon bg-success"><i class="bi bi-calendar-plus-fill"></i></div>
+                                <div class="quick-action-text"><h6>Tambah Periode</h6><p>Buat periode baru</p></div>
+                            </a>
+                            <a href="/data" class="quick-action-item">
+                                <div class="quick-action-icon bg-info"><i class="bi bi-download"></i></div>
+                                <div class="quick-action-text"><h6>Export Data</h6><p>Unduh laporan data</p></div>
+                            </a>
+                            <a href="/settings" class="quick-action-item">
+                                <div class="quick-action-icon bg-warning"><i class="bi bi-gear-fill"></i></div>
+                                <div class="quick-action-text"><h6>Pengaturan</h6><p>Kelola sistem</p></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity & Summary -->
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card activity-card">
+                    <div class="card-header"><h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Aktivitas Terbaru</h5></div>
+                    <div class="card-body">
+                        <div class="activity-timeline">
+                            <% if (typeof recentStaff !== 'undefined' && recentStaff.length > 0) { %>
+                                <% recentStaff.forEach(function(staff) { %>
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-primary"><i class="bi bi-person-plus-fill"></i></div>
+                                    <div class="activity-content">
+                                        <h6>Karyawan Baru Ditambahkan</h6>
+                                        <p><%= staff.name %> - <%= staff.jabatan %></p>
+                                        <span class="activity-time"><%= timeAgo(staff.createdAt) %></span>
+                                    </div>
+                                </div>
+                                <% }); %>
+                            <% } %>
+                            <% if (typeof recentTasks !== 'undefined' && recentTasks.length > 0) { %>
+                                <% recentTasks.forEach(function(task) { %>
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-success"><i class="bi bi-check-circle-fill"></i></div>
+                                    <div class="activity-content">
+                                        <h6>Task Dibuat</h6>
+                                        <p><%= task.description %></p>
+                                        <span class="activity-time"><%= timeAgo(task.createdAt) %></span>
+                                    </div>
+                                </div>
+                                <% }); %>
+                            <% } %>
+                            <% if ((!recentStaff || recentStaff.length === 0) && (!recentTasks || recentTasks.length === 0)) { %>
+                            <div class="text-center text-muted py-4">
+                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                <p>Belum ada aktivitas terbaru</p>
+                            </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card status-card h-100">
+                    <div class="card-header"><h5 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Ringkasan Data</h5></div>
+                    <div class="card-body">
+                        <div class="status-item">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Total Users</span>
+                                <span class="badge bg-primary"><%= typeof totalUsers !== 'undefined' ? totalUsers : 0 %></span>
+                            </div>
+                            <div class="progress"><div class="progress-bar bg-primary" style="width:100%"></div></div>
+                        </div>
+                        <div class="status-item">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Total Karyawan</span>
+                                <span class="badge bg-success"><%= typeof totalStaff !== 'undefined' ? totalStaff : 0 %></span>
+                            </div>
+                            <div class="progress"><div class="progress-bar bg-success" style="width:100%"></div></div>
+                        </div>
+                        <div class="status-item">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Total Tasks</span>
+                                <span class="badge bg-info"><%= typeof totalTasks !== 'undefined' ? totalTasks : 0 %></span>
+                            </div>
+                            <div class="progress"><div class="progress-bar bg-info" style="width:100%"></div></div>
+                        </div>
+                        <div class="status-item">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Karyawan Baru</span>
+                                <span class="badge bg-warning"><%= typeof newStaff !== 'undefined' ? newStaff : 0 %></span>
+                            </div>
+                            <div class="progress"><div class="progress-bar bg-warning" style="width:100%"></div></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</main>
+
+    <!-- Chart data for lazy loading -->
+    <script id="chart-data" type="application/json">
+        {
+            "labels": <%- JSON.stringify(typeof chartLabels !== 'undefined' && chartLabels.length > 0 ? chartLabels : ['Belum ada data']) %>,
+            "data": <%- JSON.stringify(typeof chartData !== 'undefined' && chartData.length > 0 ? chartData : [0]) %>
+        }
+    </script>
+
+    <script>
+        // Immediately update date/time
+        (function() {
+            const now = new Date();
+            const dateOpts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const timeOpts = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('id-ID', dateOpts);
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('id-ID', timeOpts);
+        })();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch user
+            fetch('/users/current-user')
+                .then(r => r.ok ? r.json() : Promise.reject())
+                .then(data => {
+                    if (data.email) {
+                        const name = data.email.split('@')[0];
+                        document.getElementById('user-name-greeting').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+                        document.getElementById('current-user-info').innerHTML = '<i class="bi bi-person-circle me-2"></i>Login sebagai: <strong>' + data.email + '</strong>';
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('user-name-greeting').textContent = 'User';
+                });
+
+            // Update time every second
+            setInterval(function() {
+                const now = new Date();
+                document.getElementById('current-time').textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }, 1000);
+
+            // Animate counters
+            document.querySelectorAll('.stat-value').forEach(el => {
+                const target = parseInt(el.dataset.target) || 0;
+                if (target === 0) { el.textContent = '0'; return; }
+                let current = 0;
+                const step = target / 100;
+                const timer = setInterval(() => {
+                    current += step;
+                    if (current >= target) {
+                        el.textContent = target.toLocaleString('id-ID');
+                        clearInterval(timer);
+                    } else {
+                        el.textContent = Math.floor(current).toLocaleString('id-ID');
+                    }
+                }, 10);
+            });
+
+            // Lazy load Chart.js
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+            script.onload = initChart;
+            document.body.appendChild(script);
+        });
+
+        function initChart() {
+            const container = document.getElementById('chart-container');
+            const chartDataEl = document.getElementById('chart-data');
+            const chartInfo = JSON.parse(chartDataEl.textContent);
+            
+            container.innerHTML = '<canvas id="revenueChart"></canvas>';
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartInfo.labels,
+                    datasets: [{
+                        label: 'Pendapatan',
+                        data: chartInfo.data,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59,130,246,0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#3b82f6',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { callback: v => 'Rp ' + v.toLocaleString('id-ID') }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+    </script>

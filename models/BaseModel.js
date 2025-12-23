@@ -22,10 +22,17 @@ class BaseModel extends Model {
         if (!this.id) {
             this.id = uuidv4();
         }
+
         // Use MySQL compatible datetime format
         const now = new Date();
-        this.createdAt = now.toISOString().slice(0, 19).replace('T', ' ');
-        this.updatedAt = now.toISOString().slice(0, 19).replace('T', ' ');
+        const formattedNow = now.toISOString().slice(0, 19).replace('T', ' ');
+
+        // Preserve createdAt if already set (vital for historic records)
+        if (!this.createdAt) {
+            this.createdAt = formattedNow;
+        }
+
+        this.updatedAt = formattedNow;
     }
 
     $beforeUpdate() {
@@ -37,7 +44,7 @@ class BaseModel extends Model {
     // Handle JSON fields parsing from database
     $parseDatabaseJson(json) {
         json = super.$parseDatabaseJson(json);
-        
+
         // Parse JSON fields if they are strings
         if (json.permission && typeof json.permission === 'string') {
             try {
@@ -46,19 +53,19 @@ class BaseModel extends Model {
                 console.warn('Failed to parse permission JSON:', e);
             }
         }
-        
+
         return json;
     }
 
     // Handle JSON fields formatting for database
     $formatDatabaseJson(json) {
         json = super.$formatDatabaseJson(json);
-        
+
         // Stringify JSON fields if they are objects
         if (json.permission && typeof json.permission === 'object') {
             json.permission = JSON.stringify(json.permission);
         }
-        
+
         return json;
     }
 }

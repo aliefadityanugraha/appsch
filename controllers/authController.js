@@ -1,262 +1,171 @@
-"use strict";
-
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
-const jsonWebToken = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
-module.exports = {
+class AuthController {
+    constructor() {
+        // Dependencies could be injected for testing
+        this.User = User;
+    }
 
-    login: (req, res) => {
-        res.status(200).render("login", {
+    // Helper: Generate JWT tokens
+    generateTokens(userId, email) {
+        return {
+            accessToken: jwt.sign({ userId, email }, process.env.ACCESS_SECRET_KEY, { expiresIn: "15m" }),
+            refreshToken: jwt.sign({ userId, email }, process.env.REFRESH_SECRET_KEY, { expiresIn: "7d" })
+        };
+    }
+
+    // Helper: Validate credentials
+    validateCredentials(email, password) {
+        if (!email || !password) {
+            throw new Error('EMAIL_PASSWORD_REQUIRED');
+        }
+        if (!process.env.ACCESS_SECRET_KEY || !process.env.REFRESH_SECRET_KEY) {
+            throw new Error('JWT_CONFIG_ERROR');
+        }
+    }
+
+    // Helper: Handle error messages
+    getErrorMessage(errorCode) {
+        const messages = {
+            'EMAIL_PASSWORD_REQUIRED': 'Email and password are required',
+            'JWT_CONFIG_ERROR': 'Server configuration error'
+        };
+        return messages[errorCode] || "An error occurred during login";
+    }
+
+    login = (req, res) => {
+        res.render("login", {
             layout: "layouts/auth-layouts",
             title: "Login",
         });
-    },
+    }
 
-    loginPost: async (req, res) => {
-        console.log('🔐 Login attempt started...');
-        console.log('📝 Request body:', req.body);
-        
+    loginPost = async (req, res) => {
         try {
             const { email, password } = req.body;
-            console.log('📧 Email:', email);
-            console.log('🔑 Password provided:', password ? 'Yes' : 'No');
             
-            if (!email || !password) {
-                console.log('❌ Missing email or password');
-                req.flash("message", "Email and password are required");
-                return res.redirect("/auth/login");
-            }
+            this.validateCredentials(email, password);
             
-            // Use custom method with logging
-            console.log('🔍 Searching for user with email:', email);
-            const user = await User.findByEmail(email);
-
-            if (!user) {
-                console.log('❌ User not found');
+            const user = await this.User.findByEmail(email);
+            if (!user || !user.password?.trim()) {
                 req.flash("message", "Invalid email or password");
                 return res.redirect("/auth/login");
             }
 
-            console.log('✅ User found:');
-            console.log('   ID:', user.id);
-            console.log('   Email:', user.email);
-            console.log('   Status:', user.status);
-            console.log('   Role:', user.role);
-            console.log('   Has password:', user.password ? 'Yes' : 'No');
-            console.log('   Password length:', user.password ? user.password.length : 0);
-
-            // Check if user has a password set
-            if (!user.password || user.password.trim() === '') {
-                console.log('❌ User has no password set');
-                req.flash("message", "Account requires password setup. Please contact administrator.");
-                return res.redirect("/auth/login");
-            }
-
-            console.log('🔐 Verifying password with bcrypt...');
             const isPasswordValid = await bcrypt.compare(password, user.password);
-            console.log('   Password match:', isPasswordValid);
-
             if (!isPasswordValid) {
-                console.log('❌ Password does not match');
                 req.flash("message", "Invalid email or password");
                 return res.redirect("/auth/login");
             }
 
-            console.log('✅ Password verified successfully');
-
-            // Check JWT secrets
-            console.log('🔑 Checking JWT secrets...');
-            if (!process.env.ACCESS_SECRET_KEY) {
-                console.log('❌ ACCESS_SECRET_KEY not found');
-                req.flash("message", "Server configuration error");
-                return res.redirect("/auth/login");
-            }
+            const { accessToken, refreshToken } = this.generateTokens(user.id, user.email);
             
-            if (!process.env.REFRESH_SECRET_KEY) {
-                console.log('❌ REFRESH_SECRET_KEY not found');
-                req.flash("message", "Server configuration error");
-                return res.redirect("/auth/login");
-            }
-            
-            console.log('✅ JWT secrets found');
+            await this.User.updateRefreshToken(user.id, refreshToken);
 
-            console.log('🎫 Creating JWT tokens...');
-            const accessToken = jsonWebToken.sign(
-                { userId: user.id, email: user.email },
-                process.env.ACCESS_SECRET_KEY,
-                { expiresIn: "15m" }
-            );
-
-            const refreshToken = jsonWebToken.sign(
-                { userId: user.id, email: user.email },
-                process.env.REFRESH_SECRET_KEY,
-                { expiresIn: "7d" }
-            );
-
-            console.log('✅ JWT tokens created:');
-            console.log('   Access token length:', accessToken.length);
-            console.log('   Refresh token length:', refreshToken.length);
-
-            console.log('💾 Updating user with refresh token...');
-            // Use custom method with logging
-            await User.updateRefreshToken(user.id, refreshToken);
-            console.log('✅ User updated successfully');
-
-            console.log('🍪 Setting session and cookies...');
             req.session.token = accessToken;
             res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
-                maxAge: 3 * 24 * 60 * 60 * 1000,
+                maxAge: 7 * 24 * 60 * 60 * 1000,
             });
 
-            console.log('✅ Session and cookies set');
-            console.log('🎉 Login successful! Redirecting to /');
-
             res.redirect("/");
-
         } catch (error) {
-            console.error("❌ Login error occurred:");
-            console.error("   Error message:", error.message);
-            console.error("   Error stack:", error.stack);
-            console.error("   Error code:", error.code);
-            
-            // More specific error messages
-            if (error.code === 'ER_NO_SUCH_TABLE') {
-                console.error("   Issue: User table does not exist");
-                req.flash("message", "Database setup error - please contact administrator");
-            } else if (error.code === 'ECONNREFUSED') {
-                console.error("   Issue: Cannot connect to database");
-                req.flash("message", "Database connection error - please try again later");
-            } else if (error.message.includes('jwt')) {
-                console.error("   Issue: JWT signing error");
-                req.flash("message", "Authentication error - please contact administrator");
-            } else {
-                req.flash("message", "An error occurred during login");
-            }
-            
+            req.flash("message", this.getErrorMessage(error.message));
             res.redirect("/auth/login");
         }
-    },
+    }
 
-    register: (req, res) => {
-        res.status(200).render("register", {
+    register = (req, res) => {
+        res.render("register", {
             layout: "layouts/auth-layouts",
-            message: req.flash("message"),
             title: "Register",
         });
-    },
+    }
 
-    registerPost: async (req, res) => {
+    registerPost = async (req, res) => {
         try {
             const { email, password } = req.body;
 
-            const existingUser = await User.query().where('email', email).first();
-            
+            const existingUser = await this.User.query().where('email', email).first();
             if (existingUser) {
                 req.flash("message", "Email already in use");
-                return res.status(400).redirect("/auth/register");
+                return res.redirect("/auth/register");
             }
 
-            const saltRounds = 12;
-            const hashedPassword = await bcrypt.hash(password, saltRounds);
+            const hashedPassword = await bcrypt.hash(password, 12);
+            const newUser = await this.User.query().insert({ email, password: hashedPassword });
 
-            const newUser = await User.query().insert({
-                email,
-                password: hashedPassword,
-            });
-
-            const token = jsonWebToken.sign(
-                { userId: newUser.id, email: newUser.email },
-                process.env.ACCESS_SECRET_KEY,
-                { expiresIn: "12h" }
-            );
-
-            req.session.token = token;
-            req.flash("message", "Registration successful");
-            res.status(201).redirect("/");
-
-        } catch (error) {
-            console.error("Registration error:", error);
-            req.flash("message", "An error occurred during registration");
-            res.status(500).json({ message: "Error" });
-        }
-    },
-
-    logout: (req, res) => {
-        req.session.destroy((err) => {
-            if (err) {
-                console.error("Error destroying session:", err);
-                return res.status(500).json({ message: "Error logging out" });
-            }
+            const { accessToken } = this.generateTokens(newUser.id, newUser.email);
+            req.session.token = accessToken;
             
+            req.flash("message", "Registration successful");
+            res.redirect("/");
+        } catch (error) {
+            req.flash("message", "An error occurred during registration");
+            res.redirect("/auth/register");
+        }
+    }
+
+    logout = (req, res) => {
+        req.session.destroy((err) => {
+            if (err) return res.status(500).json({ message: "Error logging out" });
             res.clearCookie("refreshToken");
             res.redirect("/auth/login");
         });
-    },
+    }
 
-    refreshToken: async (req, res) => {
+    refreshToken = async (req, res) => {
         const { refreshToken } = req.cookies;
-        if (!refreshToken) return res.redirect("/auth/login");
+        
+        // If no refresh token, clear session and redirect to login
+        if (!refreshToken) {
+            req.session.destroy(() => {
+                return res.redirect("/auth/login");
+            });
+            return;
+        }
 
         try {
-            const user = await User.query().where('refreshToken', refreshToken).first();
-            if (!user) return res.redirect("/auth/login");
+            const user = await this.User.query().where('refreshToken', refreshToken).first();
+            if (!user) {
+                // Clear session and cookies, then redirect
+                req.session.destroy(() => {
+                    res.clearCookie("refreshToken");
+                    return res.redirect("/auth/login");
+                });
+                return;
+            }
 
-            jsonWebToken.verify(refreshToken, process.env.REFRESH_SECRET_KEY, (err, decoded) => {
-                if (err) return res.redirect("/auth/login");
+            jwt.verify(refreshToken, process.env.REFRESH_SECRET_KEY, (err) => {
+                if (err) {
+                    // Refresh token expired, clear everything
+                    req.session.destroy(() => {
+                        res.clearCookie("refreshToken");
+                        return res.redirect("/auth/login");
+                    });
+                    return;
+                }
 
-                const accessToken = jsonWebToken.sign(
-                    { userId: user.id, email: user.email },
-                    process.env.ACCESS_SECRET_KEY,
-                    { expiresIn: '15m' }
-                );
-
-                // Set session/cookie baru
+                const { accessToken } = this.generateTokens(user.id, user.email);
                 req.session.token = accessToken;
 
-                // Jika request dari browser, redirect ke dashboard
-                if (req.headers.accept && req.headers.accept.includes('text/html')) {
+                // Redirect to dashboard for browser requests
+                if (req.headers.accept?.includes('text/html')) {
                     return res.redirect("/");
                 }
 
-                // Jika request dari API, return JSON
                 res.json({ accessToken });
             });
         } catch (error) {
-            console.error(error);
-            res.redirect("/auth/login");
-        }
-    },
-
-
-    handleLogin: async (req, res) => {
-        const { email, password } = req.body;
-        if (!email || !password) return res.status(400).json({ 'message': 'Email and password are required.' });
-
-        const foundUser = await User.query().where({ email: email }).first();
-        if (!foundUser) return res.sendStatus(401); 
-
-        const match = (crypto.createHash("sha256").update(password).digest("hex") === foundUser.password);
-        if (match) {
-            const accessToken = jsonWebToken.sign(
-                { "userId": foundUser.id },
-                process.env.ACCESS_SECRET_KEY,
-                { expiresIn: '30s' }
-            );
-            const newRefreshToken = jsonWebToken.sign(
-                { "userId": foundUser.id },
-                process.env.REFRESH_SECRET_KEY,
-                { expiresIn: '1d' }
-            );
-
-            await User.query().findById(foundUser.id).patch({ refreshToken: newRefreshToken });
-
-            res.cookie('jwt', newRefreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
-            res.json({ accessToken });
-        } else {
-            res.sendStatus(401);
+            req.session.destroy(() => {
+                res.clearCookie("refreshToken");
+                return res.redirect("/auth/login");
+            });
         }
     }
-};
+}
+
+module.exports = new AuthController();

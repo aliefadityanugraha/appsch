@@ -1,14 +1,65 @@
-"use strict";
-
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const jsonWebToken = require('jsonwebtoken');
 const EmailService = require('../services/EmailService');
 
-module.exports = {
-    // Tampilkan halaman reset password
-    showResetForm: (req, res) => {
+class PasswordResetController {
+    constructor() {
+        // Inject dependencies for better testability
+        this.User = User;
+        this.EmailService = EmailService;
+        
+        // Configuration
+        this.bcryptRounds = 12;
+        this.minPasswordLength = 6;
+        this.tokenExpiryHours = 1;
+    }
+
+    // Helper: Generate reset token
+    generateToken() {
+        return crypto.randomBytes(32).toString('hex');
+    }
+
+    // Helper: Calculate token expiry time
+    getTokenExpiry() {
+        const expiry = new Date(Date.now() + this.tokenExpiryHours * 3600000);
+        return expiry.toISOString().slice(0, 19).replace('T', ' ');
+    }
+
+    // Helper: Format current datetime for MySQL
+    getCurrentDateTime() {
+        return new Date().toISOString().slice(0, 19).replace('T', ' ');
+    }
+
+    // Helper: Validate password
+    validatePassword(password, confirmPassword) {
+        if (!password || !confirmPassword) {
+            throw new Error('Password dan konfirmasi harus diisi');
+        }
+
+        if (password !== confirmPassword) {
+            throw new Error('Password dan konfirmasi password tidak sama');
+        }
+
+        if (password.length < this.minPasswordLength) {
+            throw new Error(`Password minimal ${this.minPasswordLength} karakter`);
+        }
+
+        return true;
+    }
+
+    // Helper: Hash password
+    async hashPassword(password) {
+        return await bcrypt.hash(password, this.bcryptRounds);
+    }
+
+    // Helper: Verify password
+    async verifyPassword(password, hashedPassword) {
+        return await bcrypt.compare(password, hashedPassword);
+    }
+
+    // Route handler: Show reset password form
+    showResetForm = (req, res) => {
         const { token } = req.query;
         res.render('auth/reset-password', { 
             layout: 'layouts/auth-layouts',
@@ -16,19 +67,19 @@ module.exports = {
             token: token || null,
             message: req.flash('message')
         });
-    },
+    }
 
-    // Tampilkan halaman force reset password untuk user yang harus reset
-    showForceResetForm: (req, res) => {
+    // Route handler: Show force reset password form
+    showForceResetForm = (req, res) => {
         res.render('auth/force-reset-password', { 
             layout: 'layouts/auth-layouts',
             title: 'Ubah Password Anda',
             message: req.flash('message')
         });
-    },
+    }
 
-    // Generate reset token dan kirim ke user (untuk implementasi email nanti)
-    generateResetToken: async (req, res) => {
+    // Route handler: Generate reset token and send email
+    generateResetToken = async (req, res) => {
         try {
             const { email } = req.body;
             
@@ -37,35 +88,34 @@ module.exports = {
                 return res.redirect('/auth/reset-password');
             }
 
-            const user = await User.findByEmail(email);
+            const user = await this.User.findByEmail(email);
             if (!user) {
-                // Jangan beri tahu bahwa email tidak ditemukan untuk keamanan
+                // Don't reveal if email exists for security
                 req.flash('message', 'Jika email terdaftar, link reset password akan dikirim');
                 return res.redirect('/auth/reset-password');
             }
 
-            // Generate reset token
-            const resetToken = crypto.randomBytes(32).toString('hex');
-            const tokenExpiry = new Date(Date.now() + 3600000); // 1 jam
+            // Generate and save reset token
+            const resetToken = this.generateToken();
+            const tokenExpiry = this.getTokenExpiry();
 
-            await User.query()
+            await this.User.query()
                 .findById(user.id)
                 .patch({
-                    resetToken: resetToken,
-                    resetTokenExpiry: tokenExpiry.toISOString().slice(0, 19).replace('T', ' '),
-                    updatedAt: new Date().toISOString().slice(0, 19).replace('T', ' ')
+                    resetToken,
+                    resetTokenExpiry: tokenExpiry,
+                    updatedAt: this.getCurrentDateTime()
                 });
 
-            // Kirim email reset password
+            // Send reset email
             const baseUrl = `${req.protocol}://${req.get('host')}`;
-            const emailResult = await EmailService.sendPasswordResetEmail(email, resetToken, baseUrl);
+            const emailResult = await this.EmailService.sendPasswordResetEmail(email, resetToken, baseUrl);
             
             if (emailResult.success) {
                 console.log(`✅ Email reset password berhasil dikirim ke ${email}`);
                 req.flash('message', 'Link reset password telah dikirim ke email Anda. Silakan cek inbox atau folder spam.');
             } else {
                 console.error(`❌ Gagal mengirim email ke ${email}:`, emailResult.error);
-                // Tetap beri pesan sukses untuk keamanan, tapi log error
                 req.flash('message', 'Jika email terdaftar, link reset password akan dikirim');
             }
             
@@ -76,32 +126,25 @@ module.exports = {
             req.flash('message', 'Terjadi kesalahan, silakan coba lagi');
             res.redirect('/auth/reset-password');
         }
-    },
+    }
 
-    // Reset password dengan token
-    resetPasswordWithToken: async (req, res) => {
+    // Route handler: Reset password with token
+    resetPasswordWithToken = async (req, res) => {
         try {
             const { token, newPassword, confirmPassword } = req.body;
             
-            if (!token || !newPassword || !confirmPassword) {
-                req.flash('message', 'Semua field harus diisi');
-                return res.redirect(`/auth/reset-password?token=${token}`);
+            if (!token) {
+                req.flash('message', 'Token tidak valid');
+                return res.redirect('/auth/reset-password');
             }
 
-            if (newPassword !== confirmPassword) {
-                req.flash('message', 'Password dan konfirmasi password tidak sama');
-                return res.redirect(`/auth/reset-password?token=${token}`);
-            }
+            // Validate password
+            this.validatePassword(newPassword, confirmPassword);
 
-            if (newPassword.length < 6) {
-                req.flash('message', 'Password minimal 6 karakter');
-                return res.redirect(`/auth/reset-password?token=${token}`);
-            }
-
-            // Cari user dengan reset token
-            const user = await User.query()
+            // Find user with valid token
+            const user = await this.User.query()
                 .where('resetToken', token)
-                .where('resetTokenExpiry', '>', new Date().toISOString().slice(0, 19).replace('T', ' '))
+                .where('resetTokenExpiry', '>', this.getCurrentDateTime())
                 .first();
 
             if (!user) {
@@ -109,19 +152,17 @@ module.exports = {
                 return res.redirect('/auth/reset-password');
             }
 
-            // Hash password baru dengan bcrypt
-            const saltRounds = 12;
-            const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+            // Hash and update password
+            const hashedPassword = await this.hashPassword(newPassword);
 
-            // Update password dan hapus reset token
-            await User.query()
+            await this.User.query()
                 .findById(user.id)
                 .patch({
                     password: hashedPassword,
                     resetToken: null,
                     resetTokenExpiry: null,
                     mustResetPassword: false,
-                    updatedAt: new Date().toISOString().slice(0, 19).replace('T', ' ')
+                    updatedAt: this.getCurrentDateTime()
                 });
 
             req.flash('message', 'Password berhasil diubah, silakan login');
@@ -129,59 +170,46 @@ module.exports = {
 
         } catch (error) {
             console.error('Error resetting password:', error);
-            req.flash('message', 'Terjadi kesalahan, silakan coba lagi');
-            res.redirect('/auth/reset-password');
+            const message = error.message || 'Terjadi kesalahan, silakan coba lagi';
+            req.flash('message', message);
+            res.redirect(`/auth/reset-password${req.body.token ? `?token=${req.body.token}` : ''}`);
         }
-    },
+    }
 
-    // Force reset password untuk user yang harus reset
-    forceResetPassword: async (req, res) => {
+    // Route handler: Force reset password for users who must reset
+    forceResetPassword = async (req, res) => {
         try {
             const { currentPassword, newPassword, confirmPassword } = req.body;
-            const userId = req.user.userId; // Dari token JWT
-            
-            if (!newPassword || !confirmPassword) {
-                req.flash('message', 'Password baru dan konfirmasi harus diisi');
-                return res.redirect('/auth/force-reset');
-            }
+            const userId = req.user.userId;
 
-            if (newPassword !== confirmPassword) {
-                req.flash('message', 'Password baru dan konfirmasi tidak sama');
-                return res.redirect('/auth/force-reset');
-            }
+            // Validate password
+            this.validatePassword(newPassword, confirmPassword);
 
-            if (newPassword.length < 6) {
-                req.flash('message', 'Password minimal 6 karakter');
-                return res.redirect('/auth/force-reset');
-            }
-
-            const user = await User.query().findById(userId);
+            const user = await this.User.query().findById(userId);
             if (!user) {
                 req.flash('message', 'User tidak ditemukan');
                 return res.redirect('/auth/login');
             }
 
-            // Jika user memiliki password lama, verifikasi
+            // Verify current password if user has one
             if (user.password && currentPassword) {
-                const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
-                if (!isCurrentPasswordValid) {
+                const isValid = await this.verifyPassword(currentPassword, user.password);
+                if (!isValid) {
                     req.flash('message', 'Password lama tidak benar');
                     return res.redirect('/auth/force-reset');
                 }
             }
 
-            // Hash password baru
-            const saltRounds = 12;
-            const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+            // Hash and update password
+            const hashedPassword = await this.hashPassword(newPassword);
 
-            // Update password
-            await User.query()
+            await this.User.query()
                 .findById(userId)
                 .patch({
                     password: hashedPassword,
                     mustResetPassword: false,
                     resetToken: null,
-                    updatedAt: new Date().toISOString().slice(0, 19).replace('T', ' ')
+                    updatedAt: this.getCurrentDateTime()
                 });
 
             req.flash('message', 'Password berhasil diubah');
@@ -189,8 +217,32 @@ module.exports = {
 
         } catch (error) {
             console.error('Error in force reset password:', error);
-            req.flash('message', 'Terjadi kesalahan, silakan coba lagi');
+            const message = error.message || 'Terjadi kesalahan, silakan coba lagi';
+            req.flash('message', message);
             res.redirect('/auth/force-reset');
         }
     }
-};
+
+    // Helper: Check if token is valid (for future use)
+    async isTokenValid(token) {
+        const user = await this.User.query()
+            .where('resetToken', token)
+            .where('resetTokenExpiry', '>', this.getCurrentDateTime())
+            .first();
+        
+        return !!user;
+    }
+
+    // Helper: Invalidate all tokens for user (for future use)
+    async invalidateUserTokens(userId) {
+        await this.User.query()
+            .findById(userId)
+            .patch({
+                resetToken: null,
+                resetTokenExpiry: null,
+                updatedAt: this.getCurrentDateTime()
+            });
+    }
+}
+
+module.exports = new PasswordResetController();
