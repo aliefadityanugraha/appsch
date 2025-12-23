@@ -20,7 +20,7 @@ class User extends BaseModel {
         email: { type: 'string', format: 'email' },
         password: { type: ['string', 'null'], minLength: 1 },
         status: { type: 'boolean', default: true },
-        role: { type: 'integer', default: 1 },
+        role: { type: 'integer', default: 3 },
         refreshToken: { type: ['string', 'null'] },
         resetToken: { type: ['string', 'null'] },
         resetTokenExpiry: { type: ['string', 'null'], format: 'date-time' },

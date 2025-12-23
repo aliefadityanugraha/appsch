@@ -3869,3 +3869,33 @@ r.permission.includes is not a function | {"url":"/rbac-test","method":"GET","ip
 [2025-12-23T15:02:47.928Z] [INFO] Response 200 (97ms) | {"requestId":"c5528052-6f54-4a29-ac13-e6b6ca1a5100","responseTime":"97ms","statusCode":200}
 [2025-12-23T15:05:00.251Z] [INFO] Application initialized | {"nodeEnv":"development","port":"3333","timestamp":"2025-12-23T15:05:00.250Z"}
 [2025-12-23T15:05:29.136Z] [INFO] Application initialized | {"nodeEnv":"development","port":"3333","timestamp":"2025-12-23T15:05:29.135Z"}
+[2025-12-23T15:10:29.196Z] [INFO] Performance metrics | {"requests":{"total":0,"success":0,"errors":0,"averageResponseTime":0},"database":{"queries":0,"averageQueryTime":0,"errors":0},"memory":{"peak":"21MB","current":"21MB"},"timestamp":"2025-12-23T15:10:29.196Z"}
+[2025-12-23T15:14:38.380Z] [INFO] HTTP GET /staff | {"requestId":"a1834fc3-4843-46d4-982b-f8c64486e689","ip":"::1","userId":"anonymous"}
+[2025-12-23T15:14:38.442Z] [INFO] HTTP GET /auth/refresh-token | {"requestId":"7ea9b113-1f9f-4053-a60e-b565e252cb14","ip":"::1","userId":"anonymous"}
+[2025-12-23T15:14:38.601Z] [INFO] HTTP GET / | {"requestId":"2c09db25-05a9-4293-bd76-cc0058c3cb6d","ip":"::1","userId":"anonymous"}
+[2025-12-23T15:14:38.966Z] [INFO] Response 200 (365ms) | {"requestId":"2c09db25-05a9-4293-bd76-cc0058c3cb6d","responseTime":"365ms","statusCode":200}
+[2025-12-23T15:14:38.976Z] [INFO] Response 200 (375ms) | {"requestId":"2c09db25-05a9-4293-bd76-cc0058c3cb6d","responseTime":"375ms","statusCode":200}
+[2025-12-23T15:14:38.979Z] [INFO] Response 200 (378ms) | {"requestId":"2c09db25-05a9-4293-bd76-cc0058c3cb6d","responseTime":"378ms","statusCode":200}
+[2025-12-23T15:14:39.171Z] [INFO] HTTP GET /users/current-user | {"requestId":"feb19aad-91d5-4f60-b431-3bec2e7c1d62","ip":"::1","userId":"anonymous"}
+[2025-12-23T15:14:39.263Z] [INFO] Response 200 (92ms) | {"requestId":"feb19aad-91d5-4f60-b431-3bec2e7c1d62","responseTime":"92ms","statusCode":200}
+[2025-12-23T15:14:39.263Z] [INFO] Response 200 (92ms) | {"requestId":"feb19aad-91d5-4f60-b431-3bec2e7c1d62","responseTime":"92ms","statusCode":200}
+[2025-12-23T15:14:39.311Z] [INFO] HTTP GET /users/current-user | {"requestId":"c35c26f9-dfd3-4f6b-b79e-12c8325e6b85","ip":"::1","userId":"anonymous"}
+[2025-12-23T15:14:39.408Z] [INFO] Response 200 (97ms) | {"requestId":"c35c26f9-dfd3-4f6b-b79e-12c8325e6b85","responseTime":"97ms","statusCode":200}
+[2025-12-23T15:14:39.409Z] [INFO] Response 200 (98ms) | {"requestId":"c35c26f9-dfd3-4f6b-b79e-12c8325e6b85","responseTime":"98ms","statusCode":200}
+[2025-12-23T15:14:39.721Z] [INFO] HTTP GET / | {"requestId":"0c04fa36-b11b-4b9e-a82a-e0bd596c9e90","ip":"::1","userId":"anonymous"}
+[2025-12-23T15:14:39.813Z] [INFO] Response 200 (92ms) | {"requestId":"0c04fa36-b11b-4b9e-a82a-e0bd596c9e90","responseTime":"92ms","statusCode":200}
+[2025-12-23T15:14:39.828Z] [INFO] Response 200 (107ms) | {"requestId":"0c04fa36-b11b-4b9e-a82a-e0bd596c9e90","responseTime":"107ms","statusCode":200}
+[2025-12-23T15:14:39.818Z] [INFO] Response 200 (97ms) | {"requestId":"0c04fa36-b11b-4b9e-a82a-e0bd596c9e90","responseTime":"97ms","statusCode":200}
+[2025-12-23T15:14:39.929Z] [INFO] HTTP GET /users/current-user | {"requestId":"e176d589-59e9-4e78-86a9-529fe1f98e41","ip":"::1","userId":"anonymous"}
+[2025-12-23T15:14:40.048Z] [INFO] Response 200 (119ms) | {"requestId":"e176d589-59e9-4e78-86a9-529fe1f98e41","responseTime":"119ms","statusCode":200}
+[2025-12-23T15:14:40.048Z] [INFO] Response 200 (119ms) | {"requestId":"e176d589-59e9-4e78-86a9-529fe1f98e41","responseTime":"119ms","statusCode":200}
+[2025-12-23T15:14:40.098Z] [INFO] HTTP GET /users/current-user | {"requestId":"79615dde-41b9-4fed-b1d6-c2e216767061","ip":"::1","userId":"anonymous"}
+[2025-12-23T15:14:40.199Z] [INFO] Response 200 (101ms) | {"requestId":"79615dde-41b9-4fed-b1d6-c2e216767061","responseTime":"101ms","statusCode":200}
+[2025-12-23T15:14:40.200Z] [INFO] Response 200 (102ms) | {"requestId":"79615dde-41b9-4fed-b1d6-c2e216767061","responseTime":"102ms","statusCode":200}
+[2025-12-23T15:15:29.275Z] [INFO] Performance metrics | {"requests":{"total":0,"success":0,"errors":0,"averageResponseTime":0},"database":{"queries":0,"averageQueryTime":0,"errors":0},"memory":{"peak":"28MB","current":"28MB"},"timestamp":"2025-12-23T15:15:29.275Z"}
+[2025-12-23T15:20:29.371Z] [INFO] Performance metrics | {"requests":{"total":0,"success":0,"errors":0,"averageResponseTime":0},"database":{"queries":0,"averageQueryTime":0,"errors":0},"memory":{"peak":"28MB","current":"27MB"},"timestamp":"2025-12-23T15:20:29.371Z"}
+[2025-12-23T15:25:29.560Z] [INFO] Performance metrics | {"requests":{"total":0,"success":0,"errors":0,"averageResponseTime":0},"database":{"queries":0,"averageQueryTime":0,"errors":0},"memory":{"peak":"28MB","current":"27MB"},"timestamp":"2025-12-23T15:25:29.560Z"}
+[2025-12-23T15:30:29.619Z] [INFO] Performance metrics | {"requests":{"total":0,"success":0,"errors":0,"averageResponseTime":0},"database":{"queries":0,"averageQueryTime":0,"errors":0},"memory":{"peak":"28MB","current":"27MB"},"timestamp":"2025-12-23T15:30:29.619Z"}
+[2025-12-23T15:35:29.709Z] [INFO] Performance metrics | {"requests":{"total":0,"success":0,"errors":0,"averageResponseTime":0},"database":{"queries":0,"averageQueryTime":0,"errors":0},"memory":{"peak":"28MB","current":"27MB"},"timestamp":"2025-12-23T15:35:29.709Z"}
+[2025-12-23T15:40:29.776Z] [INFO] Performance metrics | {"requests":{"total":0,"success":0,"errors":0,"averageResponseTime":0},"database":{"queries":0,"averageQueryTime":0,"errors":0},"memory":{"peak":"28MB","current":"28MB"},"timestamp":"2025-12-23T15:40:29.776Z"}
+[2025-12-23T15:43:28.042Z] [INFO] Application initialized | {"nodeEnv":"development","port":"3333","timestamp":"2025-12-23T15:43:28.041Z"}
